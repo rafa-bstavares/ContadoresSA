@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RegimeTributario {
+  SIMPLES_NACIONAL @map("Simples Nacional")
+  LUCRO_REAL       @map("Lucro Real")
+  LUCRO_PRESUMIDO  @map("Lucro Presumido")
+}
+
+// user ta faltando google_auth_id e status_ativo
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  hash          String
+  email         String    @unique
+  tipo_usuario  String
+  data_cadastro DateTime  @default(now())
+  Company       Empresa[]
+  cpf           String?   @unique
+
+  @@map("users")
+}
+
+model Empresa {
+  id                            String           @id @default(uuid())
+  usuario                       User             @relation(fields: [usuario_id], references: [id])
+  usuario_id                    String
+  cnpj                          String
+  folha                         String
+  faturamento_mensal_medio      String
+  nome_fantasia                 String?
+  razao_social                  String?
+  uf                            String?
+  cnae_principal                String?
+  cnae_secundario               String?
+  descricao_atividade_principal String?
+  regularidade                  Boolean?
+  regime_tributario             RegimeTributario
+  Cnae                          Cnae[]
+
+  @@map("empresas")
+}
+
+model Cnae {
+  id   String @id @default(uuid())
+  cnae String
+
+  empresa    Empresa @relation(fields: [empresa_id], references: [id])
+  empresa_id String
+
+  @@map("cnaes")
+}

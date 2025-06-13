@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+
+
+@layer base {
+  /* Remover as setas do input type number nos navegadores baseados em WebKit */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Para Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+.DayPicker select,
+.DayPicker select option {
+  background-color: #2E2E2E !important;  /* seu fundo escuro */
+  color:            #fff     !important;  /* texto branco */
+}
+
+@theme {
+  --font-display: "Satoshi", "sans-serif";
+  --breakpoint-3xl: 120rem;
+  --color-avocado-100: oklch(0.99 0 0);
+  --color-avocado-200: oklch(0.98 0.04 113.22);
+  --color-avocado-300: oklch(0.94 0.11 115.03);
+  --color-avocado-400: oklch(0.92 0.19 114.08);
+  --color-avocado-500: oklch(0.84 0.18 117.33);
+  --color-avocado-600: oklch(0.53 0.12 118.34);
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  --color-premiumBg: rgb(18, 18, 18);
+  --color-fundoPreto: #242424;
+  --color-fundoCinzaEscuro: #2E2E2E;
+  --font-fontePrincipal: "Manrope";
+  --color-champanhe: "#F7E7CE";
+  --color-rose: "#C29468";
+  --color-ouroClassico: "#D4AF37";
+
+  --spacing-paddingYSecoesPagPrincipal: 10rem; 
+  --spacing-paddingXSecoesPagPrincipal: 3rem; 
+
+  --animate-aurora: aurora 60s linear infinite;
+  --animate-slideInfinito: slideInfinito 30s linear infinite;
+  --animate-slideInfinitoVertical: slideInfinitoVertical 30s linear infinite;
+  --animate-slideInfinitoVerticalContrario: slideInfinitoVerticalContrario 30s linear infinite;
+  --animate-animCelular1: animCelular1 10s linear infinite;
+  --animate-pulsar: pulsar 0.3s linear;
+  --animate-quicar: quicar 0.3s linear;
+  --animate-quicar2: quicar2 0.3s linear;
+  @keyframes aurora {
+    from {
+      background-position:
+        50% 50%,
+        50% 50%;
+    }
+    to {
+      background-position:
+        350% 50%,
+        350% 50%;
+    }
+  }
+
+  @keyframes pulsar {
+    0%{
+      transform: scale(1)
+    }
+    50% {
+      transform: scale(1.1)
+    }
+    100% {
+      transform: scale(1)
+    }
+  }
+
+  @keyframes quicar {
+    0% {
+      transform: translateY(0%)
+    }
+    50% {
+      transform: translateY(-20%)
+    }
+    100% {
+      transform: translateY(0%)
+    }
+  }
+
+   @keyframes quicar2 {
+    0% {
+      transform: translateY(0%)
+    }
+    50% {
+      transform: translateY(20%)
+    }
+    100% {
+      transform: translateY(0%)
+    }
+  }
+
+  @keyframes slideInfinito {
+    0%{
+      transform: 
+      translateX(0%);
+    }
+    100%{
+      transform: 
+      translateX(-50%);
+    }
+  }
+
+  @keyframes slideInfinitoVertical {
+    0%{
+      transform: 
+      translateY(0%);
+    }
+    100%{
+      transform: 
+      translateY(-50%);
+    }
+  }
+
+  @keyframes slideInfinitoVerticalContrario {
+    0%{
+      transform: 
+      translateY(-50%);
+    }
+    100%{
+      transform: 
+      translateY(0%);
+    }
+  }
+
+  @keyframes animCelular1 {
+      0% {
+        transform: translateY(0%);
+      }
+      25% {
+        transform: translateY(-3%);
+      }
+      50%{
+        transform: translateY(0%);
+      }
+      75% {
+        transform: translateY(3%);
+      }
+      100% {
+        transform: translateY(0%);
+      }
+  }
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes slide {
+  0%{ 
+    left: 125vw 
+  }
+  100%{ 
+    left: -25vw 
+  }
+}
+
+.textoGradiente{
+  background:linear-gradient(120deg,#F7E7CE,#D4AF37);
+  background-clip: text;
+  color: transparent
+}
+
+
+

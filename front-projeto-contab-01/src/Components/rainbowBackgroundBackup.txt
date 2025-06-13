@@ -1,0 +1,74 @@
+import { useMemo, CSSProperties } from "react"
+
+interface Stripe {
+    key: number
+    style: CSSProperties
+    className: string
+  }
+  
+  const COLORS: [string, string, string][] = [
+    ['#E879F9', '#60A5FA', '#5EEAD4'],
+    ['#E879F9', '#5EEAD4', '#60A5FA'],
+    ['#60A5FA', '#E879F9', '#5EEAD4'],
+    ['#60A5FA', '#5EEAD4', '#E879F9'],
+    ['#5EEAD4', '#E879F9', '#60A5FA'],
+    ['#5EEAD4', '#60A5FA', '#E879F9'],
+  ]
+  
+  const LENGTH = 25       // número de faixas
+  const DURATION = 45     // duração total em segundos
+
+
+export default function RainbowBackground(){
+    const stripes: Stripe[] = useMemo(() => {
+        return Array.from({ length: LENGTH }, (_, i) => {
+          // 1) escolhe aleatoriamente um trio de cores
+          const colors = COLORS[Math.floor(Math.random() * COLORS.length)]
+    
+          // 2) calcula duração e delay específicos
+          const dur = DURATION - (DURATION / LENGTH / 2) * (i + 1)  // como no SCSS
+          const del = -(i / LENGTH) * DURATION                      // delay negativo
+    
+          // 3) monta o box-shadow igualzinho ao SCSS original
+          const boxShadow = [
+            '-130px 0 80px 40px white',
+            `-50px 0 50px 25px ${colors[0]}`,
+            `0 0 50px 25px ${colors[1]}`,
+            `50px 0 50px 25px ${colors[2]}`,
+            '130px 0 80px 40px white',
+          ].join(', ')
+    
+          // 4) define as classes Tailwind arbitrárias pra animação
+          //   - animate-[slide_${dur}s_linear_infinite] → duração dinâmica
+          //   - -delay-[${del}s]                     → delay negativo
+          const cls = [
+            'absolute top-0 left-0 h-screen w-0 origin-top-right rotate-10',
+            `animate-[slide_${dur}s_linear_infinite]`,
+            `-delay-[${del}s]`,
+          ].join(' ')
+    
+          return { key: i, style: { boxShadow }, className: cls }
+        })
+      }, [])
+    
+      return (
+        <div className="relative overflow-hidden w-screen h-screen">
+          {/* 25 faixas “rainbow” */}
+          {stripes.map(({ key, className, style }) => (
+            <div key={key} className={className} style={style} />
+          ))}
+    
+          {/* Máscara em “H” branca */}
+          <div
+            className="absolute bottom-0 left-0 w-screen h-0"
+            style={{ boxShadow: '0 0 50vh 40vh white' }}
+          />
+    
+          {/* Máscara em “V” branca */}
+          <div
+            className="absolute bottom-0 left-0 w-0 h-screen"
+            style={{ boxShadow: '0 0 35vw 25vw white' }}
+          />
+        </div>
+      )
+}

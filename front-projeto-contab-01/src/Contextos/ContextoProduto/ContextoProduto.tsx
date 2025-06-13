@@ -1,0 +1,83 @@
+import { createContext, useState, Dispatch, SetStateAction, useContext } from "react";
+
+
+export type TipoOperacaoVendidoType = "Revenda" | "Indústria" | "Exportação" | "Revenda - Consumidor final fora do Estado" | "Indústria - Consumidor final fora do Estado"
+export const tipoOperacaoVendidoArr: TipoOperacaoVendidoType[] = ["Revenda", "Indústria", "Exportação", "Revenda - Consumidor final fora do Estado", "Indústria - Consumidor final fora do Estado"]
+
+export type ProdutoVendidoObj = {
+    tipoOperacao: TipoOperacaoVendidoType,
+    valorOperacao: number,
+    ncm: string,
+    icms: number,
+    icmsSt: number,
+    icmsDifal: number,
+    pisCofins: number,
+    ipi: number,
+    beneficio: number,
+    id: number
+}
+
+
+export type TipoOperacaoAdquiridoType ="Consumo"| "Insumo" | "Alimentação" | "Imobilizado" | "Revenda"
+export const tipoOperacaoAdquiridoArr: TipoOperacaoAdquiridoType[] = ["Consumo", "Insumo", "Alimentação", "Imobilizado", "Revenda"]
+
+export type MetodoAdquiridoType = "Por Operação"| "Por CNPJ" 
+export const metodoAdquiridoArr: MetodoAdquiridoType[] = ["Por CNPJ", "Por Operação"]
+
+export type RegimesAdquiridoType = "Simples Nacional" | "Lucro Real" | "Lucro Presumido"
+export const regimesAdquiridoArr: RegimesAdquiridoType[] = ["Simples Nacional", "Lucro Real", "Lucro Presumido"]
+
+export type SimNaoType = "Sim" | "Não"
+export const simNaoArr: SimNaoType[] = ["Sim", "Não"]
+
+export type ProdutoAdquiridoObj = {
+    metodo: MetodoAdquiridoType,
+    tipoOperacao: TipoOperacaoAdquiridoType | "",
+    valorOperacao: number,
+    ncm: string,
+    icms: number,
+    creditoIcms: boolean,
+    pis: number,
+    cofins: number,
+    creditoPisCofins: boolean,
+    ipi: number,
+    creditoIpi: boolean,
+    cnpjFornecedor: string,
+    regimeTributarioOutro: string,
+    fornecedorIndustrial: boolean,
+    beneficio: number,
+    id: number,
+}
+
+
+type TiposContextoProduto = {       
+    totalProdutosVendidos: ProdutoVendidoObj[],
+    setTotalProdutosVendidos: Dispatch<SetStateAction<ProdutoVendidoObj[]>>,
+    totalProdutosAdquiridos: ProdutoAdquiridoObj[],
+    setTotalProdutosAdquiridos: Dispatch<SetStateAction<ProdutoAdquiridoObj[]>>,
+}
+
+export const ContextoProduto = createContext<TiposContextoProduto>({
+    totalProdutosVendidos: [],
+    setTotalProdutosVendidos: () => {},
+    totalProdutosAdquiridos: [],
+    setTotalProdutosAdquiridos: () => {},
+} as TiposContextoProduto)
+
+
+export const ProdutoProvider = ({children}: {children: React.ReactNode}) => {
+
+    const [totalProdutosVendidos, setTotalProdutosVendidos] = useState<ProdutoVendidoObj[]>([])
+    const [totalProdutosAdquiridos, setTotalProdutosAdquiridos] = useState<ProdutoAdquiridoObj[]>([])
+
+    return (
+        <ContextoProduto.Provider value={{
+            totalProdutosVendidos,
+            setTotalProdutosVendidos,
+            totalProdutosAdquiridos,
+            setTotalProdutosAdquiridos
+        }}>
+            {children}
+        </ContextoProduto.Provider>
+    )
+}

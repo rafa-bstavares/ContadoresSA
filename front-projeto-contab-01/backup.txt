@@ -1,0 +1,455 @@
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { BotaoGeral } from "../BotaoGeral/BotaoGeral";
+import { baseUrl } from "../../App";
+import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral";
+import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro";
+
+type Props = {
+    cnaes: string[],
+    setCnaes: Dispatch<SetStateAction<string[]>>,
+    folha: number,
+    setFolha: Dispatch<SetStateAction<number>>,
+}
+
+export function PrimeiroPasso({setCnaes, folha, setFolha, cnaes}: Props){
+
+    const { objMinhaEmpresaOuPessoaAtual, setObjMinhaEmpresaOuPessoaAtual, setSoImoveis, passo1, passo2, setPasso1, setPasso2} = useContext(ContextoGeral)
+    const {setTextoErro, setTemErro} = useContext(ContextoErro)
+
+    type CriarEmpresaBodyType = {
+        cnpj: string
+        nome_fantasia?: string
+        razao_social?: string
+        uf?: string             
+        cnae_principal?: string 
+        cnae_secundario?: string 
+        descricao_atividade_principal?: string 
+        regularidade?: boolean, 
+        regime_tributario: "SIMPLES_NACIONAL" | "LUCRO_REAL" | "LUCRO_PRESUMIDO"
+    }
+
+    const [regimeTributario, setRegimeTributario] = useState<"SIMPLES_NACIONAL" | "LUCRO_REAL" | "LUCRO_PRESUMIDO">()
+    const [precisaRegime, setPrecisaRegime] = useState<boolean>(false)
+    const [precisaFolha, setPrecisaFolha] = useState<boolean>(false)
+    const [inputCpfOuCnpj, setInputCpfOuCnpj] = useState<string>("")
+    let cnaePrincipalMinhaEmpresa = ""
+    let meuCnpjOuCpfVerificado = ""
+
+    
+    function verificarDigVerif(baseCnpj: string, cnpj: string, numSlice: number){
+        
+        console.log("BASE")
+        console.log(baseCnpj)
+        let tamanhoBase = baseCnpj.length
+        let multiplicador = 9
+        let somaMult = 0
+
+        for(let i = (tamanhoBase - 1); i >= 0; i--){
+            somaMult += Number(baseCnpj[i]) * multiplicador
+
+            multiplicador--
+            multiplicador = multiplicador < 2 ? 9 : multiplicador
+        }
+
+        const digVerif = somaMult % 11
+        console.log("Dig verif: " + digVerif)
+        baseCnpj += digVerif
+        return baseCnpj
+    }
+
+
+    function validarCnpj(cnpj: string){
+        if(cnpj){
+            if(cnpj.length !== 14 || cnpj.split("").every(item => item == cnpj[0])){
+                // Validando tamanho e todos os valores iguais
+                return {valido: false, cnpj: null}
+            }else{
+                // Validando dígitos verificadores
+                let baseCnpj = cnpj.slice(0, 12)
+                baseCnpj = verificarDigVerif(baseCnpj, cnpj, 12)
+                baseCnpj = verificarDigVerif(baseCnpj, cnpj, 13)
+
+                if(baseCnpj == cnpj){
+                    //CNPJ VÁLIDO
+                    return {valido: true, cnpj: cnpj}
+                }else{
+                    return {valido: false, cnpj: null}
+                }
+
+            }   
+        }else{
+            return {valido: false, cnpj: null}
+        }
+    }
+
+
+    function checkCnpj(cnpj: string){
+        const objCnpj = validarCnpj(cnpj)
+        if(objCnpj.valido){
+            //CNPJ VÁLIDO, podemos chamar API
+            console.log("cnpj válido")
+            //varificar se tem na nossa base de dados
+            fetch(baseUrl + "/buscarEmpresa", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    cnpj: objCnpj.cnpj
+                })
+            }).then(res => res.json()).then((data) => {
+                if(data.success == true){
+                    // encontrou cnpj
+                    console.log("encontrou cnpj")
+                    console.log("dados retornados da empresa existente: ")
+                    console.log(data)
+                    console.log(data.data.regime_tributario)
+                    let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
+                    switch(data.data.regime_tributario){
+                        case "SIMPLES_NACIONAL":
+                            regimeAtual = "Simples Nacional" 
+                            break
+
+                        case "LUCRO_PRESUMIDO":
+                            regimeAtual = "Lucro Presumido"
+                            break
+
+                        case "LUCRO_REAL": 
+                            regimeAtual = "Lucro Real"
+                            break
+                    }
+                    const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                    objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                    setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+
+                    buscarCnaesApi()
+
+                    // IR PARA PASSO 2
+                    setPasso1(false)
+                    setPasso2(true)
+                    
+                }else if(data.success == false){
+                    if(data.error.code == 404){
+                        console.log("CNPJ não encontrado")
+                        setPrecisaRegime(true)
+                    }
+                    
+                }
+            })
+
+
+        }else{
+            console.log("O campo CNPJ não pode estar vazio, deve conter exatamente 14 dígitos e precisa ser um CNPJ válido.")
+        }
+    }
+
+
+    function enviarRegime(){
+
+        if(regimeTributario){
+
+            console.log("CNAE PRINCIPAL")
+            console.log(cnaePrincipalMinhaEmpresa)
+            const body: CriarEmpresaBodyType = {
+                cnpj: objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf,
+                regime_tributario: regimeTributario,
+                cnae_principal: cnaePrincipalMinhaEmpresa
+            } 
+    
+            // fazer o cadastro "simplificado" da empresa, buscar CNAES na api e caso de certo habilitar os campos de baixo dos toggles buttons 
+            fetch(baseUrl + "/criarEmpresa", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            }).then(res => res.json()).then(data => {
+                console.log("resposta criar empresa")
+                console.log(data)
+                if(data.success == true){
+                    console.log("Dados da empresa cadastrados com sucesso")
+                    buscarCnaesApi()
+                    setPrecisaFolha(true)
+                    //IR PARA PASSO 2 (isso precisa ser ativado na função do bt de envio da folha)
+                    //setPasso1(false)
+                    //setPasso2(true)
+                    let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
+                    switch(regimeTributario){
+                        case "SIMPLES_NACIONAL":
+                            regimeAtual = "Simples Nacional" 
+                            break
+
+                        case "LUCRO_PRESUMIDO":
+                            regimeAtual = "Lucro Presumido"
+                            break
+
+                        case "LUCRO_REAL": 
+                            regimeAtual = "Lucro Real"
+                            break
+                    }
+
+                    const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                    objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                    objInfosMinhaEmpresaOuPessoaClone.meuCnpjouCpf = meuCnpjOuCpfVerificado
+                    setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+                }else{
+                    if(data.error.code == 400){
+                        console.log("Você já cadastrou essa empresa")
+                    }else if(data.error.code == 500){
+                        console.log("Tivemos problemas para cadastrar sua empresa, por favor, tente novamente")
+                    }
+                }
+            })
+        }
+        
+    }
+
+
+    function valorRegime(e: ChangeEvent<HTMLInputElement>){
+        if(e.target.checked){
+            setRegimeTributario(e.target.id as "SIMPLES_NACIONAL" | "LUCRO_REAL" | "LUCRO_PRESUMIDO")
+        }
+    }
+
+
+    function buscarCnaesApi(){
+        //buscar CNAES na api e caso de certo habilitar os toggles
+        fetch(`https://open.cnpja.com/office/${meuCnpjOuCpfVerificado}`).then(res => res.json()).then(data => {
+            console.log("retorno api cnaes")
+            console.log(data)
+            const novoArrCnaes = []
+
+            //VERIFICANDO SE OS CNAES PRECISAM DE ZEROS À ESQUERDA
+
+            // CNAE principal
+            let cnaePrincipalStr = data.mainActivity.id.toString()
+            cnaePrincipalMinhaEmpresa = cnaePrincipalStr
+            // conferir se tem 7 dígitos
+            if(cnaePrincipalStr.length < 7){
+                do{
+                    cnaePrincipalStr = "0" + cnaePrincipalStr
+                }while(cnaePrincipalStr.length < 7)
+            }
+            
+
+            novoArrCnaes.push(cnaePrincipalStr)
+
+            // CNAEs secundários
+            const arrCnaesSec = data.sideActivities
+            if(arrCnaesSec.length > 0){
+                arrCnaesSec.forEach((item: {id: number}) => {
+                    let cnaeAtualStr = item.id.toString()
+                    if(cnaeAtualStr.length < 7){
+                        do{
+                            cnaeAtualStr = "0" + cnaeAtualStr
+                        }while(cnaeAtualStr.length < 7)
+                    }
+
+                    novoArrCnaes.push(cnaeAtualStr)
+                })
+            }
+
+            setCnaes(novoArrCnaes)
+
+        })
+    }
+
+    function validarCpf(cpf: string){
+
+        if (/^(\d)\1{10}$/.test(cpf)) {
+            return {valido: false, cpf: null}
+          }
+
+          const digitos = cpf.split('').map(d => parseInt(d, 10))
+
+          // Calcula o primeiro dígito verificador
+          let soma = 0;
+          for (let i = 0; i < 9; i++) {
+            soma += digitos[i] * (10 - i)
+          }
+          let resto = soma % 11;
+          const dig1 = resto < 2 ? 0 : 11 - resto;
+          if (dig1 !== digitos[9]) {
+            return {valido: false, cpf: null}
+          }
+        
+          // Calcula o segundo dígito verificador
+          soma = 0;
+          for (let i = 0; i < 10; i++) {
+            soma += digitos[i] * (11 - i);
+          }
+          resto = soma % 11;
+          const dig2 = resto < 2 ? 0 : 11 - resto;
+          if (dig2 !== digitos[10]) {
+            return {valido: false, cpf: null}
+          }
+        
+          // Se passou por todas as etapas, o CPF é válido
+          return {valido: true, cpf}
+
+    }
+
+
+    function identificarCnpjOuCpf(cpfOuCnpj: string){
+        if(cpfOuCnpj.length == 11){
+            // Verificar se é CPF válido
+            const respCpf = validarCpf(cpfOuCnpj)
+            if(respCpf.valido){
+                // Só adiciono no meu obj de infos da empresa ou pessoa se for válido
+                meuCnpjOuCpfVerificado = respCpf.cpf ? respCpf.cpf : ""
+
+                // Se for pessoa fisica não verifico no db
+                const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                objInfosMinhaEmpresaOuPessoaClone.meuRegime = "Pessoa Fisica"
+                setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+                setPasso1(false)
+                setPasso2(true)
+                // COLOCAR STATE PARA ABRIR SÓ OS IMOVEIS
+                setSoImoveis(true)
+                console.log("cpf")
+
+
+            }else{
+                setTemErro(true)
+                setTextoErro("O CPF informado não é válido, por favor, tente novamente")
+            }
+
+        }else if(cpfOuCnpj.length == 14){
+            console.log("cnpj")
+            // Verificar se é CNPJ válido
+            const respCnpj = validarCnpj(cpfOuCnpj)
+            if(respCnpj.valido){
+                //CNPJ VÁLIDO, podemos chamar API
+
+                //Só adiciono ao obj de ionfos da empresa ou pessoa se for um cnpj válido
+                meuCnpjOuCpfVerificado = respCnpj.cnpj ? respCnpj.cnpj : ""
+
+                console.log("cnpj válido")
+                //varificar se tem na nossa base de dados
+                fetch(baseUrl + "/buscarEmpresa", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        cnpj: respCnpj.cnpj
+                    })
+                }).then(res => res.json()).then((data) => {
+                    if(data.success == true){
+                        // encontrou cnpj na nossa base de dados
+                        console.log("encontrou cnpj")
+                        console.log("dados retornados da empresa existente: ")
+                        console.log(data)
+                        console.log(data.data.regime_tributario)
+                        let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
+                        switch(data.data.regime_tributario){
+                            case "SIMPLES_NACIONAL":
+                                regimeAtual = "Simples Nacional" 
+                                break
+
+                            case "LUCRO_PRESUMIDO":
+                                regimeAtual = "Lucro Presumido"
+                                break
+
+                            case "LUCRO_REAL": 
+                                regimeAtual = "Lucro Real"
+                                break
+                        }
+                        const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                        objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                        objInfosMinhaEmpresaOuPessoaClone.meuCnpjouCpf = meuCnpjOuCpfVerificado
+                        setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+
+                        buscarCnaesApi()
+                        setPrecisaFolha(true)
+
+                        // IR PARA PASSO 2 (isso vai precisar ser ativado dentro da função do botao de enviar folha)
+                        //setPasso1(false)
+                        //setPasso2(true)
+                        
+                    }else if(data.success == false){
+                        if(data.error.code == 404){
+                            console.log("CNPJ não encontrado")
+                            setPrecisaRegime(true)
+                        }
+                        
+                    }
+                })
+            }else{
+                setTemErro(true)
+                setTextoErro("O CNPJ informado não é válido, por favor, tente novamente")
+            }
+
+        }else{
+            setTemErro(true)
+            setTextoErro("No campo de CNPJ ou CPF, coloque um valor válido. Em caso de CPF devem ser 11 dígitos, em caso de CNPJ devem ser 14 dígitos")
+        }
+
+
+    }
+
+    function enviarFolhaFn(){
+        if(folha){
+            setPasso1(false)
+            setPasso2(true)
+        }
+    }
+
+
+
+
+    useEffect(() => {
+        console.log(objMinhaEmpresaOuPessoaAtual)
+    }, [objMinhaEmpresaOuPessoaAtual])
+
+    return (
+        <div className="flex flex-col gap-4 bg-white rounded-xl w-[80%] h-[80%] justify-center items-center">
+            <div className="flex flex-col gap-2">
+                <label htmlFor="cnpjIn">Digite seu CNPJ ou CPF (apenas números):</label>
+                <input readOnly={passo1? (precisaRegime? true: false) : true} onChange={(e) => setInputCpfOuCnpj(e.target.value)} id="cnpjIn" type="number" placeholder='CNPJ ou CPF' className={`outline-2 rounded-md px-4 py-2 ${passo1? (precisaRegime? "bg-gray-500": "") : "bg-gray-500"}`}/>
+            </div>
+            <BotaoGeral text="enviar CNPJ ou CPF" onClickFn={() => identificarCnpjOuCpf(inputCpfOuCnpj)} />
+            {
+                precisaRegime &&
+                <div className="flex flex-col">
+                    <div>Qual o regime tributário da empresa acima?</div>
+                    <div>
+                        <div className="flex gap-2">
+                            <input onChange={e => valorRegime(e)} type="radio" className="regimes" name="regimes" id="SIMPLES_NACIONAL" />
+                            <label htmlFor="SIMPLES_NACIONAL">Simples nacional</label>
+                        </div>
+                        <div className="flex gap-2">
+                            <input onChange={e => valorRegime(e)} type="radio" className="regimes" name="regimes" id="LUCRO_REAL"/>
+                            <label htmlFor="LUCRO_REAL">Lucro Real</label>
+                        </div>
+                        <div className="flex gap-2">
+                            <input onChange={e => valorRegime(e)} type="radio" className="regimes" name="regimes" id="LUCRO_PRESUMIDO"/>
+                            <label htmlFor="LUCRO_PRESUMIDO">Lucro Presumido</label>
+                        </div>
+                    </div>
+                    <div className="pt-2">
+                        <BotaoGeral onClickFn={enviarRegime} text="enviar regime"/>
+                    </div>
+                </div>
+            }
+            {
+                precisaFolha && 
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="folhaIn">Digite a folha de pagamento mensal relativa ao CNPJ acima (apenas números. Exemplo: 100000):</label>
+                    <input readOnly={!passo1} onChange={(e) => setFolha(Number(e.target.value))} id="folhaIn" type="number" placeholder='Folha' className={`outline-2 rounded-md px-4 py-2`}/>
+                    <BotaoGeral onClickFn={enviarFolhaFn} text="enviar folha" />
+                </div>
+            }
+            {/*
+                precisaRegime && passo1?
+                <div className="pt-2">
+                    <BotaoGeral onClickFn={enviarRegime} text="enviar regime"/>
+                </div>
+                :
+                <div className="pt-2">
+                    <BotaoGeral onClickFn={checkCnpj} text="próximo passo"/>
+                </div>
+            */}
+            {
+                passo2 &&
+                <div>
+                    Meu regime: {objMinhaEmpresaOuPessoaAtual.meuRegime}
+                </div>
+            }
+        </div>
+    )
+}

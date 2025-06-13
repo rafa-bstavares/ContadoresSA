@@ -1,0 +1,51 @@
+# ========================
+# Node.js
+# ========================
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ========================
+# TypeScript (se usar)
+# ========================
+*.tsbuildinfo
+
+# ========================
+# Prisma
+# ========================
+.prisma/
+.env
+.env.*
+*.db
+*.sqlite
+migrations/dev.db
+prisma/dev.db
+dev.db
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+.dockerignore
+**/tmp/
+**/cache/
+**/.cache/
+
+# ========================
+# Testes (caso use Jest)
+# ========================
+coverage/
+
+# ========================
+# Sistema / Editor
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
