@@ -7,7 +7,7 @@ import Servicos from '../Servicos/Servicos'
 import { useState, useContext, useEffect } from 'react'
 import { BotaoGeral } from '../BotaoGeral/BotaoGeral'
 import { baseUrl } from '../../App'
-import { ContextoParametrosOpcionais } from '../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais'
+import { ContextoParametrosOpcionais, objAreas } from '../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais'
 import { ContextoErro } from '../../Contextos/ContextoErro/ContextoErro'
 import Imoveis from '../Imoveis/Imoveis'
 import { ContextoImoveis } from '../../Contextos/ContextoImoveis/ContextoImoveis'
@@ -24,7 +24,7 @@ import { ContextoMoveis } from '../../Contextos/ContextoMoveis/ContextoMoveis';
 import ProdutosBotao from '../ProdutosBotao/ProdutosBotao'
 import { ProdutosVendidosInput } from '../ProdutosVendidosInput/ProdutosVendidosInput'
 import { ProdutosAdquiridosInput } from '../ProdutosAdquiridosInput/ProdutosAdquiridosInput'
-import { ContextoProduto, ProdutoAdquiridoObj, ProdutoVendidoObj } from '../../Contextos/ContextoProduto/ContextoProduto'
+import { aliquotasParametrosFinalType, ContextoProduto, ProdutoAdquiridoObj, ProdutoVendidoObj } from '../../Contextos/ContextoProduto/ContextoProduto'
 import { ModalPerguntaBeneficios } from '../ModalPerguntaBeneficios/ModalPerguntaBeneficios'
 import { ModalConferirBeneficios } from '../ModalConferirBeneficios/ModalConferirBeneficios'
 
@@ -100,32 +100,10 @@ export function SegundoPasso({modoBranco}: Props){
 
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
     const {
-        aliquotaCbs, 
-        aliquotaIbs, 
-        ipiSimplesServAdquiridos, 
-        icmsSimplesServAdquiridos, 
-        pisCoSimplesServAdquiridos, 
-        issSimplesServAdquiridos, 
-        icmsSimplesComercial, 
-        icmsSimplesIndustrial, 
-        ipiSimplesIndustria, 
-        pisCoSimplesComercio, 
-        pisCoSimplesIndustria,
-        pisCoLucroRealIndustrial,
-        pisCoLucroRealServAdquiridos,
-        pisCoLucroRealComercial,
-        issLucroRealIndustrial,
-        issLucroRealServAdquiridos,
-        issLucroRealComercial,
-        issLucroPresumidoComercial,
-        issLucroPresumidoIndustrial,
-        issLucroPresumidoServAdquiridos,
-        pisCoLucroPresumidoComercial,
-        pisCoLucroPresumidoIndustrial,
-        pisCoLucroPresumidoServAdquiridos,
-        pisCoLucroPresumidoLocacao,
-        pisCoSimplesLocacao,
-        pisCoLucroRealLocacao
+        aliquotasIva,
+        tabelaSimplesNacional,
+        tabelaLucroReal,
+        tabelaLucroPresumido
     } = useContext(ContextoParametrosOpcionais)
 
     const {totalImoveisLocacao, totalImoveisCompraVenda} = useContext(ContextoImoveis)
@@ -138,48 +116,15 @@ export function SegundoPasso({modoBranco}: Props){
 
 
     async function conferirBeneficios(){
+
+
         if(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)
 
 
-            const ibs = Number(aliquotaIbs.replace(",", "*").replace(".", ",").replace("*", "."))
-            const cbs = Number(aliquotaCbs.replace(",", "*").replace(".", ",").replace("*", "."))
-            
-
+            const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
+            const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
 
             if(ibs && cbs){
-
-                const parametrosEntrada = {
-                    aliquotaIbs: ibs,
-                    aliquotaCbs: cbs,
-                    aliquotaIva: ibs + cbs,
-                    ipiSimplesServAdquiridos: Number(ipiSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issSimplesServAdquiridos: Number(issSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")), 
-                    pisCoSimplesServAdquiridos: Number(pisCoSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesServAdquiridos: Number(icmsSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesComercial: Number(icmsSimplesComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesIndustrial: Number(icmsSimplesIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    ipiSimplesIndustria: Number(ipiSimplesIndustria.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesComercio: Number(pisCoSimplesComercio.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesIndustria: Number(pisCoSimplesIndustria.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealIndustrial: Number(pisCoLucroRealIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealServAdquiridos: Number(pisCoLucroRealServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealComercial: Number(pisCoLucroRealComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealIndustrial: Number(issLucroRealIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealServAdquiridos: Number(issLucroRealServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealComercial: Number(issLucroRealComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-
-                    pisCoLucroPresumidoIndustrial: Number(pisCoLucroPresumidoIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroPresumidoServAdquiridos: Number(pisCoLucroPresumidoServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroPresumidoComercial: Number(pisCoLucroPresumidoComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoIndustrial: Number(issLucroPresumidoIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoServAdquiridos: Number(issLucroPresumidoServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoComercial: Number(issLucroPresumidoComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-
-                    pisCoLucroPresumidoLocacao: Number(pisCoLucroPresumidoLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealLocacao: Number(pisCoLucroRealLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesLocacao: Number(pisCoSimplesLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
-                }
-
                 const body: beneficiosBodySchema = {
                         beneficiosPorCnae: {
                             totalAtividadesAdquiridas,
@@ -254,47 +199,59 @@ export function SegundoPasso({modoBranco}: Props){
     }
 
 
+    type objParametrosEntradaFinalType = {
+        industrial: aliquotasParametrosFinalType,
+        servicos: aliquotasParametrosFinalType,
+        comercial: aliquotasParametrosFinalType,
+        locacao: aliquotasParametrosFinalType
+    }
+
+    function converterParametrosOpcionais(obj: objAreas): objParametrosEntradaFinalType{
+        const novoObj: objParametrosEntradaFinalType = {
+            industrial: {icms: null, ipi: null, iss: null, pisCo: null},
+            comercial: {icms: null, ipi: null, iss: null, pisCo: null},
+            servicos: {icms: null, ipi: null, iss: null, pisCo: null},
+            locacao: {icms: null, ipi: null, iss: null, pisCo: null}
+        }
+
+        for (const [area, aliquotas] of Object.entries(obj)) {
+
+            for (const [imposto, valor] of Object.entries(aliquotas)) {
+                if(valor !== null){
+                    novoObj[area as keyof objParametrosEntradaFinalType][imposto as keyof aliquotasParametrosFinalType] = parseFloat(valor.replace(",", "*").replace(".", ",").replace("*", "."))
+                }
+            }
+        }
+
+        return novoObj
+    }
+
+
     async function enviarInfosAtividades(){
+
+
+
         if(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)
 
 
-            const ibs = Number(aliquotaIbs.replace(",", "*").replace(".", ",").replace("*", "."))
-            const cbs = Number(aliquotaCbs.replace(",", "*").replace(".", ",").replace("*", "."))
+            const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
+            const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
             
+            // No front end é melhor tratarmos como string, mas no back ele espera receber number, por isso temos que fazer:
+            const tabelaSimplesNacionalTradada = converterParametrosOpcionais(tabelaSimplesNacional)
+            const tabelaLucroRealTradada = converterParametrosOpcionais(tabelaLucroReal)
+            const tabelaLucroPresumidoTradada = converterParametrosOpcionais(tabelaLucroPresumido)
 
-
+            
             if(ibs && cbs){
 
                 const parametrosEntrada = {
                     aliquotaIbs: ibs,
                     aliquotaCbs: cbs,
                     aliquotaIva: ibs + cbs,
-                    ipiSimplesServAdquiridos: Number(ipiSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issSimplesServAdquiridos: Number(issSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")), 
-                    pisCoSimplesServAdquiridos: Number(pisCoSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesServAdquiridos: Number(icmsSimplesServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesComercial: Number(icmsSimplesComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    icmsSimplesIndustrial: Number(icmsSimplesIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    ipiSimplesIndustria: Number(ipiSimplesIndustria.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesComercio: Number(pisCoSimplesComercio.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesIndustria: Number(pisCoSimplesIndustria.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealIndustrial: Number(pisCoLucroRealIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealServAdquiridos: Number(pisCoLucroRealServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealComercial: Number(pisCoLucroRealComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealIndustrial: Number(issLucroRealIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealServAdquiridos: Number(issLucroRealServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroRealComercial: Number(issLucroRealComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-
-                    pisCoLucroPresumidoIndustrial: Number(pisCoLucroPresumidoIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroPresumidoServAdquiridos: Number(pisCoLucroPresumidoServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroPresumidoComercial: Number(pisCoLucroPresumidoComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoIndustrial: Number(issLucroPresumidoIndustrial.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoServAdquiridos: Number(issLucroPresumidoServAdquiridos.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    issLucroPresumidoComercial: Number(issLucroPresumidoComercial.replace(",", "*").replace(".", ",").replace("*", ".")),
-
-                    pisCoLucroPresumidoLocacao: Number(pisCoLucroPresumidoLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoLucroRealLocacao: Number(pisCoLucroRealLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
-                    pisCoSimplesLocacao: Number(pisCoSimplesLocacao.replace(",", "*").replace(".", ",").replace("*", ".")),
+                    tabelaSimplesNacional: tabelaSimplesNacionalTradada,
+                    tabelaLucroReal: tabelaLucroRealTradada,
+                    tabelaLucroPresumido: tabelaLucroPresumidoTradada,
                 }
 
             

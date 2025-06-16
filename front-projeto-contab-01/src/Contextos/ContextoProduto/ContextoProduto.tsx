@@ -30,17 +30,16 @@ export const regimesAdquiridoArr: RegimesAdquiridoType[] = ["Simples Nacional", 
 export type SimNaoType = "Sim" | "Não"
 export const simNaoArr: SimNaoType[] = ["Sim", "Não"]
 
+export type aliquotasParametrosFinalType = {iss: number | null, icms: number | null, pisCo: number | null, ipi: number | null}
+
 export type ProdutoAdquiridoObj = {
     metodo: MetodoAdquiridoType,
     tipoOperacao: TipoOperacaoAdquiridoType | "",
     valorOperacao: number,
     ncm: string,
-    icms: number,
+    aliquotas: aliquotasParametrosFinalType
     creditoIcms: boolean,
-    pis: number,
-    cofins: number,
     creditoPisCofins: boolean,
-    ipi: number,
     creditoIpi: boolean,
     cnpjFornecedor: string,
     regimeTributarioOutro: string,

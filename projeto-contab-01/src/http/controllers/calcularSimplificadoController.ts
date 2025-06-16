@@ -93,8 +93,7 @@ export const ProdutoAdquiridoObj = z.object({
     ncm: z.string(),
     icms: z.number(),
     creditoIcms: z.boolean(),
-    pis: z.number(),
-    cofins: z.number(),
+    pisCofins: z.number(),
     creditoPisCofins: z.boolean(),
     ipi: z.number(),
     creditoIpi: z.boolean(),
@@ -105,6 +104,20 @@ export const ProdutoAdquiridoObj = z.object({
     id: z.number()
 })
 
+export const aliquotasParametrosBodyType = z.object({
+    iss: z.union([z.number(), z.null()]), 
+    icms: z.union([z.number(), z.null()]), 
+    pisCo: z.union([z.number(), z.null()]), 
+    ipi: z.union([z.number(), z.null()])
+})
+
+export const objParametrosEntradaBodyType = z.object({
+    industrial: aliquotasParametrosBodyType,
+    servicos: aliquotasParametrosBodyType,
+    comercial: aliquotasParametrosBodyType,
+    locacao: aliquotasParametrosBodyType
+})
+
 
 
 export const bodySchema = z.object({
@@ -113,33 +126,12 @@ export const bodySchema = z.object({
     meuRegime: z.enum(["Simples Nacional", "Lucro Real", "Lucro Presumido", "Pessoa Fisica"]),
     totalAtividadesPrestadas: z.array(infosEmpresaSchema),
     parametrosEntrada: z.object({
-        aliquotaIbs: z.number(), 
-        aliquotaCbs: z.number(), 
-        aliquotaIva: z.number(),                    
-        ipiSimplesServAdquiridos: z.number(),
-        issSimplesServAdquiridos: z.number(),
-        pisCoSimplesServAdquiridos: z.number(),
-        icmsSimplesServAdquiridos: z.number(),
-        icmsSimplesComercial: z.number(),
-        icmsSimplesIndustrial: z.number(),
-        ipiSimplesIndustria: z.number(),
-        pisCoSimplesComercio: z.number(),
-        pisCoSimplesIndustria: z.number(),
-        pisCoLucroRealIndustrial: z.number(),
-        pisCoLucroRealServAdquiridos: z.number(),
-        pisCoLucroRealComercial: z.number(),
-        issLucroRealIndustrial: z.number(),
-        issLucroRealServAdquiridos: z.number(),
-        issLucroRealComercial: z.number(),
-        pisCoLucroPresumidoIndustrial: z.number(),
-        pisCoLucroPresumidoServAdquiridos: z.number(),
-        pisCoLucroPresumidoComercial: z.number(),
-        issLucroPresumidoIndustrial: z.number(),
-        issLucroPresumidoServAdquiridos: z.number(),
-        issLucroPresumidoComercial: z.number(),
-        pisCoLucroPresumidoLocacao: z.number(),
-        pisCoLucroRealLocacao: z.number(),
-        pisCoSimplesLocacao: z.number(),
+        aliquotaIbs: z.number(),
+        aliquotaCbs: z.number(),
+        aliquotaIva: z.number(),
+        tabelaSimplesNacional: objParametrosEntradaBodyType,
+        tabelaLucroReal: objParametrosEntradaBodyType,
+        tabelaLucroPresumido: objParametrosEntradaBodyType,
     }),
     totalAtividadesAdquiridas: z.array(objAtividadeAdquirida),
     totalImoveisLocacao: z.array(objTotalImoveisLocacao),

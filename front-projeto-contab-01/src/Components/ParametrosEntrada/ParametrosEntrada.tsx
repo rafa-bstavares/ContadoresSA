@@ -1,79 +1,125 @@
 import { ChangeEvent, useContext } from "react"
-import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
+import { ContextoParametrosOpcionais, objAliquotas, objAreas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 
+
+type objLinhaParametros = {
+    id: string,
+    valor: string | null,
+    area: keyof objAreas,
+    aliquota: keyof objAliquotas
+}
 
 export function ParametrosEntrada(){
 
     const {
-        aliquotaCbs,
-        aliquotaIbs,
-        setAliquotaCbs,
-        setAliquotaIbs,
-        icmsSimplesServAdquiridos,
-        issSimplesServAdquiridos, 
-        pisCoSimplesServAdquiridos, 
-        ipiSimplesServAdquiridos, 
-        setIcmsSimplesServAdquiridos, 
-        setIpiSimplesServAdquiridos, 
-        setIssSimplesServAdquiridos, 
-        setPisCoSimplesServAdquiridos, 
-        icmsSimplesComercial, 
-        icmsSimplesIndustrial, 
-        ipiSimplesIndustria, 
-        pisCoSimplesComercio, 
-        pisCoSimplesIndustria, 
-        setIcmsSimplesComercial, 
-        setIcmsSimplesIndustrial, 
-        setIpiSimplesIndustria, 
-        setPisCoSimplesComercio, 
-        setPisCoSimplesIndustria,
-        issLucroRealComercial,
-        issLucroRealIndustrial,
-        issLucroRealServAdquiridos,
-        pisCoLucroRealComercial,
-        pisCoLucroRealIndustrial,
-        pisCoLucroRealServAdquiridos,
-        setIssLucroRealComercial,
-        setIssLucroRealIndustrial,
-        setIssLucroRealServAdquiridos,
-        setPisCoLucroRealComercial,
-        setPisCoLucroRealIndustrial,
-        setPisCoLucroRealServAdquiridos,
-
-        issLucroPresumidoComercial,
-        issLucroPresumidoIndustrial,
-        issLucroPresumidoServAdquiridos,
-        pisCoLucroPresumidoComercial,
-        pisCoLucroPresumidoIndustrial,
-        pisCoLucroPresumidoServAdquiridos,
-        setIssLucroPresumidoComercial,
-        setIssLucroPresumidoIndustrial,
-        setIssLucroPresumidoServAdquiridos,
-        setPisCoLucroPresumidoComercial,
-        setPisCoLucroPresumidoIndustrial,
-        setPisCoLucroPresumidoServAdquiridos,
-
-        pisCoLucroPresumidoLocacao,
-        pisCoLucroRealLocacao,
-        pisCoSimplesLocacao,
-        setPisCoLucroPresumidoLocacao,
-        setPisCoLucroRealLocacao,
-        setPisCoSimplesLocacao
+        aliquotasIva,
+        setAliquotasIva,
+        tabelaLucroPresumido,
+        setTabelaLucroPresumido,
+        tabelaSimplesNacional,
+        setTabelaSimplesNacional,
+        tabelaLucroReal,
+        setTabelaLucroReal
     } = useContext(ContextoParametrosOpcionais)
 
+    
+
+    const cabecalhosTabelas = ["", "Industrial", "Serviços", "Comercial", "Locação"]
+
+    {/* Variáveis linhas Simples Nacional */}
+    const simplesNacionalLinhasPisCofins: objLinhaParametros[] = [
+        {id: "pisCoSimplesIndustrial", valor: tabelaSimplesNacional.industrial.pisCo, area: "industrial", aliquota: "pisCo"},
+        {id: "pisCoSimplesServAdquiridos", valor: tabelaSimplesNacional.servicos.pisCo, area: "servicos", aliquota: "pisCo"},
+        {id: "pisCoSimplesComercial", valor: tabelaSimplesNacional.comercial.pisCo, area: "comercial", aliquota: "pisCo"},
+        {id: "pisCoSimplesLocacao", valor: tabelaSimplesNacional.locacao.pisCo, area: "locacao", aliquota: "pisCo"},
+    ]
+    const simplesNacionalLinhasIpi: objLinhaParametros[] = [
+        {id: "ipiSimplesIndustrial", valor: tabelaSimplesNacional.industrial.ipi, area: "industrial", aliquota: "ipi"},
+        {id: "ipiSimplesServAdquiridos", valor: tabelaSimplesNacional.servicos.ipi, area: "servicos", aliquota: "ipi"},
+        {id: "ipiSimplesComercial", valor: tabelaSimplesNacional.comercial.ipi, area: "comercial", aliquota: "ipi"},
+        {id: "ipiSimplesLocacao", valor: tabelaSimplesNacional.locacao.ipi, area: "locacao", aliquota: "ipi"},
+    ]
+    const simplesNacionalLinhasIcms: objLinhaParametros[] = [
+        {id: "icmsSimplesIndustrial", valor: tabelaSimplesNacional.industrial.icms, area: "industrial", aliquota: "icms"},
+        {id: "icmsSimplesServAdquiridos", valor: tabelaSimplesNacional.servicos.icms, area: "servicos", aliquota: "icms"},
+        {id: "icmsSimplesComercial", valor: tabelaSimplesNacional.comercial.icms, area: "comercial", aliquota: "icms"},
+        {id: "icmsSimplesLocacao", valor: tabelaSimplesNacional.locacao.icms, area: "locacao", aliquota: "icms"},
+    ]
+    const simplesNacionalLinhasIss: objLinhaParametros[] = [
+        {id: "issSimplesIndustrial", valor: tabelaSimplesNacional.industrial.iss, area: "industrial", aliquota: "iss"},
+        {id: "issSimplesServAdquiridos", valor: tabelaSimplesNacional.servicos.iss, area: "servicos", aliquota: "iss"},
+        {id: "issSimplesComercial", valor: tabelaSimplesNacional.comercial.iss, area: "comercial", aliquota: "iss"},
+        {id: "issSimplesLocacao", valor: tabelaSimplesNacional.locacao.iss, area: "locacao", aliquota: "iss"},
+    ]
+
+    {/* Variáveis linhas Lucro Real */}
+    const lucroRealLinhasPisCofins: objLinhaParametros[] = [
+        {id: "pisCoLucroRealIndustrial", valor: tabelaLucroReal.industrial.pisCo, area: "industrial", aliquota: "pisCo"},
+        {id: "pisCoLucroRealServAdquiridos", valor: tabelaLucroReal.servicos.pisCo, area: "servicos", aliquota: "pisCo"},
+        {id: "pisCoLucroRealComercial", valor: tabelaLucroReal.comercial.pisCo, area: "comercial", aliquota: "pisCo"},
+        {id: "pisCoLucroRealLocacao", valor: tabelaLucroReal.locacao.pisCo, area: "locacao", aliquota: "pisCo"},
+    ]
+    const lucroRealLinhasIpi: objLinhaParametros[] = [
+        {id: "ipiLucroRealIndustrial", valor: tabelaLucroReal.industrial.ipi, area: "industrial", aliquota: "ipi"},
+        {id: "ipiLucroRealServAdquiridos", valor: tabelaLucroReal.servicos.ipi, area: "servicos", aliquota: "ipi"},
+        {id: "ipiLucroRealComercial", valor: tabelaLucroReal.comercial.ipi, area: "comercial", aliquota: "ipi"},
+        {id: "ipiLucroRealLocacao", valor: tabelaLucroReal.locacao.ipi, area: "locacao", aliquota: "ipi"},
+    ]
+    const lucroRealLinhasIcms: objLinhaParametros[] = [
+        {id: "icmsLucroRealIndustrial", valor: tabelaLucroReal.industrial.icms, area: "industrial", aliquota: "icms"},
+        {id: "icmsLucroRealServAdquiridos", valor: tabelaLucroReal.servicos.icms, area: "servicos", aliquota: "icms"},
+        {id: "icmsLucroRealComercial", valor: tabelaLucroReal.comercial.icms, area: "comercial", aliquota: "icms"},
+        {id: "icmsLucroRealLocacao", valor: tabelaLucroReal.locacao.icms, area: "locacao", aliquota: "icms"},
+    ]
+    const lucroRealLinhasIss: objLinhaParametros[] = [
+        {id: "issLucroRealIndustrial", valor: tabelaLucroReal.industrial.iss, area: "industrial", aliquota: "iss"},
+        {id: "issLucroRealServAdquiridos", valor: tabelaLucroReal.servicos.iss, area: "servicos", aliquota: "iss"},
+        {id: "issLucroRealComercial", valor: tabelaLucroReal.comercial.iss, area: "comercial", aliquota: "iss"},
+        {id: "issLucroRealLocacao", valor: tabelaLucroReal.locacao.iss, area: "locacao", aliquota: "iss"},
+    ]
+
+    {/* Variáveis linhas Lucro Presumido */}
+    const lucroPresumidoLinhasPisCofins: objLinhaParametros[] = [
+        {id: "pisCoLucroPresumidoIndustrial", valor: tabelaLucroPresumido.industrial.pisCo, area: "industrial", aliquota: "pisCo"},
+        {id: "pisCoLucroPresumidoServAdquiridos", valor: tabelaLucroPresumido.servicos.pisCo, area: "servicos", aliquota: "pisCo"},
+        {id: "pisCoLucroPresumidoComercial", valor: tabelaLucroPresumido.comercial.pisCo, area: "comercial", aliquota: "pisCo"},
+        {id: "pisCoLucroPresumidoLocacao", valor: tabelaLucroPresumido.locacao.pisCo, area: "locacao", aliquota: "pisCo"},
+    ]
+    const lucroPresumidoLinhasIpi: objLinhaParametros[] = [
+        {id: "ipiLucroPresumidoIndustrial", valor: tabelaLucroPresumido.industrial.ipi, area: "industrial", aliquota: "ipi"},
+        {id: "ipiLucroPresumidoServAdquiridos", valor: tabelaLucroPresumido.servicos.ipi, area: "servicos", aliquota: "ipi"},
+        {id: "ipiLucroPresumidoComercial", valor: tabelaLucroPresumido.comercial.ipi, area: "comercial", aliquota: "ipi"},
+        {id: "ipiLucroPresumidoLocacao", valor: tabelaLucroPresumido.locacao.ipi, area: "locacao", aliquota: "ipi"},
+    ]
+    const lucroPresumidoLinhasIcms: objLinhaParametros[] = [
+        {id: "icmsLucroPresumidoIndustrial", valor: tabelaLucroPresumido.industrial.icms, area: "industrial", aliquota: "icms"},
+        {id: "icmsLucroPresumidoServAdquiridos", valor: tabelaLucroPresumido.servicos.icms, area: "servicos", aliquota: "icms"},
+        {id: "icmsLucroPresumidoComercial", valor: tabelaLucroPresumido.comercial.icms, area: "comercial", aliquota: "icms"},
+        {id: "icmsLucroPresumidoLocacao", valor: tabelaLucroPresumido.locacao.icms, area: "locacao", aliquota: "icms"},
+    ]
+    const lucroPresumidoLinhasIss: objLinhaParametros[] = [
+        {id: "issLucroPresumidoIndustrial", valor: tabelaLucroPresumido.industrial.iss, area: "industrial", aliquota: "iss"},
+        {id: "issLucroPresumidoServAdquiridos", valor: tabelaLucroPresumido.servicos.iss, area: "servicos", aliquota: "iss"},
+        {id: "issLucroPresumidoComercial", valor: tabelaLucroPresumido.comercial.iss, area: "comercial", aliquota: "iss"},
+        {id: "issLucroPresumidoLocacao", valor: tabelaLucroPresumido.locacao.iss, area: "locacao", aliquota: "iss"},
+    ]
 
     function mudarIbs(e: ChangeEvent<HTMLInputElement>){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setAliquotaIbs(valorInput)
+            const objAliquotasIvaClone = {...aliquotasIva}
+            objAliquotasIvaClone.ibs = valorInput
+            setAliquotasIva(objAliquotasIvaClone)
             return 
         }
 
         const regexStrNum = /^\d*(?:[.,]\d*)?$/
 
         if(regexStrNum.test(valorInput)){
-            setAliquotaIbs(valorInput)
+            const objAliquotasIvaClone = {...aliquotasIva}
+            objAliquotasIvaClone.ibs = valorInput
+            setAliquotasIva(objAliquotasIvaClone)
             return 
         }
     }
@@ -82,401 +128,77 @@ export function ParametrosEntrada(){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setAliquotaIbs(valorInput)
+            const objAliquotasIvaClone = {...aliquotasIva}
+            objAliquotasIvaClone.cbs = valorInput
+            setAliquotasIva(objAliquotasIvaClone)
             return 
         }
 
         const regexStrNum = /^\d*(?:[.,]\d*)?$/
 
         if(regexStrNum.test(valorInput)){
-            setAliquotaIbs(valorInput)
+            const objAliquotasIvaClone = {...aliquotasIva}
+            objAliquotasIvaClone.cbs = valorInput
+            setAliquotasIva(objAliquotasIvaClone)
             return 
         }
     }
 
-    function mudarIpiSimplesServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
+    const mudarAliquotaSimplesNacional = (area: keyof objAreas, imposto: keyof objAliquotas, e: ChangeEvent<HTMLInputElement>) => {
 
-        if(valorInput === ""){
-            setIpiSimplesServAdquiridos(valorInput)
-            return 
-        }
+        const valorInput = e.target.value
 
         const regexStrNum = /^\d*(?:[.,]\d*)?$/
 
-        if(regexStrNum.test(valorInput)){
-            setIpiSimplesServAdquiridos(valorInput)
+        if((valorInput === "") || (regexStrNum.test(valorInput))){
+            setTabelaSimplesNacional((prev) => ({
+                ...prev,
+                [area]: {
+                ...prev[area],
+                [imposto]: valorInput,
+                },
+            }))
             return 
         }
+
     }
 
-    function mudarIcmsSimplesServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
+    const mudarAliquotaLucroReal = (area: keyof objAreas, imposto: keyof objAliquotas, e: ChangeEvent<HTMLInputElement>) => {
 
-        if(valorInput === ""){
-            setIcmsSimplesServAdquiridos(valorInput)
-            return 
-        }
+        const valorInput = e.target.value
 
         const regexStrNum = /^\d*(?:[.,]\d*)?$/
 
-        if(regexStrNum.test(valorInput)){
-            setIcmsSimplesServAdquiridos(valorInput)
+        if((valorInput === "") || (regexStrNum.test(valorInput))){
+            setTabelaLucroReal((prev) => ({
+                ...prev,
+                [area]: {
+                ...prev[area],
+                [imposto]: valorInput,
+                },
+            }))
             return 
         }
+
     }
 
-    function mudarIssSimplesServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
+    const mudarAliquotaLucroPresumido = (area: keyof objAreas, imposto: keyof objAliquotas, e: ChangeEvent<HTMLInputElement>) => {
 
-        if(valorInput === ""){
-            setIssSimplesServAdquiridos(valorInput)
-            return 
-        }
+        const valorInput = e.target.value
 
         const regexStrNum = /^\d*(?:[.,]\d*)?$/
 
-        if(regexStrNum.test(valorInput)){
-            setIssSimplesServAdquiridos(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoSimplesServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoSimplesServAdquiridos(valorInput)
+        if((valorInput === "") || (regexStrNum.test(valorInput))){
+            setTabelaLucroPresumido((prev) => ({
+                ...prev,
+                [area]: {
+                ...prev[area],
+                [imposto]: valorInput,
+                },
+            }))
             return 
         }
 
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoSimplesServAdquiridos(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoSimplesIndustria(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoSimplesIndustria(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoSimplesIndustria(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoSimplesComercio(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoSimplesComercio(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoSimplesComercio(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoSimplesLocacao(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoSimplesLocacao(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoSimplesLocacao(valorInput)
-            return 
-        }
-    }
-
-    function mudarIpiSimplesIndustria(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIpiSimplesIndustria(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIpiSimplesIndustria(valorInput)
-            return 
-        }
-    }
-
-    function mudarIcmsSimplesIndustria(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIcmsSimplesIndustrial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIcmsSimplesIndustrial(valorInput)
-            return 
-        }
-    }
-    
-    function mudarIcmsSimplesComercio(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIcmsSimplesComercial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIcmsSimplesComercial(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroRealComercial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroRealComercial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroRealComercial(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroRealLocacao(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroRealLocacao(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroRealLocacao(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroRealIndustrial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroRealIndustrial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroRealIndustrial(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroRealServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroRealServAdquiridos(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroRealServAdquiridos(valorInput)
-            return 
-        }
-    }
-
-    function mudarIssLucroRealIndustrial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroRealIndustrial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroRealIndustrial(valorInput)
-            return 
-        }
-    }
-
-    function mudarIssLucroRealComercial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroRealComercial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroRealComercial(valorInput)
-            return 
-        }
-    }
-
-    function mudarIssLucroRealServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroRealServAdquiridos(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroRealServAdquiridos(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroPresumidoComercial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroPresumidoComercial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroPresumidoComercial(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroPresumidoLocacao(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroPresumidoLocacao(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroPresumidoLocacao(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroPresumidoIndustrial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroPresumidoIndustrial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroPresumidoIndustrial(valorInput)
-            return 
-        }
-    }
-
-    function mudarpisCoLucroPresumidoServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setPisCoLucroPresumidoServAdquiridos(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setPisCoLucroPresumidoServAdquiridos(valorInput)
-            return 
-        }
-    }
-
-
-    function mudarIssLucroPresumidoIndustrial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroPresumidoIndustrial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroPresumidoIndustrial(valorInput)
-            return 
-        }
-    }
-
-    function mudarIssLucroPresumidoComercial(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroPresumidoComercial(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroPresumidoComercial(valorInput)
-            return 
-        }
-    }
-
-    function mudarIssLucroPresumidoServAdquiridos(e: ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setIssLucroPresumidoServAdquiridos(valorInput)
-            return 
-        }
-
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
-
-        if(regexStrNum.test(valorInput)){
-            setIssLucroPresumidoServAdquiridos(valorInput)
-            return 
-        }
     }
 
     return (
@@ -484,14 +206,14 @@ export function ParametrosEntrada(){
             <div className="flex gap-4 items-center">
                 <label htmlFor="aliquotaIbs">Alíquota IBS</label>
                 <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                    <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={aliquotaIbs} onChange={(e) => mudarIbs(e)}/>
+                    <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={aliquotasIva.ibs} onChange={(e) => mudarIbs(e)}/>
                     <div className=" px-1 flex items-center justify-center bg-gray-500">%</div>
                 </div>
             </div>
             <div className="flex gap-4 items-center">
                 <label htmlFor="aliquotaCb">Alíquota CBS</label>
                 <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                    <input className="p-1 outline-none flex-1" type="text" id="aliquotaCbs" value={aliquotaCbs} onChange={(e) => mudarCbs(e)}/>
+                    <input className="p-1 outline-none flex-1" type="text" id="aliquotaCbs" value={aliquotasIva.cbs} onChange={(e) => mudarCbs(e)}/>
                     <div className=" px-1 flex items-center justify-center bg-gray-500">%</div>
                 </div>
             </div>
@@ -500,142 +222,99 @@ export function ParametrosEntrada(){
             <div className="flex flex-col gap-2 pt-8 w-[90%]">
                 <div className="font-bold">Alíquotas padrões utilizadas nas aquisições de empresas do Simples Nacional</div>
                 <div className="grid grid-cols-5 gap-4 border border-gray-300 rounded-md p-2">
-                    <div>   
+                    {/* CABEÇALHO TABELA */}
+                    {
+                        cabecalhosTabelas.map(cabecalho => (
+                            <div>
+                                {cabecalho}
+                            </div>
+                        ))
+                    }
 
-                    </div>
-                    <div>
-                        Industrial
-                    </div>
-                    <div>
-                        Serviços
-                    </div>
-                    <div>
-                        Comercial
-                    </div>
-                    <div>
-                        Locação
-                    </div>
 
+                    {/* LINHA PIS-COFINS */}
                     <div>
                         PIS-COFINS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoSimplesIndustrial" value={pisCoSimplesIndustria} onChange={(e) => mudarpisCoSimplesIndustria(e)}/>
+                    {
+                        simplesNacionalLinhasPisCofins.map(linhaPisCofins => (
+                            linhaPisCofins.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaPisCofins.id}`} value={linhaPisCofins.valor} onChange={(e) => mudarAliquotaSimplesNacional(linhaPisCofins.area, linhaPisCofins.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoSimplesServAdquiridos" value={pisCoSimplesServAdquiridos} onChange={(e) => mudarpisCoSimplesServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoSimplesComercial" value={pisCoSimplesComercio} onChange={(e) => mudarpisCoSimplesComercio(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoSimplesComercial" value={pisCoSimplesLocacao} onChange={(e) => mudarpisCoSimplesLocacao(e)}/>
-
-                        </div>
-                    </div>
+                            </div>
+                        ))
+                    }
 
 
+                    {/* LINHA IPI */}
                     <div>
                         IPI
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="ipiSimplesIndustrial" value={ipiSimplesIndustria} onChange={(e) => mudarIpiSimplesIndustria(e)}/>
+                    {
+                        simplesNacionalLinhasIpi.map(linhaIpi => (
+                            linhaIpi.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIpi.id}`} value={linhaIpi.valor} onChange={(e) => mudarAliquotaSimplesNacional(linhaIpi.area, linhaIpi.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        {/*<div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={ipiSimplesServAdquiridos} onChange={(e) => mudarIpiSimplesServAdquiridos(e)}/>
-
-                        </div>*/}
-                    </div>
-                    <div>
-
-                    </div>
-                    <div>
-
-                    </div>
+                            </div>
+                        ))    
+                    }
 
 
-
-
-
-
-
-                    {/*<div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={pisCoSimplesServAdquiridos} onChange={(e) => mudarpisCoSimplesServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={icmsSimplesServAdquiridos} onChange={(e) => mudarIcmsSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={issSimplesServAdquiridos} onChange={(e) => mudarIssSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>*/}
-
-
-
-
-
+                    {/* LINHA ICMS */}
                     <div>
                         ICMS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="icmsSimplesIndustria" value={icmsSimplesIndustrial} onChange={(e) => mudarIcmsSimplesIndustria(e)}/>
+                    {
+                        simplesNacionalLinhasIcms.map(linhaIcms => (
+                            linhaIcms.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIcms.id}`} value={linhaIcms.valor} onChange={(e) => mudarAliquotaSimplesNacional(linhaIcms.area, linhaIcms.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="icmsSimplesComercio" value={icmsSimplesComercial} onChange={(e) => mudarIcmsSimplesComercio(e)}/>
-
-                        </div>
-                    </div>
-                    <div>
-
-                    </div>
+                            </div>
+                        ))    
+                    }
                     
 
+                    {/* LINHA ISS */}
                     <div>
                         ISS
                     </div>
-                    <div>
+                    {
+                        simplesNacionalLinhasIss.map(linhaIss => (
+                            linhaIss.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIss.id}`} value={linhaIss.valor} onChange={(e) => mudarAliquotaSimplesNacional(linhaIss.area, linhaIss.aliquota, e)}/>
 
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={issSimplesServAdquiridos} onChange={(e) => mudarIssSimplesServAdquiridos(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
+                            </div>
+                        ))    
+                    }    
 
-                    </div>
-                    <div>
-                        
-                    </div>
                 </div>
             </div>
            {/* Fim Tabela Simples Serviços Adquiridos */}
@@ -647,139 +326,99 @@ export function ParametrosEntrada(){
             <div className="flex flex-col gap-2 pt-8 w-[90%]">
                 <div className="font-bold">Alíquotas padrões utilizadas nas aquisições de empresas do Lucro Real</div>
                 <div className="grid grid-cols-5 gap-4 border border-gray-300 rounded-md p-2">
-                    <div>   
+                    {/* CABEÇALHO TABELA */}
+                    {
+                        cabecalhosTabelas.map(cabecalho => (
+                            <div>
+                                {cabecalho}
+                            </div>
+                        ))
+                    }
 
-                    </div>
-                    <div>
-                        Industrial
-                    </div>
-                    <div>
-                        Serviços
-                    </div>
-                    <div>
-                        Comercial
-                    </div>
-                    <div>
-                        Locação
-                    </div>
 
+                    {/* LINHA PIS-COFINS */}
                     <div>
                         PIS-COFINS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroRealIndustrial" value={pisCoLucroRealIndustrial} onChange={(e) => mudarpisCoLucroRealIndustrial(e)}/>
+                    {
+                        lucroRealLinhasPisCofins.map(linhaPisCo => (
+                            linhaPisCo.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaPisCo.id}`} value={linhaPisCo.valor} onChange={(e) => mudarAliquotaLucroReal(linhaPisCo.area, linhaPisCo.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroRealServAdquiridos" value={pisCoLucroRealServAdquiridos} onChange={(e) => mudarpisCoLucroRealServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroRealComercial" value={pisCoLucroRealComercial} onChange={(e) => mudarpisCoLucroRealComercial(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroRealComercial" value={pisCoLucroRealLocacao} onChange={(e) => mudarpisCoLucroRealLocacao(e)}/>
+                            </div>
+                        ))    
+                    }    
 
-                        </div>
-                    </div>
 
+                    {/* LINHA IPI */}
                     <div>
                         IPI
                     </div>
-                    <div>
+                    {
+                        lucroRealLinhasIpi.map(linhaIpi => (
+                            linhaIpi.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIpi.id}`} value={linhaIpi.valor} onChange={(e) => mudarAliquotaLucroReal(linhaIpi.area, linhaIpi.aliquota, e)}/>
 
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        {/*<div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={ipiSimplesServAdquiridos} onChange={(e) => mudarIpiSimplesServAdquiridos(e)}/>
-
-                        </div>*/}
-                    </div>
-                    <div>
-
-                    </div>
-                    <div>
-
-                    </div>
-
+                            </div>
+                        ))    
+                    }    
 
 
-
-
-
-
-                    {/*<div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={pisCoSimplesServAdquiridos} onChange={(e) => mudarpisCoSimplesServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={icmsSimplesServAdquiridos} onChange={(e) => mudarIcmsSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={issSimplesServAdquiridos} onChange={(e) => mudarIssSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>*/}
-
-
-
-
-
+                    {/* LINHA ICMS */}
                     <div>
                         ICMS
                     </div>
-                    <div>
+                    {
+                        lucroRealLinhasIcms.map(linhaIcms => (
+                            linhaIcms.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIcms.id}`} value={linhaIcms.valor} onChange={(e) => mudarAliquotaLucroReal(linhaIcms.area, linhaIcms.aliquota, e)}/>
 
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                    </div>
-                    <div>
-
-                    </div>
-                    <div>
-
-                    </div>    
+                            </div>
+                        ))    
+                    }     
 
 
-
+                    {/* LINHA ISS */}
                     <div>
                         ISS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroRealIndustrial" value={issLucroRealIndustrial} onChange={(e) => mudarIssLucroRealIndustrial(e)}/>
+                    {
+                        lucroRealLinhasIss.map(linhaIss => (
+                            linhaIss.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIss.id}`} value={linhaIss.valor} onChange={(e) => mudarAliquotaLucroReal(linhaIss.area, linhaIss.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroRealServAdquiridos" value={issLucroRealServAdquiridos} onChange={(e) => mudarIssLucroRealServAdquiridos(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroRealComercial" value={issLucroRealComercial} onChange={(e) => mudarIssLucroRealComercial(e)}/>
+                            </div>
+                        ))    
+                    }   
 
-                        </div>
-                    </div>
-                    <div>
-
-                    </div>
                 </div>
             </div>
             {/* Fim Tabela Lucro Real Serviços Adquiridos */}
@@ -792,139 +431,99 @@ export function ParametrosEntrada(){
             <div className="flex flex-col gap-2 pt-8 w-[90%]">
                 <div className="font-bold">Alíquotas padrões utilizadas nas aquisições de empresas do Lucro Presumido</div>
                 <div className="grid grid-cols-5 gap-4 border border-gray-300 rounded-md p-2">
-                    <div>   
-
-                    </div>
-                    <div>
-                        Industrial
-                    </div>
-                    <div>
-                        Serviços
-                    </div>
-                    <div>
-                        Comercial
-                    </div>
-                    <div>
-                        Locação
-                    </div>
+                    {/* CABEÇALHO TABELA */}
+                    {
+                        cabecalhosTabelas.map(cabecalho => (
+                            <div>
+                                {cabecalho}
+                            </div>
+                        ))
+                    }
 
 
+                    {/* LINHA PIS-COFINS */}
                     <div>
                         PIS-COFINS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroPresumidoIndustrial" value={pisCoLucroPresumidoIndustrial} onChange={(e) => mudarpisCoLucroPresumidoIndustrial(e)}/>
+                    {
+                        lucroPresumidoLinhasPisCofins.map(linhaPisCo => (
+                            linhaPisCo.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaPisCo.id}`} value={linhaPisCo.valor} onChange={(e) => mudarAliquotaLucroPresumido(linhaPisCo.area, linhaPisCo.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroPresumidoServAdquiridos" value={pisCoLucroPresumidoServAdquiridos} onChange={(e) => mudarpisCoLucroPresumidoServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroPresumidoComercial" value={pisCoLucroPresumidoComercial} onChange={(e) => mudarpisCoLucroPresumidoComercial(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="pisCoLucroPresumidoComercial" value={pisCoLucroPresumidoLocacao} onChange={(e) => mudarpisCoLucroPresumidoLocacao(e)}/>
-
-                        </div>
-                    </div>
+                            </div>
+                        ))    
+                    }  
 
 
+                    {/* LINHA IPI */}
                     <div>
                         IPI
                     </div>
-                    <div>
+                    {
+                        lucroPresumidoLinhasIpi.map(linhaIpi => (
+                            linhaIpi.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIpi.id}`} value={linhaIpi.valor} onChange={(e) => mudarAliquotaLucroPresumido(linhaIpi.area, linhaIpi.aliquota, e)}/>
 
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        {/*<div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={ipiSimplesServAdquiridos} onChange={(e) => mudarIpiSimplesServAdquiridos(e)}/>
-
-                        </div>*/}
-                    </div>
-                    <div>
-
-                    </div>
-                    <div>
-
-                    </div>
-
+                            </div>
+                        ))    
+                    } 
 
 
-
-
-
-                    {/*<div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={pisCoSimplesServAdquiridos} onChange={(e) => mudarpisCoSimplesServAdquiridos(e)}/>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={icmsSimplesServAdquiridos} onChange={(e) => mudarIcmsSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="aliquotaIbs" value={issSimplesServAdquiridos} onChange={(e) => mudarIssSimplesServAdquiridos(e)}/>
-
-                        </div>
-                    </div>*/}
-
-
-
-
-
+                    {/* LINHA ICMS */}
                     <div>
                         ICMS
                     </div>
-                    <div>
+                    {
+                        lucroPresumidoLinhasIcms.map(linhaIcms => (
+                            linhaIcms.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIcms.id}`} value={linhaIcms.valor} onChange={(e) => mudarAliquotaLucroPresumido(linhaIcms.area, linhaIcms.aliquota, e)}/>
 
-                    </div>
-                    <div>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                    </div>
-                    <div>
-
-                    </div>
-                    <div>
-
-                    </div>
+                            </div>
+                        ))    
+                    } 
 
 
+                    {/* LINHA ISS */}
                     <div>
                         ISS
                     </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroPresumidoIndustrial" value={issLucroPresumidoIndustrial} onChange={(e) => mudarIssLucroPresumidoIndustrial(e)}/>
+                    {
+                        lucroPresumidoLinhasIss.map(linhaIss => (
+                            linhaIss.valor !== null ?
+                            <div>
+                                <div className="border-solid border-2 border-gray-500 rounded-md flex">
+                                    <input className="p-1 outline-none flex-1" type="text" id={`${linhaIss.id}`} value={linhaIss.valor} onChange={(e) => mudarAliquotaLucroPresumido(linhaIss.area, linhaIss.aliquota, e)}/>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroPresumidoServAdquiridos" value={issLucroPresumidoServAdquiridos} onChange={(e) => mudarIssLucroPresumidoServAdquiridos(e)}/>
+                                </div>
+                            </div>
+                            : 
+                            <div>
 
-                        </div>
-                    </div>
-                    <div>
-                        <div className="border-solid border-2 border-gray-500 rounded-md flex">
-                            <input className="p-1 outline-none flex-1" type="text" id="issLucroPresumidoComercial" value={issLucroPresumidoComercial} onChange={(e) => mudarIssLucroPresumidoComercial(e)}/>
+                            </div>
+                        ))    
+                    } 
 
-                        </div>
-                    </div>
-                    <div>
-
-                    </div>
                 </div>
             </div>
             {/* Fim Tabela Lucro Presumido Serviços Adquiridos */}

@@ -1,11 +1,11 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
-import { ContextoProduto, tipoOperacaoAdquiridoArr, TipoOperacaoAdquiridoType, ProdutoAdquiridoObj, MetodoAdquiridoType, metodoAdquiridoArr, RegimesAdquiridoType, regimesAdquiridoArr, SimNaoType, simNaoArr } from "../../Contextos/ContextoProduto/ContextoProduto"
+import { ContextoProduto, tipoOperacaoAdquiridoArr, TipoOperacaoAdquiridoType, ProdutoAdquiridoObj, MetodoAdquiridoType, metodoAdquiridoArr, RegimesAdquiridoType, regimesAdquiridoArr, SimNaoType, simNaoArr, aliquotasParametrosFinalType} from "../../Contextos/ContextoProduto/ContextoProduto"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
-import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
+import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 
 
 
@@ -18,12 +18,9 @@ export function ProdutosAdquiridosInput(){
     const [valorOperacaoAdd, setValorOperacaoAdd] = useState<string>("")
     const [cnpjFornecedorAdd, setCnpjFornecedorAdd] = useState<string>("")
     const [ncmAdd, setNcmAdd] = useState<string>("")
-    const [icms, setIcms] = useState<string>("0")
+    const [aliquotasAdd, setAliquotasAdd] = useState<objAliquotas>({icms: null, ipi: null, iss: null, pisCo: null})
     const [creditoIcms, setCreditoIcms] = useState<boolean>(false)
-    const [pis, setPis] = useState<string>("0")
-    const [cofins, setCofins] = useState<string>("0")
     const [creditoPisCofins, setCreditoPisCofins] = useState<boolean>(false)
-    const [ipi, setIpi] = useState<string>("0")
     const [creditoIpi, setCreditoIpi] = useState<boolean>(false)
     const [ncmGenerico, setNcmGenerico] = useState<boolean>(false)
     const [totalProdutosAdquiridosModal, setTotalProdutosAdquiridosModal] = useState<ProdutoAdquiridoObj[]>([])
@@ -38,7 +35,7 @@ export function ProdutosAdquiridosInput(){
     const [fornecedorIndustrialAberto, setFornecedorIndustrialAberto] = useState<boolean>(false)
 
     const {totalProdutosAdquiridos, setTotalProdutosAdquiridos} = useContext(ContextoProduto)
-    const {icmsSimplesIndustrial, icmsSimplesComercial, ipiSimplesIndustria, pisCoSimplesIndustria, pisCoSimplesComercio, pisCoLucroRealComercial, pisCoLucroRealIndustrial, pisCoLucroPresumidoComercial, pisCoLucroPresumidoIndustrial} = useContext(ContextoParametrosOpcionais)
+    const {aliquotasIva, tabelaSimplesNacional, tabelaLucroReal, tabelaLucroPresumido, setAliquotasIva, setTabelaSimplesNacional, setTabelaLucroReal, setTabelaLucroPresumido} = useContext(ContextoParametrosOpcionais)
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
 
     
@@ -83,7 +80,8 @@ export function ProdutosAdquiridosInput(){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setIcms("0")
+            const objAliquotasClone = {...aliquotasAdd, icms: "0"}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
@@ -97,10 +95,12 @@ export function ProdutosAdquiridosInput(){
         if(arrSeparadoVirgula[0].split("").every(carac => carac == "0")){
 
             if(temVirgula){
-                setIcms("0," + arrSeparadoVirgula[1])
+                const objAliquotasClone = {...aliquotasAdd, icms: "0," + arrSeparadoVirgula[1]}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }else{
-                setIcms("0")
+                const objAliquotasClone = {...aliquotasAdd, icms: "0"}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }
 
@@ -111,23 +111,26 @@ export function ProdutosAdquiridosInput(){
         // Se ta aqui é porque já não é só zero antes da virgula
         // Para o zero não ficar na frente no numero. Não ficar: 012, mas ficar: 12. Aqui só ativa se o valor antes da virgula tiver mais de um digito e se o primeiro desses digitos for zero
         if(arrSeparadoVirgula[0].length > 1 && arrSeparadoVirgula[0][0] == "0"){
-            setIcms(arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, icms: arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
         const regexStrNum = /^\d*(,\d*)?$/
         // qualquer valor que não cair nas excessoes anteriores
         if(regexStrNum.test(valorInput)){
-            setIcms(arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, icms: arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
     }
 
-    function escolherPis(e: React.ChangeEvent<HTMLInputElement>){
+    function escolherPisCofins(e: React.ChangeEvent<HTMLInputElement>){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setPis("0")
+            const objAliquotasClone = {...aliquotasAdd, pisCo: "0"}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
@@ -141,10 +144,12 @@ export function ProdutosAdquiridosInput(){
         if(arrSeparadoVirgula[0].split("").every(carac => carac == "0")){
 
             if(temVirgula){
-                setPis("0," + arrSeparadoVirgula[1])
+                const objAliquotasClone = {...aliquotasAdd, pisCo: "0," + arrSeparadoVirgula[1]}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }else{
-                setPis("0")
+                const objAliquotasClone = {...aliquotasAdd, pisCo: "0"}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }
 
@@ -155,58 +160,16 @@ export function ProdutosAdquiridosInput(){
         // Se ta aqui é porque já não é só zero antes da virgula
         // Para o zero não ficar na frente no numero. Não ficar: 012, mas ficar: 12. Aqui só ativa se o valor antes da virgula tiver mais de um digito e se o primeiro desses digitos for zero
         if(arrSeparadoVirgula[0].length > 1 && arrSeparadoVirgula[0][0] == "0"){
-            setPis(arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, pisCo: arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
         const regexStrNum = /^\d*(,\d*)?$/
         // qualquer valor que não cair nas excessoes anteriores
         if(regexStrNum.test(valorInput)){
-            setPis(arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
-            return 
-        }
-    }
-
-    function escolherCofins(e: React.ChangeEvent<HTMLInputElement>){
-        const valorInput = e.target.value
-
-        if(valorInput === ""){
-            setCofins("0")
-            return 
-        }
-
-        const arrSeparadoVirgula = valorInput.split(",")
-        const temVirgula = valorInput.split("").some(carac => carac == ",")
-
-        console.log("tem virgula")
-        console.log(temVirgula)
-
-        //conferir se antes da virgula é só zero
-        if(arrSeparadoVirgula[0].split("").every(carac => carac == "0")){
-
-            if(temVirgula){
-                setCofins("0," + arrSeparadoVirgula[1])
-                return 
-            }else{
-                setCofins("0")
-                return 
-            }
-
-        }
-
-        // Sem considerar casos de apenas zero antes da virgula
-
-        // Se ta aqui é porque já não é só zero antes da virgula
-        // Para o zero não ficar na frente no numero. Não ficar: 012, mas ficar: 12. Aqui só ativa se o valor antes da virgula tiver mais de um digito e se o primeiro desses digitos for zero
-        if(arrSeparadoVirgula[0].length > 1 && arrSeparadoVirgula[0][0] == "0"){
-            setCofins(arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
-            return 
-        }
-
-        const regexStrNum = /^\d*(,\d*)?$/
-        // qualquer valor que não cair nas excessoes anteriores
-        if(regexStrNum.test(valorInput)){
-            setCofins(arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, pisCo: arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
     }
@@ -215,7 +178,8 @@ export function ProdutosAdquiridosInput(){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setIpi("0")
+            const objAliquotasClone = {...aliquotasAdd, ipi: "0"}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
@@ -229,10 +193,12 @@ export function ProdutosAdquiridosInput(){
         if(arrSeparadoVirgula[0].split("").every(carac => carac == "0")){
 
             if(temVirgula){
-                setIpi("0," + arrSeparadoVirgula[1])
+                const objAliquotasClone = {...aliquotasAdd, ipi: "0," + arrSeparadoVirgula[1]}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }else{
-                setIpi("0")
+                const objAliquotasClone = {...aliquotasAdd, ipi: "0"}
+                setAliquotasAdd(objAliquotasClone)
                 return 
             }
 
@@ -243,14 +209,16 @@ export function ProdutosAdquiridosInput(){
         // Se ta aqui é porque já não é só zero antes da virgula
         // Para o zero não ficar na frente no numero. Não ficar: 012, mas ficar: 12. Aqui só ativa se o valor antes da virgula tiver mais de um digito e se o primeiro desses digitos for zero
         if(arrSeparadoVirgula[0].length > 1 && arrSeparadoVirgula[0][0] == "0"){
-            setIpi(arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, ipi: arrSeparadoVirgula[0].slice(1, 3) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
 
         const regexStrNum = /^\d*(,\d*)?$/
         // qualquer valor que não cair nas excessoes anteriores
         if(regexStrNum.test(valorInput)){
-            setIpi(arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : ""))
+            const objAliquotasClone = {...aliquotasAdd, ipi: arrSeparadoVirgula[0].slice(0, 2) + (temVirgula ? "," : "") + (arrSeparadoVirgula[1] ? arrSeparadoVirgula[1] : "")}
+            setAliquotasAdd(objAliquotasClone)
             return 
         }
     }
@@ -313,10 +281,7 @@ export function ProdutosAdquiridosInput(){
         //Resetar inputs e fechar modal
 
         setTipoOperacaoAdd(undefined)
-        setIcms("0")
-        setPis("0")
-        setCofins("0")
-        setIpi("0")
+        setAliquotasAdd({icms: null, ipi: null, iss: null, pisCo: null})
         setTotalProdutosAdquiridosModal([])
         setNcmAdd("")
         setValorOperacaoAdd("")
@@ -332,8 +297,23 @@ export function ProdutosAdquiridosInput(){
 
     }
 
+
+    function tratarObjAliquotas(objAliquotasAdd: objAliquotas): aliquotasParametrosFinalType{
+
+        let objAliquotasFinal: aliquotasParametrosFinalType = {icms: null, ipi: null, iss: null, pisCo: null}
+
+        for(const [nomeAliquota, valorAliquota] of Object.entries(objAliquotasAdd)){
+            if(valorAliquota !== null){
+                objAliquotasFinal[`${nomeAliquota}` as keyof aliquotasParametrosFinalType] = Number(valorAliquota.replace(",", "*").replace(".", ",").replace("*", "."))
+            }
+        }
+
+        return objAliquotasFinal
+
+    }
+
     function addItemProdutoVendidoModal(){
-            if(valorOperacaoAdd && icms && pis && cofins && ipi && metodoAdd && regimeFornecedorAdd){
+            if(valorOperacaoAdd  && metodoAdd && regimeFornecedorAdd){
                 let maxId = 0
                 let idAtual  
                 totalProdutosAdquiridos.forEach(item => {
@@ -344,18 +324,18 @@ export function ProdutosAdquiridosInput(){
 
                 const indexItemAtual = totalProdutosAdquiridosModal.length
 
-                idAtual = maxId + 1 + indexItemAtual         
+                idAtual = maxId + 1 + indexItemAtual       
+                
+                // Passando as aliquotas de string para number (que é como o back end espera receber)
+                const objAliquotasFinal = tratarObjAliquotas(aliquotasAdd) 
                 
 
                 const novoArr = [...totalProdutosAdquiridosModal]
                 const novoObjAtual: ProdutoAdquiridoObj = {
                     tipoOperacao: metodoAdd == "Por Operação" ? (tipoOperacaoAdd ? tipoOperacaoAdd : "") : "",
                     metodo: metodoAdd,
-                    icms: Number(icms.replace(",", ".")),
-                    pis: Number(pis.replace(",", ".")),
-                    cofins: Number(cofins.replace(",", ".")),
-                    ipi: Number(ipi.replace(",", ".")),
                     ncm: ncmGenerico ? "" : ncmAdd,
+                    aliquotas: objAliquotasFinal,
                     valorOperacao: Number(valorOperacaoAdd),
                     cnpjFornecedor: metodoAdd == "Por CNPJ" ? cnpjFornecedorAdd : "",
                     creditoIcms,
@@ -374,10 +354,7 @@ export function ProdutosAdquiridosInput(){
                 //Resetar inputs e fechar modal
 
                 setTipoOperacaoAdd(undefined)
-                setIcms("0")
-                setPis("0")
-                setCofins("0")
-                setIpi("0")
+                setAliquotasAdd({icms: null, ipi: null, iss: null, pisCo: null})
                 setNcmAdd("")
                 setValorOperacaoAdd("")
                 setMetodoAdd(undefined)
@@ -627,32 +604,30 @@ export function ProdutosAdquiridosInput(){
     useEffect(() => {
         if(regimeFornecedorAdd && fornecedorIndustrialAdd !== undefined){
             // Só ativa quando regimeFornecedorAdd e fornecedorIndustrialAdd estiverem com algum valor
+            
             if(regimeFornecedorAdd == "Simples Nacional"){
                 if(fornecedorIndustrialAdd){
                     // TABELA SIMPLES COLUNA INDUSTRIAL
-                    setIcms(icmsSimplesIndustrial)
-                    setIpi(ipiSimplesIndustria)
-                    setPis(pisCoSimplesIndustria)
+                    setAliquotasAdd(tabelaSimplesNacional.industrial)
                 }else{
                     // TABELA SIMPLES COLUNA COMERCIAL
-                    setIcms(icmsSimplesComercial)
-                    setPis(pisCoSimplesComercio)
+                    setAliquotasAdd(tabelaSimplesNacional.comercial)
                 }
             }else if(regimeFornecedorAdd == "Lucro Presumido"){
                 if(fornecedorIndustrialAdd){
                     // TABELA LUCRO PRESUMIDO COLUNA INDUSTRIAL
-                    setPis(pisCoLucroPresumidoIndustrial)
+                    setAliquotasAdd(tabelaLucroPresumido.industrial)
                 }else{
                     // TABELA LUCRO PRESUMIDO COLUNA COMERCIAL
-                    setPis(pisCoLucroPresumidoComercial)
+                    setAliquotasAdd(tabelaLucroPresumido.comercial)
                 }
             }else if(regimeFornecedorAdd == "Lucro Real"){
                 if(fornecedorIndustrialAdd){
                     // TABELA LUCRO REAL COLUNA INDUSTRIAL
-                    setPis(pisCoLucroRealIndustrial)
+                    setAliquotasAdd(tabelaLucroReal.industrial)
                 }else{
                     // TABELA LUCRO REAL COLUNA COMERCIAL
-                    setPis(pisCoLucroPresumidoComercial)
+                    setAliquotasAdd(tabelaLucroReal.comercial)
                 }
             }
         }
@@ -971,67 +946,65 @@ export function ProdutosAdquiridosInput(){
                                     />
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex flex-col"> 
-                                        <label className="text-gray-400 w-[10vw]">Aliq. ICMS</label>
-                                        <input
-                                        value={icms}
-                                        onChange={escolherIcms}
-                                        inputMode="numeric"
-                                        pattern="\d*"
-                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                        />
+                                {        
+                                    aliquotasAdd.icms !== null &&                        
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col"> 
+                                            <label className="text-gray-400 w-[10vw]">Aliq. ICMS</label>
+                                            <input
+                                            value={aliquotasAdd.icms}
+                                            onChange={escolherIcms}
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col items-start">
+                                            <label htmlFor="creditoIcms">Tem crédito ICMS?</label>
+                                            <input checked={creditoIcms} onChange={(e) => checkTemCreditoIcmsInput(e)} type="checkbox" name="creditoIcms" id="creditoIcms" />
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col items-start">
-                                        <label htmlFor="creditoIcms">Tem crédito ICMS?</label>
-                                        <input checked={creditoIcms} onChange={(e) => checkTemCreditoIcmsInput(e)} type="checkbox" name="creditoIcms" id="creditoIcms" />
-                                    </div>
-                                </div>
+                                }
 
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex flex-col">
-                                        <label className="text-gray-400 w-[10vw]">Aliq. PIS</label>
-                                        <input
-                                        value={pis}
-                                        onChange={escolherPis}
-                                        inputMode="numeric"
-                                        pattern="\d*"
-                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                        />
+                                {
+                                    aliquotasAdd.pisCo !== null &&
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col">
+                                            <label className="text-gray-400 w-[10vw]">Aliq. PIS-COFINS</label>
+                                            <input
+                                            value={aliquotasAdd.pisCo}
+                                            onChange={escolherPisCofins}
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col items-start">
+                                            <label htmlFor="creditoPisCofins">Tem crédito PIS-COFINS?</label>
+                                            <input checked={creditoPisCofins} onChange={(e) => checkTemCreditoPisCofinsInput(e)} type="checkbox" name="creditoPisCofins" id="creditoPisCofins" />
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col items-start">
-                                        <label htmlFor="creditoPisCofins">Tem crédito PIS-COFINS?</label>
-                                        <input checked={creditoPisCofins} onChange={(e) => checkTemCreditoPisCofinsInput(e)} type="checkbox" name="creditoPisCofins" id="creditoPisCofins" />
-                                    </div>
-                                </div>
+                                }
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Aliq. COFINS</label>
-                                    <input
-                                    value={cofins}
-                                    onChange={escolherCofins}
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                    /> 
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex flex-col">
-                                        <label className="text-gray-400 w-[10vw]">Aliq. IPI</label>
-                                        <input
-                                        value={ipi}
-                                        onChange={escolherIpi}
-                                        inputMode="numeric"
-                                        pattern="\d*"
-                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                        />
+                                {
+                                    aliquotasAdd.ipi !== null &&
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col">
+                                            <label className="text-gray-400 w-[10vw]">Aliq. IPI</label>
+                                            <input
+                                            value={aliquotasAdd.ipi}
+                                            onChange={escolherIpi}
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col items-start">
+                                            <label htmlFor="creditoIpi">Tem crédito IPI?</label>
+                                            <input checked={creditoIpi} onChange={(e) => checkTemCreditoIpiInput(e)} type="checkbox" name="creditoIpi" id="creditoIpi" />
+                                        </div>                            
                                     </div>
-                                    <div className="flex flex-col items-start">
-                                        <label htmlFor="creditoIpi">Tem crédito IPI?</label>
-                                        <input checked={creditoIpi} onChange={(e) => checkTemCreditoIpiInput(e)} type="checkbox" name="creditoIpi" id="creditoIpi" />
-                                    </div>                            
-                                </div>
+                                }
 
                         </div>
 
@@ -1065,7 +1038,7 @@ export function ProdutosAdquiridosInput(){
                                                 <>
                                                     {
                                                         index == 0 &&
-                                                        <div className="grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
+                                                        <div className="grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                             <div>Método</div>
                                                             <div>Tipo Operação</div>
                                                             <div>CNPJ Fornecedor</div>
@@ -1073,8 +1046,7 @@ export function ProdutosAdquiridosInput(){
                                                             <div>Fornecedor Industrial</div>
                                                             <div>NCM</div>
                                                             <div>Aliq. ICMS</div>
-                                                            <div>Aliq. PIS</div>
-                                                            <div>Aliq. COFINS</div>
+                                                            <div>Aliq. PIS-COFINS</div>
                                                             <div>Aliq. IPI</div>
                                                             <div>Valor Operação</div>
                                                             <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
@@ -1083,17 +1055,16 @@ export function ProdutosAdquiridosInput(){
                                                         </div>
                                                     }
                                 
-                                                    <div className={`grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                    <div className={`grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                         <div>{produto.metodo}</div>
                                                         <div>{produto.metodo == "Por Operação" ? produto.tipoOperacao : ""}</div>
                                                         <div>{produto.metodo == "Por Operação" ? "Diversos" : produto.cnpjFornecedor}</div>
                                                         <div>{produto.regimeTributarioOutro}</div>
                                                         <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                         <div>{produto.ncm}</div>
-                                                        <div>{produto.icms}% - {produto.creditoIcms ? "Com Crédito" : "Sem Crédito"}</div>
-                                                        <div>{produto.pis}%</div>
-                                                        <div>{produto.cofins}%</div>
-                                                        <div>{produto.ipi}% - {produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}</div>
+                                                        <div>{produto.aliquotas.icms !== null ? produto.aliquotas.icms + `% - ${produto.creditoIcms ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
+                                                        <div>{produto.aliquotas.pisCo !== null ? produto.aliquotas.pisCo + `% - ${produto.creditoPisCofins ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
+                                                        <div>{produto.aliquotas.ipi !== null ? produto.aliquotas.ipi + `% - ${produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                         <div>{produto.valorOperacao}</div>
                                                         <div onClick={() => {apagarProdutoAdquiridoModal(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
                                                             <img className="w-3 h-3" src={lixeira} alt="lixeira" />
@@ -1147,7 +1118,7 @@ export function ProdutosAdquiridosInput(){
                                         <>
                                             {
                                                 index == 0 &&
-                                                <div className="grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
+                                                <div className="grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                     <div>Método</div>
                                                     <div>Tipo Operação</div>
                                                     <div>CNPJ Fornecedor</div>
@@ -1155,8 +1126,7 @@ export function ProdutosAdquiridosInput(){
                                                     <div>Fornecedor Industrial</div>
                                                     <div>NCM</div>
                                                     <div>Aliq. ICMS</div>
-                                                    <div>Aliq. PIS</div>
-                                                    <div>Aliq. COFINS</div>
+                                                    <div>Aliq. PIS-COFINS</div>
                                                     <div>Aliq. IPI</div>
                                                     <div>Valor Operação</div>
                                                     <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
@@ -1165,17 +1135,16 @@ export function ProdutosAdquiridosInput(){
                                                 </div>
                                             }
                         
-                                            <div className={`grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                            <div className={`grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                 <div>{produto.metodo}</div>
                                                 <div>{produto.metodo == "Por Operação" ? produto.tipoOperacao : ""}</div>
                                                 <div>{produto.metodo == "Por CNPJ" ? produto.cnpjFornecedor : "Diversos"}</div>
                                                 <div>{produto.regimeTributarioOutro}</div>
                                                 <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                 <div>{produto.ncm}</div>
-                                                <div>{produto.icms}% - {produto.creditoIcms ? "Com Crédito" : "Sem Crédito"}</div>
-                                                <div>{produto.pis}%</div>
-                                                <div>{produto.cofins}%</div>
-                                                <div>{produto.ipi}% - {produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}</div>
+                                                <div>{produto.aliquotas.icms !== null ? produto.aliquotas.icms + `% - ${produto.creditoIcms ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
+                                                <div>{produto.aliquotas.pisCo !== null ? produto.aliquotas.pisCo + `% - ${produto.creditoPisCofins ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
+                                                <div>{produto.aliquotas.ipi !== null ? produto.aliquotas.ipi + `% - ${produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                 <div>{produto.valorOperacao}</div>
                                                 <div onClick={() => {apagarProdutoAdquirido(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
                                                     <img className="w-3 h-3" src={lixeira} alt="lixeira" />

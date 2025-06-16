@@ -24,35 +24,22 @@ export interface objAtividadesAdquitidasType {
   operacao: string
 }
 
+export type aliquotasParametrosBodyType = {iss: number | null, icms: number | null, pisCo: number | null, ipi: number | null}
+
+export type objParametrosEntradaBodyType = {
+    industrial: aliquotasParametrosBodyType,
+    servicos: aliquotasParametrosBodyType,
+    comercial: aliquotasParametrosBodyType,
+    locacao: aliquotasParametrosBodyType
+}
 
 interface parametrosEntrada {
-  aliquotaIbs: number,
-  aliquotaCbs: number,
-  aliquotaIva: number,
-  ipiSimplesServAdquiridos: number,
-  issSimplesServAdquiridos: number,
-  pisCoSimplesServAdquiridos: number,
-  icmsSimplesServAdquiridos: number,
-  icmsSimplesComercial: number,
-  icmsSimplesIndustrial: number,
-  ipiSimplesIndustria: number,
-  pisCoSimplesComercio: number,
-  pisCoSimplesIndustria: number,
-  pisCoLucroRealIndustrial: number,
-  pisCoLucroRealServAdquiridos: number,
-  pisCoLucroRealComercial: number,
-  issLucroRealIndustrial: number,
-  issLucroRealServAdquiridos: number,
-  issLucroRealComercial: number,
-  pisCoLucroPresumidoIndustrial: number,
-  pisCoLucroPresumidoServAdquiridos: number,
-  pisCoLucroPresumidoComercial: number,
-  issLucroPresumidoIndustrial: number,
-  issLucroPresumidoServAdquiridos: number,
-  issLucroPresumidoComercial: number,
-  pisCoLucroPresumidoLocacao: number,
-  pisCoLucroRealLocacao: number,
-  pisCoSimplesLocacao: number,
+    aliquotaIbs: number,
+    aliquotaCbs: number,
+    aliquotaIva: number,
+    tabelaSimplesNacional: objParametrosEntradaBodyType,
+    tabelaLucroReal: objParametrosEntradaBodyType,
+    tabelaLucroPresumido: objParametrosEntradaBodyType,
 }
 
 interface ExcelRow {
@@ -172,8 +159,7 @@ export interface ProdutoAdquiridoObj {
     ncm: string,
     icms: number,
     creditoIcms: boolean,
-    pis: number,
-    cofins: number,
+    pisCofins: number,
     creditoPisCofins: boolean,
     ipi: number,
     creditoIpi: boolean,
@@ -943,8 +929,8 @@ export class calcularSimplificadoUseCase{
                 })
               }else if(meuRegime == 'Lucro Presumido'){
                   // Prestação de serviços lucro presumido
-                  const pisCo = this.parametrosEntrada.pisCoLucroPresumidoServAdquiridos / 100
-                  const iss = this.parametrosEntrada.issLucroPresumidoServAdquiridos / 100
+                  const pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
+                  const iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
 
                   const aliquotaDesonerada = pisCo + iss
 
@@ -995,8 +981,8 @@ export class calcularSimplificadoUseCase{
               }else if(meuRegime == 'Lucro Real'){
                   // Prestação de serviços lucro real
 
-                  const pisCo = this.parametrosEntrada.pisCoLucroRealServAdquiridos / 100
-                  const iss = this.parametrosEntrada.issLucroRealServAdquiridos / 100
+                  const pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
+                  const iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
 
                   const aliquotaDesonerada = pisCo + iss
 
@@ -1046,10 +1032,10 @@ export class calcularSimplificadoUseCase{
               console.log("////////////////////////")
               console.log("Análise Serviços adquiridos")
 
-              const iss = this.parametrosEntrada.issSimplesServAdquiridos / 100
-              const icms = this.parametrosEntrada.icmsSimplesServAdquiridos / 100
-              const ipi = this.parametrosEntrada.ipiSimplesServAdquiridos / 100
-              const pisCo = this.parametrosEntrada.pisCoSimplesServAdquiridos / 100
+              const iss = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss / 100 : 0
+              const icms = this.parametrosEntrada.tabelaSimplesNacional.servicos.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.icms / 100 : 0
+              const ipi = this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi / 100 : 0
+              const pisCo = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo / 100 : 0
               const ibsBruto = this.parametrosEntrada.aliquotaIbs / 100
               const cbsBruto = this.parametrosEntrada.aliquotaCbs / 100
               const ivaBruto = this.parametrosEntrada.aliquotaIva / 100
@@ -1127,13 +1113,13 @@ export class calcularSimplificadoUseCase{
                       if(objOperacaoAtual){
 
                         if(objOperacaoAtual.colunaParametros == "comercio"){
-                          const pisCofinsComercio = this.parametrosEntrada.pisCoSimplesComercio
-                          const icmsComercio = this.parametrosEntrada.icmsSimplesComercial
+                          const pisCofinsComercio = this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo : 0
+                          const icmsComercio = this.parametrosEntrada.tabelaSimplesNacional.comercial.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.icms : 0
                           aliquotaDesonerada = pisCofinsComercio + icmsComercio
                               console.log("eentrou comercio")
                         }else if(objOperacaoAtual.colunaParametros == "serviços"){
-                          const pisCofinsServico = this.parametrosEntrada.pisCoSimplesServAdquiridos
-                          const issServico = this.parametrosEntrada.issSimplesServAdquiridos
+                          const pisCofinsServico = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo : 0
+                          const issServico = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss : 0
                               console.log("eentrou comercio")
                           aliquotaDesonerada = pisCofinsServico + issServico
                         }
@@ -1259,8 +1245,8 @@ export class calcularSimplificadoUseCase{
                     if(atividade.regimeTributario == "Lucro Presumido"){
                         console.log("atividade " + (index + 1) + " é do lucro presumido")
                       // LUCRO PRESUMIDO
-                          const pisCo = this.parametrosEntrada.pisCoLucroPresumidoServAdquiridos / 100
-                          const iss = this.parametrosEntrada.issLucroPresumidoServAdquiridos / 100
+                          const pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
+                          const iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
 
                           let aliquotaDesonerada = 0
                           let faturamentoDesonerado
@@ -1318,13 +1304,13 @@ export class calcularSimplificadoUseCase{
 
 
                               if(objOperacaoAtual.colunaParametros == "comercio"){
-                                const pisCofinsComercio = this.parametrosEntrada.pisCoLucroPresumidoComercial
-                                const issComercio = this.parametrosEntrada.issLucroPresumidoComercial
+                                const pisCofinsComercio = this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo : 0
+                                const issComercio = this.parametrosEntrada.tabelaLucroPresumido.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.iss : 0
                               console.log("eentrou comercio")
                                 aliquotaDesonerada = pisCofinsComercio + issComercio
                               }else if(objOperacaoAtual.colunaParametros == "serviços"){
-                                const pisCofinsServico = this.parametrosEntrada.pisCoLucroPresumidoServAdquiridos
-                                const issServico = this.parametrosEntrada.issLucroPresumidoServAdquiridos
+                                const pisCofinsServico = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo : 0
+                                const issServico = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss : 0
                               console.log("eentrou comercio")
                                 aliquotaDesonerada = pisCofinsServico + issServico
                               }
@@ -1382,8 +1368,8 @@ export class calcularSimplificadoUseCase{
                     }else if(atividade.regimeTributario == "Lucro Real"){
                         console.log("atividade " + (index + 1) + " é do lucro real")
                         // LUCRO REAL
-                        const pisCo = this.parametrosEntrada.pisCoLucroRealServAdquiridos / 100
-                        const iss = this.parametrosEntrada.issLucroRealServAdquiridos / 100
+                        const pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
+                        const iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
 
                         let aliquotaDesonerada = 0
                         let faturamentoDesonerado 
@@ -1440,13 +1426,13 @@ export class calcularSimplificadoUseCase{
 
                             if(objOperacaoAtual.colunaParametros == "comercio"){
                               console.log("eentrou comercio")
-                              const pisCofinsComercio = this.parametrosEntrada.pisCoLucroRealComercial
-                              const issComercio = this.parametrosEntrada.issLucroRealComercial
+                              const pisCofinsComercio = this.parametrosEntrada.tabelaLucroReal.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.pisCo : 0
+                              const issComercio = this.parametrosEntrada.tabelaLucroReal.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.iss : 0
                               aliquotaDesonerada = pisCofinsComercio + issComercio
                             }else if(objOperacaoAtual.colunaParametros == "serviços"){
-                                                            console.log("eentrou serviço")
-                              const pisCofinsServico = this.parametrosEntrada.pisCoLucroRealServAdquiridos
-                              const issServico = this.parametrosEntrada.issLucroRealServAdquiridos
+                              console.log("eentrou serviço")
+                              const pisCofinsServico = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo : 0
+                              const issServico = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss : 0
                               aliquotaDesonerada = pisCofinsServico + issServico
                             }
 
@@ -1833,10 +1819,9 @@ export class calcularSimplificadoUseCase{
 
           // BENS MÓVEIS - LOCAÇÃO
           if(totalMoveisLocacao.length > 0){
-
-            const pisCoLucroPresumidoLocacao = this.parametrosEntrada.pisCoLucroPresumidoLocacao
-            const pisCoLucroRealLocacao = this.parametrosEntrada.pisCoLucroRealLocacao
-            const pisCoSimplesLocacao = this.parametrosEntrada.pisCoSimplesLocacao
+            const pisCoLucroPresumidoLocacao = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo : 0
+            const pisCoLucroRealLocacao = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo : 0
+            const pisCoSimplesLocacao = this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo : 0
 
             console.log("piscofins lucroPresumido era pra ser 3,65%")
             console.log(pisCoLucroPresumidoLocacao)
@@ -1901,14 +1886,14 @@ export class calcularSimplificadoUseCase{
                     if(meuRegime == 'Lucro Presumido'){
                       aliquotaDesonerar = pisCoLucroPresumidoLocacao
                       if(movel.comOperador){
-                        valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * parametrosEntrada.issLucroPresumidoServAdquiridos
+                        valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * (parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? parametrosEntrada.tabelaLucroPresumido.servicos.iss : 0)
                       }else{
                         valorImpostosAtuais = (valorBase * aliquotaDesonerar)
                       }
                     }else if(meuRegime == 'Lucro Real'){
                         aliquotaDesonerar = pisCoLucroRealLocacao
                         if(movel.comOperador){
-                          valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * parametrosEntrada.issLucroRealServAdquiridos
+                          valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * (parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? parametrosEntrada.tabelaLucroReal.servicos.iss : 0)
                         }else{
                           valorImpostosAtuais = (valorBase * aliquotaDesonerar)
                         }
@@ -2158,17 +2143,17 @@ export class calcularSimplificadoUseCase{
 
                 if(produtoAdquirido.fornecedorIndustrial){
                   // Pegar parametros da coluna industrial
-                  aliquotaDesonerar = (produtoAdquirido.icms  + produtoAdquirido.ipi + produtoAdquirido.pis)
+                  aliquotaDesonerar = (produtoAdquirido.icms  + produtoAdquirido.ipi + produtoAdquirido.pisCofins)
                 }else{
                   // Caso não industrial pegar parametros da coluna comercial
-                  aliquotaDesonerar = (produtoAdquirido.icms + produtoAdquirido.pis)
+                  aliquotaDesonerar = (produtoAdquirido.icms + produtoAdquirido.pisCofins)
                 }
 
                 valorImpostosAtuais = valorBase * aliquotaDesonerar
 
               }else{
                 // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
-                const aliquotaDesonerar = produtoAdquirido.icms + produtoAdquirido.pis + produtoAdquirido.cofins + produtoAdquirido.ipi 
+                const aliquotaDesonerar = produtoAdquirido.icms + produtoAdquirido.pisCofins + produtoAdquirido.ipi 
                 console.log("aliquota a desonerar: " + aliquotaDesonerar)
                 valorImpostosAtuais = valorBase * aliquotaDesonerar
 

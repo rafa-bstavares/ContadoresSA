@@ -16,7 +16,7 @@ export function Configuracoes(){
     }
 
     const {setConfigAberta} = useContext(ContextoConfiguracoes)
-    const {aliquotaCbs, aliquotaIbs} = useContext(ContextoParametrosOpcionais)
+    const {aliquotasIva} = useContext(ContextoParametrosOpcionais)
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
 
     const opcoesConfigIniciais = [
@@ -43,7 +43,7 @@ export function Configuracoes(){
 
         const itemAtivo = opcoesConfig.find(item => item.ativo === true)
         if(itemAtivo?.nome == "Parâmetros de entrada"){
-            if(aliquotaCbs == "" || aliquotaIbs == ""){
+            if(aliquotasIva.cbs == "" || aliquotasIva.ibs == ""){
                 console.log("Todos os parâmetros precisam estar preenchidos")
                 setTemErro(true)
                 setTextoErro("Todos os parâmetros precisam estar preenchidos")
