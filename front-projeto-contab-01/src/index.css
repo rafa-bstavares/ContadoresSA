@@ -40,6 +40,7 @@
   --color-champanhe: "#F7E7CE";
   --color-rose: "#C29468";
   --color-ouroClassico: "#D4AF37";
+  --color-amareloPriceTax: "#FFDD00"
 
   --spacing-paddingYSecoesPagPrincipal: 10rem; 
   --spacing-paddingXSecoesPagPrincipal: 3rem; 
@@ -168,8 +169,14 @@ body {
   }
 }
 
-.textoGradiente{
+.textoGradienteAntigo{
   background:linear-gradient(120deg,#F7E7CE,#D4AF37);
+  background-clip: text;
+  color: transparent
+}
+
+.textoGradiente{
+  background:linear-gradient(120deg,#ff9d00, 50%,#FFDD00);
   background-clip: text;
   color: transparent
 }

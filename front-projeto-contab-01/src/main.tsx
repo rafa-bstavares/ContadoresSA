@@ -17,6 +17,8 @@ import  { DadosPessoais } from './Components/DadosPessoais/DadosPessoais.tsx'
 import { MinhasEmpresas } from './Components/MinhasEmpresas/MinhasEmpresas.tsx'
 import { MoveisProvider } from './Contextos/ContextoMoveis/ContextoMoveis.tsx'
 import { ProdutoProvider } from './Contextos/ContextoProduto/ContextoProduto.tsx'
+import { ResultadoSimulador } from './Components/ResultadoSimulador/ResultadoSimulador.tsx'
+import { ResultadoSimuladorProvider } from './Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -30,16 +32,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <UsuarioProvider>
       <MoveisProvider>
       <ProdutoProvider>
+      <ResultadoSimuladorProvider>
         <Routes>
           <Route path='/' element={<App/>}>
-            <Route path='/Perfil' element={<Perfil/>}>
-              <Route path='/Perfil' element={<Calculadora/>}></Route>
+            <Route path='/Perfil/' element={<Perfil/>}>
+              <Route path='/Perfil/TirarAqui' element={<Calculadora/>}></Route>
               <Route path='/Perfil/DadosPessoais' element={<DadosPessoais/>}></Route>
               <Route path='/Perfil/MinhasEmpresas' element={<MinhasEmpresas/>}></Route>
+              <Route path='/Perfil/' element={<ResultadoSimulador/>} ></Route>
             </Route>
             <Route path='/' element={<PaginaInicial/>}></Route>
           </Route>
         </Routes>
+      </ResultadoSimuladorProvider>
       </ProdutoProvider>
       </MoveisProvider>
       </UsuarioProvider>

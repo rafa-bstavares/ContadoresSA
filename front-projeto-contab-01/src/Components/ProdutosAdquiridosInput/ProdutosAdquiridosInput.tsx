@@ -6,6 +6,7 @@ import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
 import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
+import { ToogleButton, toogleFn } from "../ToogleButton/ToogleButton"
 
 
 
@@ -13,7 +14,7 @@ import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/Conte
 export function ProdutosAdquiridosInput(){
 
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoAdquiridoType>()
-    const [metodoAdd, setMetodoAdd] = useState<MetodoAdquiridoType>()
+    const [metodoAdd, setMetodoAdd] = useState<MetodoAdquiridoType>("Por CNPJ")
     const [regimeFornecedorAdd, setRegimeFornecedorAdd] = useState<RegimesAdquiridoType>()
     const [valorOperacaoAdd, setValorOperacaoAdd] = useState<string>("")
     const [cnpjFornecedorAdd, setCnpjFornecedorAdd] = useState<string>("")
@@ -23,6 +24,7 @@ export function ProdutosAdquiridosInput(){
     const [creditoPisCofins, setCreditoPisCofins] = useState<boolean>(false)
     const [creditoIpi, setCreditoIpi] = useState<boolean>(false)
     const [ncmGenerico, setNcmGenerico] = useState<boolean>(false)
+    const [cnpjGenerico, setCnpjGenerico] = useState<boolean>(false)
     const [totalProdutosAdquiridosModal, setTotalProdutosAdquiridosModal] = useState<ProdutoAdquiridoObj[]>([])
     const [fornecedorIndustrialAdd, setFornecedorIndustrialAdd] = useState<boolean>(false)
 
@@ -241,23 +243,13 @@ export function ProdutosAdquiridosInput(){
         const objCnpj = validarCnpj()
         if(metodoAdd){
             if(metodoAdd == "Por CNPJ" ? objCnpj.valido : true){
-                if(metodoAdd == "Por CNPJ"){
-                    if((ncmGenerico ? true : ncmAdd) && cnpjFornecedorAdd && fornecedorIndustrialAdd !== undefined && regimeFornecedorAdd){
-                        setInfo1Aberto(false)
-                        setInfo2Aberto(true)
-                    }else{
-                        setTemErro(true)
-                        setTextoErro("Preencha todos os valores de Informações Gerais")
-                    }
-                }else if(metodoAdd == "Por Operação"){
-                    if((ncmGenerico ? true : ncmAdd.length == 8) && tipoOperacaoAdd && fornecedorIndustrialAdd !== undefined && regimeFornecedorAdd){
+                    if((ncmGenerico ? true : ncmAdd) && (metodoAdd == "Por CNPJ" ? cnpjFornecedorAdd : true) && tipoOperacaoAdd && fornecedorIndustrialAdd !== undefined && regimeFornecedorAdd){
                         setInfo1Aberto(false)
                         setInfo2Aberto(true)
                     }else{
                         setTemErro(true)
                         setTextoErro("Preencha todos os valores de Informações Gerais. O NCM deve conter exatamente 8 dígitos.")
-                    }
-                }
+                    }            
             }else{
                 setTemErro(true)
                 setTextoErro("CNPJ inválido")
@@ -285,10 +277,11 @@ export function ProdutosAdquiridosInput(){
         setTotalProdutosAdquiridosModal([])
         setNcmAdd("")
         setValorOperacaoAdd("")
-        setMetodoAdd(undefined)
+        setMetodoAdd("Por CNPJ")
         setCnpjFornecedorAdd("")   
         setNcmGenerico(false)
         setFornecedorIndustrialAdd(false)
+        setCnpjGenerico(false)
 
         setInfo2Aberto(false)
         setInfo1Aberto(true)
@@ -313,7 +306,7 @@ export function ProdutosAdquiridosInput(){
     }
 
     function addItemProdutoVendidoModal(){
-            if(valorOperacaoAdd  && metodoAdd && regimeFornecedorAdd){
+            if(valorOperacaoAdd  && metodoAdd && regimeFornecedorAdd && tipoOperacaoAdd){
                 let maxId = 0
                 let idAtual  
                 totalProdutosAdquiridos.forEach(item => {
@@ -332,7 +325,7 @@ export function ProdutosAdquiridosInput(){
 
                 const novoArr = [...totalProdutosAdquiridosModal]
                 const novoObjAtual: ProdutoAdquiridoObj = {
-                    tipoOperacao: metodoAdd == "Por Operação" ? (tipoOperacaoAdd ? tipoOperacaoAdd : "") : "",
+                    tipoOperacao: tipoOperacaoAdd,
                     metodo: metodoAdd,
                     ncm: ncmGenerico ? "" : ncmAdd,
                     aliquotas: objAliquotasFinal,
@@ -357,10 +350,11 @@ export function ProdutosAdquiridosInput(){
                 setAliquotasAdd({icms: null, ipi: null, iss: null, pisCo: null})
                 setNcmAdd("")
                 setValorOperacaoAdd("")
-                setMetodoAdd(undefined)
+                setMetodoAdd("Por CNPJ")
                 setCnpjFornecedorAdd("")
                 setNcmGenerico(false)
                 setFornecedorIndustrialAdd(false)
+                setCnpjGenerico(false)
                 
                 setInfo2Aberto(false)
                 setInfo1Aberto(true)
@@ -523,6 +517,16 @@ export function ProdutosAdquiridosInput(){
         }
     }
 
+    function checkCnpjGenericoInput(e: React.ChangeEvent<HTMLInputElement>){
+        if(e.target.checked){
+            setCnpjGenerico(true)
+            setMetodoAdd("Por Operação")
+        }else{
+            setCnpjGenerico(false)
+            setMetodoAdd("Por CNPJ")
+        }
+    }
+
 
     function apagarProdutoAdquirido(id: number){
         const novoArr = [...totalProdutosAdquiridos]
@@ -633,6 +637,10 @@ export function ProdutosAdquiridosInput(){
         }
     }, [regimeFornecedorAdd, fornecedorIndustrialAdd])
 
+    useEffect(() => {
+        cnpjGenerico ? setMetodoAdd("Por Operação") : setMetodoAdd("Por CNPJ")
+    }, [cnpjGenerico])
+
 
     return (
         <div className="flex flex-col gap-2">
@@ -641,7 +649,7 @@ export function ProdutosAdquiridosInput(){
             <div className={`fixed left-0 right-0 top-0 h-screen flex flex-col items-center justify-center bg-black/90 text-white z-50`}>
 
 
-                <div className={`flex flex-col overflow-y-scroll h-[90vh] gap-6 bg-premiumBg px-24 py-12 rounded-md`}>
+                <div className={`flex flex-col w-[95vw] overflow-y-scroll h-[90vh] gap-6 bg-premiumBg px-24 py-12 rounded-md`}>
                     <div className="flex self-end mb-6 cursor-pointer" onClick={() => setModalProdutosAberto(false)}>
                         <img
                         className="w-12 h-12"
@@ -668,7 +676,7 @@ export function ProdutosAdquiridosInput(){
                         <div className="overflow-hidden flex flex-col gap-8"> {/* ESSE OVERFLOW-HIDDEN QUE ESTÁ FAZENDO O TOOLTIP NÃO APARECER TODO */}
                             <div className="flex gap-8 p-6">
 
-
+{/*
                                 <div className="flex flex-col">
                                     <label className="text-gray-400 w-[10vw]">Método:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
@@ -713,73 +721,81 @@ export function ProdutosAdquiridosInput(){
                                         </div>
                                     </div>
                                 </div>
+                                */}
 
-                                {   
-                                    metodoAdd == "Por Operação" &&                         
-                                    <div className="flex flex-col">
-                                        <label className="text-gray-400 w-[10vw]">Tipo do Operação:</label>
-                                        <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                                            <div
-                                            onClick={trocarDropTipoOperacao}
-                                            className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                                            >
-                                                <div className=" opacity-50">
-                                                    {tipoOperacaoAdd || "Escolha o tipo do aluguel"}
-                                                </div>
-                                                <div
-                                                    className={`
-                                                    ${tipoOperacaoAberto ? "rotate-180" : "rotate-0"}
-                                                    transition-all ease-linear duration-500
-                                                    `}
-                                                >
-                                                    <img
-                                                    src={setaSeletor}
-                                                    alt="seta-seletor"
-                                                    className="w-4 h-4"
-                                                    />
-                                                </div>
-                                            </div>
 
-                                            <div
-                                            className={`
-                                                ${tipoOperacaoAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                                                [transition:grid-template-rows_500ms]
-                                            `}
+
+                                <div className="flex flex-col flex-1">
+                                    {
+                                        metodoAdd == "Por CNPJ" &&
+                                        <div className="flex flex-col flex-1">
+                                            <label
+                                                htmlFor="cnpj"
+                                                className="flex flex-col text-gray-400"
                                             >
-                                            <div className="overflow-hidden">
-                                                {tipoOperacaoAdquiridoArr.map(item => (
-                                                <div
-                                                    key={item}
-                                                    className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
-                                                    onClick={() => escolherTipoOperacao(item)}
-                                                >
-                                                    {item}
-                                                </div>
-                                                ))}
+                                                <div>CNPJ Fornecedor</div>
+                                            </label>
+                                            <input
+                                                className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
+                                                type="number"
+                                                id="ncm"
+                                                value={cnpjFornecedorAdd}
+                                                onChange={mudarCnpjFornecedor}
+                                            />
+                                        </div>
+                                    }
+                                    <ToogleButton valor={cnpjGenerico} onChangeFn={() => toogleFn(setCnpjGenerico, cnpjGenerico)} texto="CNPJ genérico" />
+                                    {/*<div className="flex flex-col items-start">
+                                        <label htmlFor="cnpjGenerico">CNPJ genérico</label>
+                                        <input checked={metodoAdd == "Por Operação"} onChange={(e) => checkCnpjGenericoInput(e)} type="checkbox" name="cnpjGenerico" id="cnpjGenerico" />
+                                    </div>*/}
+                                </div>
+                      
+                                <div className="flex flex-col">
+                                    <label className="text-gray-400 w-[10vw]">Tipo do Operação:</label>
+                                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                                        <div
+                                        onClick={trocarDropTipoOperacao}
+                                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
+                                        >
+                                            <div className=" opacity-50">
+                                                {tipoOperacaoAdd || "Escolha o tipo do aluguel"}
                                             </div>
+                                            <div
+                                                className={`
+                                                ${tipoOperacaoAberto ? "rotate-180" : "rotate-0"}
+                                                transition-all ease-linear duration-500
+                                                `}
+                                            >
+                                                <img
+                                                src={setaSeletor}
+                                                alt="seta-seletor"
+                                                className="w-4 h-4"
+                                                />
                                             </div>
                                         </div>
-                                    </div>
-                                }
 
-                                {
-                                    metodoAdd == "Por CNPJ" &&
-                                    <div className="flex flex-col flex-1">
-                                        <label
-                                            htmlFor="cnpj" 
-                                            className="flex flex-col text-gray-400"
-                                        > 
-                                            <div>CNPJ Fornecedor</div>
-                                        </label>
-                                        <input
-                                            className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                            type="number"
-                                            id="ncm"
-                                            value={cnpjFornecedorAdd}
-                                            onChange={mudarCnpjFornecedor}
-                                        />
-                                    </div>  
-                                }
+                                        <div
+                                        className={`
+                                            ${tipoOperacaoAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                            [transition:grid-template-rows_500ms]
+                                        `}
+                                        >
+                                        <div className="overflow-hidden">
+                                            {tipoOperacaoAdquiridoArr.map(item => (
+                                            <div
+                                                key={item}
+                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                onClick={() => escolherTipoOperacao(item)}
+                                            >
+                                                {item}
+                                            </div>
+                                            ))}
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <div className="flex flex-col">
                                     <label className="text-gray-400 w-[10vw]">Fornecedor Industrial:</label>
@@ -847,10 +863,11 @@ export function ProdutosAdquiridosInput(){
                                             />
                                         </div>
                                     }
-                                    <div className="flex flex-col items-start">
-                                        <label htmlFor="ncmGenerico">NCM genérico?</label>
+                                    <ToogleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM genérico" />
+                                    {/*<div className="flex flex-col items-start">
+                                        <label htmlFor="ncmGenerico">NCM genérico</label>
                                         <input checked={ncmGenerico} onChange={(e) => checkNcmGenericoInput(e)} type="checkbox" name="ncmGenerico" id="ncmGenerico" />
-                                    </div>
+                                    </div>*/}
                                 </div>
                             
                                 <div className="flex flex-col">
@@ -959,10 +976,11 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <div className="flex flex-col items-start">
+                                        <ToogleButton valor={creditoIcms} onChangeFn={() => toogleFn(setCreditoIcms, creditoIcms)} texto="Tem crédito ICMS"/>
+                                        {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoIcms">Tem crédito ICMS?</label>
                                             <input checked={creditoIcms} onChange={(e) => checkTemCreditoIcmsInput(e)} type="checkbox" name="creditoIcms" id="creditoIcms" />
-                                        </div>
+                                        </div>*/}
                                     </div>
                                 }
 
@@ -979,10 +997,11 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <div className="flex flex-col items-start">
+                                        <ToogleButton valor={creditoPisCofins} onChangeFn={() => toogleFn(setCreditoPisCofins, creditoPisCofins)} texto="Tem crédito PIS-COFINS"/>
+                                        {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoPisCofins">Tem crédito PIS-COFINS?</label>
                                             <input checked={creditoPisCofins} onChange={(e) => checkTemCreditoPisCofinsInput(e)} type="checkbox" name="creditoPisCofins" id="creditoPisCofins" />
-                                        </div>
+                                        </div>*/}
                                     </div>
                                 }
 
@@ -999,10 +1018,11 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <div className="flex flex-col items-start">
+                                        <ToogleButton valor={creditoIpi} onChangeFn={() => toogleFn(setCreditoIpi, creditoIpi)} texto="Tem crédito IPI"/>
+                                        {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoIpi">Tem crédito IPI?</label>
                                             <input checked={creditoIpi} onChange={(e) => checkTemCreditoIpiInput(e)} type="checkbox" name="creditoIpi" id="creditoIpi" />
-                                        </div>                            
+                                        </div>*/}                           
                                     </div>
                                 }
 
@@ -1038,10 +1058,9 @@ export function ProdutosAdquiridosInput(){
                                                 <>
                                                     {
                                                         index == 0 &&
-                                                        <div className="grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
-                                                            <div>Método</div>
-                                                            <div>Tipo Operação</div>
+                                                        <div className="grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                             <div>CNPJ Fornecedor</div>
+                                                            <div>Tipo Operação</div>
                                                             <div>Regime Fornecedor</div>
                                                             <div>Fornecedor Industrial</div>
                                                             <div>NCM</div>
@@ -1055,10 +1074,9 @@ export function ProdutosAdquiridosInput(){
                                                         </div>
                                                     }
                                 
-                                                    <div className={`grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
-                                                        <div>{produto.metodo}</div>
-                                                        <div>{produto.metodo == "Por Operação" ? produto.tipoOperacao : ""}</div>
+                                                    <div className={`grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                         <div>{produto.metodo == "Por Operação" ? "Diversos" : produto.cnpjFornecedor}</div>
+                                                        <div>{produto.tipoOperacao}</div>                                                       
                                                         <div>{produto.regimeTributarioOutro}</div>
                                                         <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                         <div>{produto.ncm}</div>
@@ -1118,10 +1136,9 @@ export function ProdutosAdquiridosInput(){
                                         <>
                                             {
                                                 index == 0 &&
-                                                <div className="grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
-                                                    <div>Método</div>
-                                                    <div>Tipo Operação</div>
+                                                <div className="grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                     <div>CNPJ Fornecedor</div>
+                                                    <div>Tipo Operação</div>                                                   
                                                     <div>Regime Fornecedor</div>
                                                     <div>Fornecedor Industrial</div>
                                                     <div>NCM</div>
@@ -1135,10 +1152,9 @@ export function ProdutosAdquiridosInput(){
                                                 </div>
                                             }
                         
-                                            <div className={`grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
-                                                <div>{produto.metodo}</div>
-                                                <div>{produto.metodo == "Por Operação" ? produto.tipoOperacao : ""}</div>
+                                            <div className={`grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                 <div>{produto.metodo == "Por CNPJ" ? produto.cnpjFornecedor : "Diversos"}</div>
+                                                <div>{produto.tipoOperacao}</div>
                                                 <div>{produto.regimeTributarioOutro}</div>
                                                 <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                 <div>{produto.ncm}</div>

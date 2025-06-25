@@ -98,7 +98,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                         
 
 
-                        <div className="flex flex-col gap-12 bg-fundoCinzaEscuro px-24 py-12 rounded-2xl ">
+                        <div className="flex flex-col gap-12 bg-premiumBg px-24 py-12 rounded-2xl w-[95vw]">
                             <div className="flex self-end cursor-pointer" onClick={() => setModalServicosPrestadosAberto(false)}>
                                 <img
                                 className="w-12 h-12"
@@ -106,7 +106,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                                 alt="fechar modal locação"
                                 />
                             </div>
-                            <div className="flex items-start gap-6">
+                            <div className="flex items-start justify-center gap-6">
                                 {/*Drop down com as atividades*/}
                                 <div className="flex flex-col gap-1">
                                     <label className="text-gray-400">Escolha um CNAE:</label>

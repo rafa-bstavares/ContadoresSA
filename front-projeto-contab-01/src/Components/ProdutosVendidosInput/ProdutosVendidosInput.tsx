@@ -1,10 +1,13 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoObj } from "../../Contextos/ContextoProduto/ContextoProduto"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
+import { ToogleButton, toogleFn } from "../ToogleButton/ToogleButton"
+import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
+import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 
 
 
@@ -14,11 +17,11 @@ export function ProdutosVendidosInput(){
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoVendidoType>()
     const [valorOperacaoAdd, setValorOperacaoAdd] = useState<string>("")
     const [ncmAdd, setNcmAdd] = useState<string>("")
-    const [icms, setIcms] = useState<string>("0")
+    const [icms, setIcms] = useState<string | null>(null)
     const [icmsSt, setIcmsSt] = useState<string>("0")
     const [icmsDifal, setIcmsDifal] = useState<string>("0")
-    const [pisCofins, setPisCofins] = useState<string>("0")
-    const [ipi, setIpi] = useState<string>("0")
+    const [pisCofins, setPisCofins] = useState<string | null>(null)
+    const [ipi, setIpi] = useState<string | null>(null)
     const [ncmGenerico, setNcmGenerico] = useState<boolean>(false)
     const [totalProdutosVendidosModal, setTotalProdutosVendidosModal] = useState<ProdutoVendidoObj[]>([])
 
@@ -28,7 +31,9 @@ export function ProdutosVendidosInput(){
     const [tipoOperacaoAberto, setTipoOperacaoAberto] = useState<boolean>(false)
 
     const {totalProdutosVendidos, setTotalProdutosVendidos} = useContext(ContextoProduto)
+    const {objMinhaEmpresaOuPessoaAtual} = useContext(ContextoGeral)
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
+    const {tabelaSimplesNacional, tabelaLucroPresumido, tabelaLucroReal} = useContext(ContextoParametrosOpcionais)
 
 
     function abrirModalProdutosFn(){
@@ -306,7 +311,7 @@ export function ProdutosVendidosInput(){
 
     function addItemProdutoVendidoModal(){
 
-        if(tipoOperacaoAdd && valorOperacaoAdd && icms && icmsSt && icmsDifal && pisCofins && ipi){
+        if(tipoOperacaoAdd && valorOperacaoAdd && icmsSt && icmsDifal){
             let maxId = 0
             let idAtual  
             totalProdutosVendidos.forEach(item => {
@@ -323,12 +328,12 @@ export function ProdutosVendidosInput(){
             const novoArr = [...totalProdutosVendidosModal]
             const novoObjAtual: ProdutoVendidoObj = {
                 tipoOperacao: tipoOperacaoAdd,
-                icms: Number(icms.replace(",", ".")),
+                icms: icms ? Number(icms.replace(",", ".")) : 0,
                 icmsSt: Number(icmsSt.replace(",", ".")),
                 icmsDifal: Number(icmsDifal.replace(",", ".")),
-                ipi: Number(ipi.replace(",", ".")),
+                ipi: ipi ? Number(ipi.replace(",", ".")) : 0,
                 ncm: ncmGenerico ? "" : ncmAdd,
-                pisCofins: Number(icms.replace(",", ".")),
+                pisCofins: icms ? Number(icms.replace(",", ".")) : 0,
                 valorOperacao: Number(valorOperacaoAdd),
                 beneficio: 0,
                 id: idAtual
@@ -419,6 +424,27 @@ export function ProdutosVendidosInput(){
         console.log(totalProdutosVendidosModal)
     }, [totalProdutosVendidosModal])
 
+    useEffect(() => {
+        console.log("ABRIU O BGLH Q TEM Q VER O REGIME")
+        // Em produtos, para saber de qual tabela pegar os parametros inicais, sempre vemos o regime do fornecedor, como nesse caso o meu cliente é o fornecedor (produtos vendidos):
+        if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
+            console.log("meu regime simples")
+            setIcms(tabelaSimplesNacional.comercial.icms)
+            setIpi(tabelaSimplesNacional.comercial.ipi)
+            setPisCofins(tabelaSimplesNacional.comercial.pisCo)
+        }else if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
+                        console.log("meu regime presumido")
+            setIcms(tabelaLucroPresumido.comercial.icms)
+            setIpi(tabelaLucroPresumido.comercial.ipi)
+            setPisCofins(tabelaLucroPresumido.comercial.pisCo)
+        }else{
+                        console.log("meu regime real")
+            setIcms(tabelaLucroReal.comercial.icms)
+            setIpi(tabelaLucroReal.comercial.ipi)
+            setPisCofins(tabelaLucroReal.comercial.pisCo)
+        }
+    }, [modalProdutosAberto])
+
 
     return (
         <div className="flex flex-col gap-2">
@@ -427,7 +453,7 @@ export function ProdutosVendidosInput(){
             <div className={`fixed left-0 right-0 top-0 h-screen flex flex-col items-center justify-center bg-black/90 text-white z-50`}>
 
 
-                <div className={`flex flex-col overflow-y-scroll h-[90vh] gap-6 bg-premiumBg px-24 py-12 rounded-md`}>
+                <div className={`flex flex-col overflow-y-scroll w-[95vw] h-[90vh] gap-6 bg-premiumBg px-24 py-12 rounded-md`}>
                     <div className="flex self-end mb-6 cursor-pointer" onClick={() => setModalProdutosAberto(false)}>
                         <img
                         className="w-12 h-12"
@@ -519,10 +545,11 @@ export function ProdutosVendidosInput(){
                                             />
                                         </div>
                                     }
-                                    <div className="flex flex-col items-start">
+                                    <ToogleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM genérico"/>
+                                    {/*<div className="flex flex-col items-start">
                                         <label htmlFor="ncmGenericoVendidos">NCM genérico?</label>
                                         <input checked={ncmGenerico} onChange={(e) => checkNcmGenericoInput(e)} type="checkbox" name="ncmGenericoVendidos" id="ncmGenericoVendidos" />
-                                    </div>
+                                    </div>*/}
                                 </div>
 
                             </div>
@@ -573,16 +600,19 @@ export function ProdutosVendidosInput(){
                                     />
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Aliq. ICMS</label>
-                                    <input
-                                    value={icms}
-                                    onChange={escolherIcms}
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                    /> 
-                                </div>
+                                {
+                                    icms !== null &&
+                                    <div className="flex flex-col">
+                                        <label className="text-gray-400 w-[10vw]">Aliq. ICMS</label>
+                                        <input
+                                        value={icms}
+                                        onChange={escolherIcms}
+                                        inputMode="numeric"
+                                        pattern="\d*"
+                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                        /> 
+                                    </div>
+                                }
 
                                 <div className="flex flex-col">
                                     <label className="text-gray-400 w-[10vw]">Aliq. ICMS ST</label>
@@ -606,27 +636,33 @@ export function ProdutosVendidosInput(){
                                     /> 
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Aliq. PIS-COFINS</label>
-                                    <input
-                                    value={pisCofins}
-                                    onChange={escolherPisCofins}
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                    /> 
-                                </div>
+                                {
+                                    pisCofins !== null &&
+                                    <div className="flex flex-col">
+                                        <label className="text-gray-400 w-[10vw]">Aliq. PIS-COFINS</label>
+                                        <input
+                                        value={pisCofins}
+                                        onChange={escolherPisCofins}
+                                        inputMode="numeric"
+                                        pattern="\d*"
+                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                        /> 
+                                    </div>
+                                }
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Aliq. IPI</label>
-                                    <input
-                                    value={ipi}
-                                    onChange={escolherIpi}
-                                    inputMode="numeric"
-                                    pattern="\d*"
-                                    className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
-                                    /> 
-                                </div>
+                                {
+                                    ipi !== null &&
+                                    <div className="flex flex-col">
+                                        <label className="text-gray-400 w-[10vw]">Aliq. IPI</label>
+                                        <input
+                                        value={ipi}
+                                        onChange={escolherIpi}
+                                        inputMode="numeric"
+                                        pattern="\d*"
+                                        className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                                        /> 
+                                    </div>
+                                }
 
                         </div>
 

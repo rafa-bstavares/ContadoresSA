@@ -8,6 +8,7 @@ import xis from "../../assets/images/xisContab.svg"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import { metodosType } from "../SegundoPasso/SegundoPasso"
 
+
 type Props = {
     totalAtividadesAdquiridas: objAtividadesAdquitidasType[],
     setTotalAtividadesAdquiridas: Dispatch<SetStateAction<objAtividadesAdquitidasType[]>>
@@ -107,6 +108,23 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
 
     }
 
+
+    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+        const objTotalServAdqClone = [...totalAtividadesAdquiridas]
+        const idEncontrado = objTotalServAdqClone.findIndex(item => item.id == id)
+        if(idEncontrado > -1){
+            if(e.target.checked){
+                objTotalServAdqClone[idEncontrado].compoeCusto = true
+            }else{
+                objTotalServAdqClone[idEncontrado].compoeCusto = false
+            }
+
+            setTotalAtividadesAdquiridas(objTotalServAdqClone)
+        }else{
+            console.log("ID compoe custo não encontrado")
+        }
+    }
+
     async function addItemServicoAdquirido(){
         const jaTem = totalAtividadesAdquiridas.some(item => item.cpfOuCnpj == cnpjAdquiridoAdd)
         if(jaTem){
@@ -180,6 +198,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                     temCreditoPisCofins: false,
                     operacao,
                     beneficio: 0,
+                    compoeCusto: false,
                     metodo: metodoAdd
                 };
                 let novoArr = [...totalServicosTomadosModal]
@@ -297,7 +316,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                     <div className={`fixed left-0 right-0 top-0 h-screen flex flex-col items-center justify-center z-50 bg-black/90`}>
 
 
-                        <div className="flex flex-col gap-12 bg-fundoCinzaEscuro px-24 py-12 rounded-2xl ">
+                        <div className="flex flex-col gap-12 w-[95vw] bg-premiumBg px-24 py-12 rounded-2xl ">
                             <div className="flex self-end cursor-pointer" onClick={() => setModalServicosTomadosAberto(false)}>
                                 <img
                                 className="w-12 h-12"
@@ -305,10 +324,10 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                 alt="fechar modal locação"
                                 />
                             </div>
-                            <div className="flex gap-6 self-center">
+                            <div className="flex items-start justify-center gap-6">
 
 
-                                <div className="flex flex-col">
+                                <div className="flex flex-col gap-1">
                                     <label className="text-gray-400 w-[10vw]">Método:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
@@ -356,7 +375,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
 
                                 {
                                     metodoAdd == "Por Operação" &&
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col gap-1">
                                         <label className="text-gray-400 w-[10vw]">Operações:</label>
                                         <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                             <div
@@ -406,82 +425,88 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     metodoAdd == "Por CNPJ" &&
                                     <div className="flex flex-col gap-1">
                                         <label className="text-gray-400" htmlFor="cnpjAdquirido">Cnpj:</label>
-                                        <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="cnpjAdquirido" onChange={(e) => setCnpjAdquiridoAdd(e.target.value)}/>
+                                        <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-2" type="number" id="cnpjAdquirido" onChange={(e) => setCnpjAdquiridoAdd(e.target.value)}/>
                                     </div>
                                 }
 
                                 <div className="flex flex-col gap-1">
                                     <label className="text-gray-400" htmlFor="cnpjFaturamento">Valor Total:</label>
-                                    <input value={cnpjFaturamentoAdd} className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="cnpjFaturamento" onChange={(e) => setCnpjFaturamentoAdd(Number(e.target.value))}/>
+                                    <input value={cnpjFaturamentoAdd} className="outline-none p-2 rounded-md border-2 border-solid border-gray-300" type="number" id="cnpjFaturamento" onChange={(e) => setCnpjFaturamentoAdd(Number(e.target.value))}/>
                                 </div>
-                                <div>
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-gray-400 opacity-0" htmlFor="cnpjFaturamento">Valor Total:</label>
                                     <BotaoGeral principalBranco={true} text="Adicionar" onClickFn={addItemServicoAdquirido}/>
                                 </div>
                             </div>
 
                             {/* APRESENTAÇÃO DE RESULTADOS DENTRO DO MODAL */}
-                            {totalServicosTomadosModal.map((item, index) => {
-                                return (    
-                                    <div className="mt-8">
-                                        {
-                                            index == 0 &&
-                                            <div className="grid grid-cols-[repeat(5,1fr)_auto] gap-10 items-center mb-4">
-                                                <div>Método</div>
-                                                <div>CNPJ</div>
-                                                <div>Faturamento</div>
-                                                <div>Regime Tributário</div>
+                            {
+                                totalServicosTomadosModal.length > 0 &&
+                                <div className="flex flex-col gap-2 border-solid border-white border-2 rounded-2xl">
+                                    {totalServicosTomadosModal.map((item, index) => {
+                                        return (
+                                            <div className="mt-8">
                                                 {
-                                                    objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
-                                                    <div>Crédito</div>
+                                                    index == 0 &&
+                                                    <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
+                                                        <div>Método</div>
+                                                        <div>CNPJ</div>
+                                                        <div>Faturamento</div>
+                                                        <div>Regime Tributário</div>
+                                                        {
+                                                            objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                                            <div>Crédito</div>
+                                                        }
+                                                        <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
+                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                                        </div>
+                                                    </div>
                                                 }
-                                            </div> 
-                                        }
-
-                                        <div className="grid grid-cols-[repeat(5,1fr)_auto] gap-10 items-center">
-                                            <div>{item.metodo}</div>
-                                            <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
-                                            <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
-                                            {
-                                                // Podemos fazer assim pq quando recebemos da API verificamos se o regime é simples, se não for colocamos como real
-                                                (item.regimeTributario == "Lucro Real" || item.regimeTributario == "Lucro Presumido") || (item.metodo == "Por Operação") ?
-
-                                                <div className="flex gap-4" >
+                                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                    <div>{item.metodo}</div>
+                                                    <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
+                                                    <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
                                                     {
-                                                        item.metodo == "Por Operação" &&
-                                                        <div className="flex gap-2" onChange={() => mudarRegimeModal(item.id, "Simples Nacional")}>
-                                                            <input type="radio" className={`regime${index}`} name={`regime${index}`} id="simples nacional radio" defaultChecked={item.metodo == "Por Operação"}/>
-                                                            <label htmlFor="simples nacional radio">Simples Nacional</label>
+                                                        // Podemos fazer assim pq quando recebemos da API verificamos se o regime é simples, se não for colocamos como real
+                                                        (item.regimeTributario == "Lucro Real" || item.regimeTributario == "Lucro Presumido") || (item.metodo == "Por Operação") ?
+                                                        <div className="flex gap-4" >
+                                                            {
+                                                                item.metodo == "Por Operação" &&
+                                                                <div className="flex gap-2" >
+                                                                    <input onChange={() => mudarRegimeModal(item.id, "Simples Nacional")} type="radio" className={`regime${index}-modal`} name={`regime${index}-modal`} id={`simples-radio-${index}-modal`} defaultChecked={item.metodo == "Por Operação"}/>
+                                                                    <label htmlFor={`simples-radio-${index}`}>Simples Nacional</label>
+                                                                </div>
+                                                            }
+                                                            <div className="flex gap-2" >
+                                                                <input onChange={() => mudarRegimeModal(item.id, "Lucro Real")} type="radio" className={`regime${index}-modal`} name={`regime${index}-modal`} id={`lucroReal-radio-${index}-modal`} defaultChecked={item.metodo == "Por CNPJ"}/>
+                                                                <label htmlFor={`lucroReal-radio-${index}`}>Lucro Real</label>
+                                                            </div>
+                                                            <div className="flex gap-2" >
+                                                                <input onChange={() => mudarRegimeModal(item.id, "Lucro Presumido")} type="radio" className={`regime${index}-modal`} name={`regime${index}-modal`} id={`lucroPresumido-radio-${index}-modal`} />
+                                                                <label htmlFor={`lucroPresumido-radio-${index}`}>Lucro Presumido</label>
+                                                            </div>
+                                                        </div>
+                                                            :
+                                                        <div>
+                                                            Simples Nacional
                                                         </div>
                                                     }
-                                                    <div className="flex gap-2" onChange={() => mudarRegimeModal(item.id, "Lucro Real")}>
-                                                        <input type="radio" className={`regime${index}`} name={`regime${index}`} id="lucro real radio" defaultChecked={item.metodo == "Por CNPJ"}/>
-                                                        <label htmlFor="lucro real radio">Lucro Real</label>
+                                                    {
+                                                        objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                                        <div className="flex gap-2">
+                                                            <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
+                                                            <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
+                                                        </div>
+                                                    }
+                                                    <div onClick={() => {apagarAtividadeModal(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
+                                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
                                                     </div>
-                                                    <div className="flex gap-2" onChange={() => mudarRegimeModal(item.id, "Lucro Presumido")}>
-                                                        <input type="radio" className={`regime${index}`} name={`regime${index}`} id="lucro presumido radio" />
-                                                        <label htmlFor="lucro presumido radio">Lucro Presumido</label>
-                                                    </div>
                                                 </div>
-                                                    :
-                                                <div>
-                                                    Simples Nacional
-                                                </div>
-
-                                            }
-                                            {
-                                                objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" && 
-                                                <div className="flex gap-2">
-                                                    <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
-                                                    <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
-                                                </div>
-                                            }
-                                            <div onClick={() => {apagarAtividadeModal(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                <img className="w-3 h-3" src={lixeira} alt="lixeira" />
                                             </div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                                        )
+                                    })}
+                                </div>
+                            }
 
                             {
                                 totalServicosTomadosModal.length > 0 &&
@@ -506,70 +531,80 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
 
 
 
-            <div className=" flex flex-col gap-2">
-                {totalAtividadesAdquiridas.map((item, index) => {
-                    return (    
-                        <div className="mt-8">
-                            {
-                                index == 0 &&
-                                <div className="grid grid-cols-[repeat(5,1fr)_auto] gap-10 items-center mb-4">
-                                    <div>Método</div>
-                                    <div>CNPJ</div>
-                                    <div>Faturamento</div>
-                                    <div>Regime Tributário</div>
-                                    {
-                                        objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
-                                        <div>Crédito</div>
-                                    }
-                                </div> 
-                            }
-
-                            <div className="grid grid-cols-[repeat(5,1fr)_auto] gap-10 items-center">
-                                <div>{item.metodo}</div>
-                                <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
-                                <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
+            {
+                totalAtividadesAdquiridas.length > 0 &&
+                <div className=" flex flex-col gap-2 border-solid border-white border-2 rounded-2xl">
+                    {totalAtividadesAdquiridas.map((item, index) => {
+                        return (    
+                            <div className="mt-8">
                                 {
-                                    // Podemos fazer assim pq quando recebemos da API verificamos se o regime é simples, se não for colocamos como real
-                                    (item.regimeTributario == "Lucro Real" || item.regimeTributario == "Lucro Presumido") || (item.metodo == "Por Operação") ?
-
-                                    <div className="flex gap-4" >
+                                    index == 0 &&
+                                    <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
+                                        <div>Método</div>
+                                        <div>CNPJ</div>
+                                        <div>Faturamento</div>
+                                        <div>Regime Tributário</div>
                                         {
-                                            item.metodo == "Por Operação" &&
-                                            <div className="flex gap-2" onChange={() => mudarRegimeAposAdicionado(item.id, "Simples Nacional")}>
-                                                <input type="radio" className={`regime${index}`} name={`regime${index}`} id="simples nacional radio" defaultChecked={item.regimeTributario == "Simples Nacional"}/>
-                                                <label htmlFor="simples nacional radio">Simples Nacional</label>
-                                            </div>
+                                            objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                            <div>Crédito</div>
                                         }
-                                        <div className="flex gap-2" onChange={() => mudarRegimeAposAdicionado(item.id, "Lucro Real")}>
-                                            <input type="radio" className={`regime${index}`} name={`regime${index}`} id="lucro real radio" defaultChecked={item.regimeTributario == "Lucro Real"}/>
-                                            <label htmlFor="lucro real radio">Lucro Real</label>
+                                        <div>Compõe Custo</div>
+                                        <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
+                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
                                         </div>
-                                        <div className="flex gap-2" onChange={() => mudarRegimeAposAdicionado(item.id, "Lucro Presumido")}>
-                                            <input type="radio" className={`regime${index}`} name={`regime${index}`} id="lucro presumido radio" defaultChecked={item.regimeTributario == "Lucro Presumido"}/>
-                                            <label htmlFor="lucro presumido radio">Lucro Presumido</label>
-                                        </div>
-                                    </div>
-                                        :
-                                    <div>
-                                        Simples Nacional
-                                    </div>
+                                    </div> 
+                                }
 
-                                }
-                                {
-                                    objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" && 
-                                    <div className="flex gap-2">
-                                        <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
-                                        <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
+                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(6,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                    <div>{item.metodo}</div>
+                                    <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
+                                    <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
+                                    {
+                                        // Podemos fazer assim pq quando recebemos da API verificamos se o regime é simples, se não for colocamos como real
+                                        (item.regimeTributario == "Lucro Real" || item.regimeTributario == "Lucro Presumido") || (item.metodo == "Por Operação") ?
+
+                                        <div className="flex gap-4" >
+                                            {
+                                                item.metodo == "Por Operação" &&
+                                                <div className="flex gap-2" >
+                                                    <input onChange={() => mudarRegimeAposAdicionado(item.id, "Simples Nacional")} type="radio" className={`regime${index}`} name={`regime${index}`} id={`simples-radio-${index}`} checked={item.regimeTributario == "Simples Nacional"}/>
+                                                    <label htmlFor={`simples-radio-${index}`}>Simples Nacional</label>
+                                                </div>
+                                            }
+                                            <div className="flex gap-2" >
+                                                <input onChange={() => mudarRegimeAposAdicionado(item.id, "Lucro Real")} type="radio" className={`regime${index}`} name={`regime${index}`} id={`lucroReal-radio-${index}`} checked={item.regimeTributario == "Lucro Real"}/>
+                                                <label htmlFor={`lucroReal-radio-${index}`}>Lucro Real</label>
+                                            </div>
+                                            <div className="flex gap-2" >
+                                                <input onChange={() => mudarRegimeAposAdicionado(item.id, "Lucro Presumido")} type="radio" className={`regime${index}`} name={`regime${index}`} id={`lucroPresumido-radio-${index}`} checked={item.regimeTributario == "Lucro Presumido"}/>
+                                                <label htmlFor={`lucroPresumido-radio-${index}`}>Lucro Presumido</label>
+                                            </div>
+                                        </div>
+                                            :
+                                        <div>
+                                            Simples Nacional
+                                        </div>
+
+                                    }
+                                    {
+                                        objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" && 
+                                        <div className="flex gap-2">
+                                            <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
+                                            <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
+                                        </div>
+                                    }
+                                    <div className="flex flex-col items-start">
+                                        <input checked={item.compoeCusto} onChange={(e) => alterarCompoeCusto(e, item.id)} type="checkbox" name="compoeCustoServAdq" id="compoeCustoServAdq" />
                                     </div>
-                                }
-                                <div onClick={() => {apagarAtividade(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                    <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                    <div onClick={() => {apagarAtividade(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
+                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                })}
-            </div>
+                        )
+                    })}
+                </div>
+            }
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react"
-import logoTemporaria from "../../assets/images/logoTemporaria.svg"
+import logo from "../../assets/images/priceTaxLogo.png"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import { ContextoLogin } from "../../Contextos/ContextoLogin/ContextoLogin"
 import { Link } from "react-router-dom"
@@ -28,9 +28,8 @@ export function Menu(){
     
     return (
         <div className="h-[7vh]  w-full flex justify-between items-center px-20 relative z-20 ">
-            <Link to={"/"} className="h-[50%] flex gap-4 items-center cursor-pointer">
-                <img className="object-cover h-full" src={logoTemporaria} alt="logotipo contadores sa" />
-                <div className="text-xl textoGradiente">Contadores SA</div>
+            <Link to={"/"} className="h-[80%] flex gap-4 items-center cursor-pointer">
+                <img className="object-cover h-full w-auto" src={logo} alt="logotipo contadores sa" />
             </Link>
 
             {/*<div className="h-full flex justify-center items-center gap-12" >

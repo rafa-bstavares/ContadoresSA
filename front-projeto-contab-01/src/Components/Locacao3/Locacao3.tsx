@@ -221,6 +221,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                 tipoOutraParte: tipoOutroAdd,
                 prazoDeterminado: prazoDeterminadoAdd,
                 regimeOutro: tipoOutroAdd == "Pessoa física" ? "Pessoa Fisica" : regimeOutroAdd ? regimeOutroAdd : "Simples Nacional",
+                compoeCusto: false,
                 quantidade: quantidadeAdd,
                 id: idAtual 
              }
@@ -343,6 +344,24 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
 
 
     }
+
+
+    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+        const objTotalImoveisClone = [...totalImoveisLocacao]
+        const idEncontrado = objTotalImoveisClone.findIndex(item => item.id == id)
+        if(idEncontrado > -1){
+            if(e.target.checked){
+                objTotalImoveisClone[idEncontrado].compoeCusto = true
+            }else{
+                objTotalImoveisClone[idEncontrado].compoeCusto = false
+            }
+
+            setTotalImoveisLocacao(objTotalImoveisClone)
+        }else{
+            console.log("ID compoe custo não encontrado")
+        }
+    }
+
 
     function voltarParaInfo1(){
         setInfo2Aberto(false)
@@ -926,7 +945,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
 
                                     {totalImoveisPagosModal.map((imovel, index) => {
                                         return (
-                                            imovel.tipoAluguel == "Aluguel pago"?
+                                            imovel.tipoAluguel == "Aluguel pago" ?
                                                 <>
                                                     {
                                                         index == 0 &&
@@ -1060,7 +1079,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>É residencial</div>
                                                         <div>Tipo aluguel</div>
                                                         <div>Tipo da outra parte</div>
@@ -1070,11 +1089,12 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                         <div>Valor condomínio</div>
                                                         <div>Juros</div>
                                                         <div>Acréscimos</div>
+                                                        <div>Compõe Custo</div>
                                                         <div>Quantidade</div>
                                                     </div>
                                                 }
                             
-                                                <div className={`grid grid-cols-[repeat(10,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                <div className={`grid grid-cols-[repeat(11,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div>{imovel.residencial ? "Sim" : "Não"}</div>
                                                     <div>{imovel.tipoAluguel}</div>
                                                     <div>{imovel.tipoOutraParte}</div>
@@ -1084,6 +1104,9 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                     <div>{"R$ " + Number(imovel.valorCondominio).toLocaleString("pt-br")}</div>
                                                     <div>{"R$ " + Number(imovel.juros).toLocaleString("pt-br")}</div>
                                                     <div>{imovel.acrescimos}</div>
+                                                    <div className="flex flex-col items-start">
+                                                        <input checked={imovel.compoeCusto} onChange={(e) => alterarCompoeCusto(e, imovel.id)} type="checkbox" name="compoeCusto" id="compoeCusto" />
+                                                    </div>
                                                     <div>{imovel.quantidade}</div>
                                                     <div onClick={() => {apagarImovelLocacao(imovel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
                                                         <img className="w-3 h-3" src={lixeira} alt="lixeira" />

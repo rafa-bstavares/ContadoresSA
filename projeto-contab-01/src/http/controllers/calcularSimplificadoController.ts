@@ -24,6 +24,7 @@ export const objAtividadeAdquirida = z.object({
     temCreditoPisCofins: z.boolean(),
     metodo: z.enum(["Por CNPJ", "Por Operação"]),
     beneficio: z.number(),
+    compoeCusto: z.boolean(),
     operacao: z.string()
 })
 
@@ -36,6 +37,7 @@ const objTotalMoveisLocacao = z.object({
     comOperador: z.boolean(),
     valorMaoObra: z.number(),
     regimeOutro: z.enum(["Lucro Real", "Lucro Presumido", "Simples Nacional", "Pessoa Fisica"]),
+    compoeCusto: z.boolean(),
     id: z.number()
 })
 
@@ -50,6 +52,7 @@ export const objTotalImoveisLocacao = z.object({
     tipoOutraParte: z.enum(["Pessoa física", "Pessoa jurídica"]),
     prazoDeterminado: z.boolean(),
     regimeOutro: z.enum(["Lucro Real", "Lucro Presumido", "Simples Nacional", "Pessoa Fisica"]),
+    compoeCusto: z.boolean(),
     quantidade: z.number()
 })
 
@@ -86,16 +89,21 @@ export const MetodoAdquiridoType = z.enum(["Por Operação", "Por CNPJ" ])
 
 export const TipoOperacaoAdquiridoType = z.enum(["Consumo", "Insumo", "Alimentação", "Imobilizado", "Revenda"])
 
+export const aliquotasParametrosBodyType = z.object({
+    iss: z.union([z.number(), z.null()]), 
+    icms: z.union([z.number(), z.null()]), 
+    pisCo: z.union([z.number(), z.null()]), 
+    ipi: z.union([z.number(), z.null()])
+})
+
 export const ProdutoAdquiridoObj = z.object({
     metodo: MetodoAdquiridoType,
     tipoOperacao: z.union([TipoOperacaoAdquiridoType, z.literal("")]),
     valorOperacao: z.number(),
     ncm: z.string(),
-    icms: z.number(),
+    aliquotas: aliquotasParametrosBodyType,
     creditoIcms: z.boolean(),
-    pisCofins: z.number(),
     creditoPisCofins: z.boolean(),
-    ipi: z.number(),
     creditoIpi: z.boolean(),
     cnpjFornecedor: z.string(),
     regimeTributarioOutro: z.string(),
@@ -104,12 +112,7 @@ export const ProdutoAdquiridoObj = z.object({
     id: z.number()
 })
 
-export const aliquotasParametrosBodyType = z.object({
-    iss: z.union([z.number(), z.null()]), 
-    icms: z.union([z.number(), z.null()]), 
-    pisCo: z.union([z.number(), z.null()]), 
-    ipi: z.union([z.number(), z.null()])
-})
+
 
 export const objParametrosEntradaBodyType = z.object({
     industrial: aliquotasParametrosBodyType,
@@ -158,10 +161,11 @@ export async function calcularSimplificadoController(request: FastifyRequest, re
         const calcularSimplificado = new calcularSimplificadoUseCase(empresaRepo, body.cpfOuCnpj, body.totalAtividadesPrestadas, body.parametrosEntrada, body.totalAtividadesAdquiridas, body.totalImoveisLocacao, body.totalImoveisCompraVenda, body.totalMoveisLocacao, body.totalProdutosVendidos, body.totalProdutosAdquiridos, body.meuRegime)
 
         try{
-            await calcularSimplificado.execute()
-            return reply.status(200).send({message: "Foi"})
+            const respostaCalculo = await calcularSimplificado.execute()
+            return reply.status(200).send({success: true, data: respostaCalculo, error: null})
         }catch(err){
-            return reply.status(500).send("Erro")
+            return reply.status(500).send({success: false, data: null, error: {code: 500, message: err}})
+            
         }
 
 
@@ -169,6 +173,7 @@ export async function calcularSimplificadoController(request: FastifyRequest, re
 
     }catch(err){
         console.log(err)
+        return reply.status(500).send({success: false, data: null, error: {code: 500, message: err}})
     }
 
 }

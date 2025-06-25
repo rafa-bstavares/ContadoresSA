@@ -27,6 +27,9 @@ import { ProdutosAdquiridosInput } from '../ProdutosAdquiridosInput/ProdutosAdqu
 import { aliquotasParametrosFinalType, ContextoProduto, ProdutoAdquiridoObj, ProdutoVendidoObj } from '../../Contextos/ContextoProduto/ContextoProduto'
 import { ModalPerguntaBeneficios } from '../ModalPerguntaBeneficios/ModalPerguntaBeneficios'
 import { ModalConferirBeneficios } from '../ModalConferirBeneficios/ModalConferirBeneficios'
+import { ContextoResultadoSimulador, objRespostaFinalType } from '../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador'
+import { useNavigate } from 'react-router-dom'
+import { ToogleButton } from '../ToogleButton/toogleButton'
 
 
 type ObjInfosType = {
@@ -58,6 +61,7 @@ export type objAtividadesAdquitidasType = {
     temCreditoPisCofins: boolean,
     metodo: metodosType,
     beneficio: number,
+    compoeCusto: boolean,
     operacao: string
 }
 
@@ -84,6 +88,16 @@ type Props = {
     modoBranco: boolean
 }
 
+type respostaApiType = { 
+    success: true
+    data: objRespostaFinalType
+    error: any
+} | {
+    success: false
+    data: null
+    error: any
+};
+
 export function SegundoPasso({modoBranco}: Props){
 
     const [arrInfosEmpresa, setArrInfosEmpresa] = useState<ObjInfosType[]>([])
@@ -91,6 +105,7 @@ export function SegundoPasso({modoBranco}: Props){
     const [totalAtividadesAdquiridas, setTotalAtividadesAdquiridas] = useState<objAtividadesAdquitidasType[]>([])
     const [modalPerguntaBeneficiosAberto, setModalPerguntaBeneficiosAberto] = useState<boolean>(false)
     const [modalBeneficiosAberto, setModalBeneficiosAberto] = useState<boolean>(false)
+    const [testeToogle, setTesteToogle] = useState<boolean>(false)
     const [objIsChecked, setObjIsChecked] = useState<objIsCheckedType>({
         isCheckedImoveis: false,
         isCheckedServicos: false,
@@ -98,6 +113,7 @@ export function SegundoPasso({modoBranco}: Props){
         isCheckedProdutos: false
     })
 
+    const {setObjResultado} = useContext(ContextoResultadoSimulador)
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
     const {
         aliquotasIva,
@@ -111,8 +127,12 @@ export function SegundoPasso({modoBranco}: Props){
     const {totalProdutosAdquiridos, totalProdutosVendidos, setTotalProdutosAdquiridos, setTotalProdutosVendidos} = useContext(ContextoProduto)
     const {objMinhaEmpresaOuPessoaAtual, passo2} = useContext(ContextoGeral)
 
+    const navigate = useNavigate()
 
 
+    function testeToogleFn(){
+        setTesteToogle(!testeToogle)
+    }
 
 
     async function conferirBeneficios(){
@@ -135,6 +155,9 @@ export function SegundoPasso({modoBranco}: Props){
                             totalProdutosVendidos
                         }
                     }
+
+                    console.log("BODY encontrar benmeficios")
+                    console.log(body)
 
                 fetch(baseUrl + "/encontrarBeneficios", {
                     method: "POST",
@@ -271,8 +294,13 @@ export function SegundoPasso({modoBranco}: Props){
                         totalProdutosVendidos,
                         totalProdutosAdquiridos
                     })
-                }).then(res => res.json()).then(data => {
+                }).then(res => res.json()).then((data: respostaApiType) => {
+                    console.log("retorno do calcular simplificado")
                     console.log(data)
+                    if(data.success){
+                        setObjResultado(data.data)
+                        navigate("/Perfil/Resultado")
+                    }
                 })
                 
 
@@ -375,7 +403,6 @@ export function SegundoPasso({modoBranco}: Props){
                         </div>
                     </div>
                 </div>
-
             </div>
 
 

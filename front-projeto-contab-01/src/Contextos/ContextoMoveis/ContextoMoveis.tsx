@@ -8,6 +8,7 @@ export type MoveisLocacaoObj = {
     creditaPisCofins: boolean,
     comOperador: boolean,
     valorMaoObra: number,
+    compoeCusto: boolean,
     regimeOutro: "Lucro Real" | "Lucro Presumido" | "Simples Nacional" | "Pessoa Fisica",
     id: number
 }

@@ -11,6 +11,7 @@ export type ImoveisLocacaoObj = {
     tipoOutraParte: "Pessoa física" | "Pessoa jurídica",
     prazoDeterminado: boolean,
     regimeOutro: "Lucro Real" | "Lucro Presumido" | "Simples Nacional" | "Pessoa Fisica",
+    compoeCusto: boolean,
     quantidade: number,
     id: number
 }

@@ -154,6 +154,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                 comOperador: comOperadorAdd,
                 creditaPisCofins: creditaPisCofinsAdd,
                 valorMaoObra: temMaoDeObra ? Number(valorLocacaoAdd) : 0 ,
+                compoeCusto: false,
                 regimeOutro: tipoOutroAdd == "Pessoa física" ? "Pessoa Fisica" : regimeOutroAdd ? regimeOutroAdd : "Simples Nacional",
                 id: idAtual 
              }
@@ -329,6 +330,24 @@ export default function LocacaoMoveis({modoBranco}: Props){
         console.log("arr Final")
         setTotalMoveisModal(arrFinal)
     }
+
+
+    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+        const objTotalMoveisClone = [...totalMoveisLocacao]
+        const idEncontrado = objTotalMoveisClone.findIndex(item => item.id == id)
+        if(idEncontrado > -1){
+            if(e.target.checked){
+                objTotalMoveisClone[idEncontrado].compoeCusto = true
+            }else{
+                objTotalMoveisClone[idEncontrado].compoeCusto = false
+            }
+
+            setTotalMoveisLocacao(objTotalMoveisClone)
+        }else{
+            console.log("ID compoe custo não encontrado")
+        }
+    }
+
 
 
     useEffect(() => {
@@ -946,7 +965,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(8,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>Tipo aluguel</div>
                                                         <div>Tipo da outra parte</div>
                                                         <div>Prazo determinado</div>
@@ -954,13 +973,14 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                         <div>Credita pis-cofins</div>
                                                         <div>Com operador</div>
                                                         <div>Valor locação</div>
+                                                        <div>Compõe Custo</div>
                                                         <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
                                                             <img className="w-3 h-3" src={lixeira} alt="lixeira" />
                                                         </div>
                                                     </div>
                                                 }
                             
-                                                <div className={`grid grid-cols-[repeat(8,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                <div className={`grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div>{movel.tipoAluguel}</div>
                                                     <div>{movel.tipoOutraParte}</div>
                                                     <div>{movel.prazoDeterminado ? "Sim" : "Não"}</div>
@@ -968,6 +988,9 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                     <div>{movel.creditaPisCofins ? "Sim" : "Não"}</div>
                                                     <div>{movel.comOperador ? "Sim" : "Não"}</div>
                                                     <div>{"R$ " + Number(movel.valorLocacao).toLocaleString("pt-br")}</div>
+                                                    <div className="flex flex-col items-start">
+                                                        <input checked={movel.compoeCusto} onChange={(e) => alterarCompoeCusto(e, movel.id)} type="checkbox" name="compoeCustoMoveis" id="compoeCustoMoveis" />
+                                                    </div>
                                                     <div onClick={() => {apagarMovelLocacao(movel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
                                                         <img className="w-3 h-3" src={lixeira} alt="lixeira" />
                                                     </div>
