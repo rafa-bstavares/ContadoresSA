@@ -2,6 +2,7 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
 import { beneficiosPorCnaeType } from "../ModalConferirBeneficios/ModalConferirBeneficios"
 import { objAtividadeFinal, objAtividadesAdquitidasType } from "../SegundoPasso/SegundoPasso"
+import { ToggleButton } from "../ToggleButton/ToggleButton"
 
 type Props = {
     index: number, 
@@ -19,7 +20,8 @@ export function ItemBeneficioCnae({index, linhaBeneficio, beneficiosPorCnae, set
 
 
     const [beneficioAtual, setBeneficioAtual] = useState<string>(linhaBeneficio.reducao.toString().replace(".", ","))
-
+    const [aliquotaIvaAtual, setAliquotaIvaAtual] = useState<number>(linhaBeneficio.aliquotaIva)
+    const [manterBeneficioAtual, setManterBeneficioAtual] = useState<boolean>(linhaBeneficio.manter)
 
     function retornaInputPorcentagemTratado(e: ChangeEvent<HTMLInputElement>){
         const valorInput = e.target.value
@@ -82,7 +84,12 @@ export function ItemBeneficioCnae({index, linhaBeneficio, beneficiosPorCnae, set
             const idxEditar = totalAtividadesAdquiridasClone.findIndex(atividadeClone => atividadeClone.id == item.id)
             if(idxEditar > -1){
                 totalAtividadesAdquiridas[idxEditar].beneficio = Number(inputTratado)
+                // Mudar a aliquota IVA
+                const novoValorAliquotaIVA = 0.28 - (Number(inputTratado) * 0.28)
+                setAliquotaIvaAtual(novoValorAliquotaIVA)
             }
+
+
 
             setTotalAtividadesAdquiridas(totalAtividadesAdquiridasClone)
 
@@ -91,6 +98,9 @@ export function ItemBeneficioCnae({index, linhaBeneficio, beneficiosPorCnae, set
             const idxEditar = totalAtividadesPrestadasClone.findIndex(atividadeClone => atividadeClone.id == item.id)
             if(idxEditar > -1){
                 totalAtividadesPrestadas[idxEditar].beneficio = Number(inputTratado)
+                // Mudar a aliquota IVA
+                const novoValorAliquotaIVA = 0.28 - (Number(inputTratado) * 0.28)
+                setAliquotaIvaAtual(novoValorAliquotaIVA)
             }
             setTotalAtividadesPrestadas(totalAtividadesPrestadasClone)
         }
@@ -104,9 +114,44 @@ export function ItemBeneficioCnae({index, linhaBeneficio, beneficiosPorCnae, set
             setBeneficiosPorCnae(beneficiosPorCnaeClone)
     }
 
+    function retornarValorPorcentagem(num: number){
+        return (num * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"
+    }
+
+    function mudarManterBeneficio(item: beneficiosPorCnaeType){
+        // Alterar os Arrays que vão para o backend
+        if(item.origem == "Servico Adquirido"){          
+            const totalAtividadesAdquiridosClone = [...totalAtividadesAdquiridas]
+            const idxEditar = totalAtividadesAdquiridosClone.findIndex(atividadesAdquiridosClone => atividadesAdquiridosClone.id == item.id)
+            if(idxEditar > -1){
+                // Mudar manter beneficio tela modal
+                setManterBeneficioAtual(!manterBeneficioAtual)
+
+                //mudar manter beneficio que vai pro backend
+                totalAtividadesAdquiridas[idxEditar].manterBeneficio = !manterBeneficioAtual
+
+                // Será que n preciso mudar o beneficiosPorCnae tb?
+
+            }
+
+            setTotalAtividadesAdquiridas(totalAtividadesAdquiridosClone)
+
+        }else if(item.origem == "Servico Prestado"){
+            const totalAtividadesPrestadasClone = [...totalAtividadesPrestadas]
+            const idxEditar = totalAtividadesPrestadasClone.findIndex(atividadesPrestadasClone => atividadesPrestadasClone.id == item.id)
+            if(idxEditar > -1){
+                // Mudar manter beneficio tela modal
+                setManterBeneficioAtual(!manterBeneficioAtual)
+
+                //mudar manter beneficio que vai pro backend
+                totalAtividadesPrestadas[idxEditar].manterBeneficio = !manterBeneficioAtual
+            }
+            setTotalAtividadesPrestadas(totalAtividadesPrestadasClone)
+        }
+    }
 
     return (
-        <div className={`grid grid-cols-[repeat(5,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+        <div className={`grid grid-cols-[100px_300px_repeat(3,_100px)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
             <div>{linhaBeneficio.cnae}</div>
             <div>{linhaBeneficio.descricao}</div>
             <div className="flex flex-col">
@@ -118,8 +163,10 @@ export function ItemBeneficioCnae({index, linhaBeneficio, beneficiosPorCnae, set
                 className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                 /> 
             </div>
-            <div>{linhaBeneficio.aliquotaIva}</div>
-            <div>{linhaBeneficio.manter}</div>
+            <div>{retornarValorPorcentagem(aliquotaIvaAtual)}</div>
+            <div>
+                <ToggleButton onChangeFn={() => mudarManterBeneficio(linhaBeneficio)} valor={manterBeneficioAtual} texto=""/>
+            </div>
         </div>
     )
 }

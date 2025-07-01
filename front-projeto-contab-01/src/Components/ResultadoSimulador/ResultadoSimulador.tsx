@@ -31,7 +31,9 @@ export function ResultadoSimulador(){
         tributosRecolhidos: "Tributos Recolhidos",
         saldoCredor: "Saldo Credor",
         resultado: "Resultado",
-        resultadoSemClientes: "Resultado Sobre Clientes (%)" 
+        irCs: "IR/CS",
+        resultadoPosIrCs: "Resultado Pós IR/CS",
+        resultadoSobreClientes: "Resultado Sobre Clientes (%)" 
     }
 
     const nomeLinhasTabelaDre: Record<keyof tabelaDreType, string> = {
@@ -41,21 +43,24 @@ export function ResultadoSimulador(){
         lucroBruto: "Lucro Bruto",
         despesas: "Despesas",
         lucrosAntesIrCs: "Lucro Antes IR/CS",
-        irCs: "IR/CS"
+        irCs: "IR/CS",
+        lucroLiquido: "Lucro Líquido"
     }
 
     const nomeLinhasTabelaCompras: Record<keyof totalComprasType, string> = {
         comprasProdutos: "Compras Produtos",
         servicosTomados: "Serviços Tomados",
         locacaoMoveis: "Locação Móveis",
-        locacaoImoveis: "Locação Imóveis"
+        locacaoImoveis: "Locação Imóveis",
+        total: "Total"
     }
 
     const nomeLinhasTabelaVendas: Record<keyof totalVendasType, string> = {
         vendasProdutos: "Vendas Produtos",
         servicosPrestados: "Serviços Prestados",
         locacaoMoveis: "Locação Móveis",
-        locacaoImoveis: "Locação Imóveis"
+        locacaoImoveis: "Locação Imóveis",
+        total: "Total"
     }
 
 
@@ -77,35 +82,35 @@ export function ResultadoSimulador(){
     "servicosPrestados": [
         {
             "antesReforma": {
-                "valor": 4444,
-                "valorImpostos": 633.2700000000001,
-                "valorDesonerado": 3810.73,
+                "valor": 1000,
+                "valorImpostos": 142.50000000000003,
+                "valorDesonerado": 857.5,
                 "porcentagemCargaTributaria": 0.16618075801749274,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 4237.53176,
-                    "valorImpostos": 426.80176000000006,
-                    "porcentagemCargaTributaria": 0.11200000000000002,
+                    "valor": 953.54,
+                    "valorImpostos": 96.04000000000002,
+                    "porcentagemCargaTributaria": 0.11200000000000003,
                     "custo": null
                 }
             ]
         },
         {
             "antesReforma": {
-                "valor": 5555,
-                "valorImpostos": 791.5875000000001,
-                "valorDesonerado": 4763.4125,
-                "porcentagemCargaTributaria": 0.1661807580174927,
+                "valor": 2000,
+                "valorImpostos": 285.00000000000006,
+                "valorDesonerado": 1715,
+                "porcentagemCargaTributaria": 0.16618075801749274,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 6097.168000000001,
-                    "valorImpostos": 1333.7555000000002,
+                    "valor": 2195.2,
+                    "valorImpostos": 480.20000000000005,
                     "porcentagemCargaTributaria": 0.28,
                     "custo": null
                 }
@@ -113,18 +118,18 @@ export function ResultadoSimulador(){
         },
         {
             "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 474.95250000000004,
-                "valorDesonerado": 2858.0475,
-                "porcentagemCargaTributaria": 0.1661807580174927,
+                "valor": 1500,
+                "valorImpostos": 213.75000000000003,
+                "valorDesonerado": 1286.25,
+                "porcentagemCargaTributaria": 0.16618075801749274,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 3658.3008,
-                    "valorImpostos": 800.2533000000001,
-                    "porcentagemCargaTributaria": 0.28,
+                    "valor": 1430.31,
+                    "valorImpostos": 144.06000000000003,
+                    "porcentagemCargaTributaria": 0.11200000000000003,
                     "custo": null
                 }
             ]
@@ -133,73 +138,55 @@ export function ResultadoSimulador(){
     "servicosTomados": [
         {
             "antesReforma": {
-                "valor": 4444,
-                "valorImpostos": 384.40599999999995,
-                "valorDesonerado": 4059.594,
-                "porcentagemCargaTributaria": 0.09469074986316364,
-                "custo": 4032.93
+                "valor": 500,
+                "valorImpostos": 71.25000000000001,
+                "valorDesonerado": 428.75,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": 453.75
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 5196.28032,
-                    "valorImpostos": 1136.68632,
+                    "valor": 548.8,
+                    "valorImpostos": 120.05000000000001,
                     "porcentagemCargaTributaria": 0.28,
-                    "custo": 4059.594
+                    "custo": 428.75
                 }
             ]
         },
         {
             "antesReforma": {
-                "valor": 5555,
-                "valorImpostos": 461.065,
-                "valorDesonerado": 5093.935,
-                "porcentagemCargaTributaria": 0.09051254089422027,
-                "custo": 5041.1625
+                "valor": 300,
+                "valorImpostos": 42.75000000000001,
+                "valorDesonerado": 257.25,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": 272.25
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 6520.236800000001,
-                    "valorImpostos": 1426.3018000000002,
+                    "valor": 329.28,
+                    "valorImpostos": 72.03,
                     "porcentagemCargaTributaria": 0.28,
-                    "custo": 5093.935
+                    "custo": 257.25
                 }
             ]
         },
         {
             "antesReforma": {
-                "valor": 4444,
-                "valorImpostos": 384.40599999999995,
-                "valorDesonerado": 4059.594,
-                "porcentagemCargaTributaria": 0.09469074986316364,
-                "custo": 4444
+                "valor": 200,
+                "valorImpostos": 28.500000000000004,
+                "valorDesonerado": 171.5,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": 200
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 5196.28032,
-                    "valorImpostos": 1136.68632,
+                    "valor": 219.52,
+                    "valorImpostos": 48.02,
                     "porcentagemCargaTributaria": 0.28,
-                    "custo": 4059.594
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 6666,
-                "valorImpostos": 949.9050000000001,
-                "valorDesonerado": 5716.095,
-                "porcentagemCargaTributaria": 0.1661807580174927,
-                "custo": 6666
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 7316.6016,
-                    "valorImpostos": 1600.5066000000002,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": 5716.095
+                    "custo": 171.5
                 }
             ]
         }
@@ -207,91 +194,91 @@ export function ResultadoSimulador(){
     "locacaoBensMoveis": [
         {
             "antesReforma": {
-                "valor": 2222,
-                "valorImpostos": 205.535,
-                "valorDesonerado": 2016.465,
+                "valor": 500,
+                "valorImpostos": 46.25,
+                "valorDesonerado": 453.75,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 453.75
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 580.8,
+                    "valorImpostos": 127.05000000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 453.75
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 400,
+                "valorImpostos": 13.200000000000001,
+                "valorDesonerado": 386.8,
+                "porcentagemCargaTributaria": 0.03412616339193382,
+                "custo": 400
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 495.10400000000004,
+                    "valorImpostos": 108.30400000000002,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 386.8
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1000,
+                "valorImpostos": 142.5,
+                "valorDesonerado": 857.5,
+                "porcentagemCargaTributaria": 0.1661807580174927,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 1097.6,
+                    "valorImpostos": 240.10000000000002,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1000,
+                "valorImpostos": 142.5,
+                "valorDesonerado": 857.5,
+                "porcentagemCargaTributaria": 0.1661807580174927,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 1097.6,
+                    "valorImpostos": 240.10000000000002,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 700,
+                "valorImpostos": 64.75,
+                "valorDesonerado": 635.25,
                 "porcentagemCargaTributaria": 0.10192837465564739,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 2581.0752,
-                    "valorImpostos": 564.6102000000001,
+                    "valor": 813.12,
+                    "valorImpostos": 177.87,
                     "porcentagemCargaTributaria": 0.28,
                     "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 474.9525,
-                "valorDesonerado": 2858.0475,
-                "porcentagemCargaTributaria": 0.16618075801749269,
-                "custo": null
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 3658.3008,
-                    "valorImpostos": 800.2533000000001,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 109.989,
-                "valorDesonerado": 3223.011,
-                "porcentagemCargaTributaria": 0.03412616339193382,
-                "custo": 3333
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 4125.45408,
-                    "valorImpostos": 902.4430800000001,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": 3223.011
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 308.3025,
-                "valorDesonerado": 3024.6975,
-                "porcentagemCargaTributaria": 0.10192837465564737,
-                "custo": null
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 3871.6128000000003,
-                    "valorImpostos": 846.9153000000001,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 109.989,
-                "valorDesonerado": 3223.011,
-                "porcentagemCargaTributaria": 0.03412616339193382,
-                "custo": 3333
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 4125.45408,
-                    "valorImpostos": 902.4430800000001,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": 3223.011
                 }
             ]
         }
@@ -299,17 +286,71 @@ export function ResultadoSimulador(){
     "produtosVendidos": [
         {
             "antesReforma": {
-                "valor": 222,
-                "valorImpostos": 8.88,
-                "valorDesonerado": 213.12,
-                "porcentagemCargaTributaria": 0.04166666666666667,
+                "valor": 700,
+                "valorImpostos": 21,
+                "valorDesonerado": 679,
+                "porcentagemCargaTributaria": 0.030927835051546393,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 236.98944,
-                    "valorImpostos": 23.869440000000004,
+                    "valor": 730.3324,
+                    "valorImpostos": 51.3324,
+                    "porcentagemCargaTributaria": 0.0756,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 500,
+                "valorImpostos": 75,
+                "valorDesonerado": 425,
+                "porcentagemCargaTributaria": 0.17647058823529413,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 425,
+                    "valorImpostos": 0,
+                    "porcentagemCargaTributaria": 0,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 450,
+                "valorImpostos": 54.00000000000001,
+                "valorDesonerado": 396,
+                "porcentagemCargaTributaria": 0.13636363636363638,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 480.2688,
+                    "valorImpostos": 84.26880000000001,
+                    "porcentagemCargaTributaria": 0.21280000000000004,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 600,
+                "valorImpostos": 90.00000000000001,
+                "valorDesonerado": 510,
+                "porcentagemCargaTributaria": 0.17647058823529416,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 567.12,
+                    "valorImpostos": 57.12000000000001,
                     "porcentagemCargaTributaria": 0.11200000000000002,
                     "custo": null
                 }
@@ -317,36 +358,18 @@ export function ResultadoSimulador(){
         },
         {
             "antesReforma": {
-                "valor": 2222,
-                "valorImpostos": 199.98,
-                "valorDesonerado": 2022.02,
-                "porcentagemCargaTributaria": 0.0989010989010989,
+                "valor": 560,
+                "valorImpostos": 67.2,
+                "valorDesonerado": 492.8,
+                "porcentagemCargaTributaria": 0.13636363636363635,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 2588.1856,
-                    "valorImpostos": 566.1656,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 433.29,
-                "valorDesonerado": 2899.71,
-                "porcentagemCargaTributaria": 0.14942528735632185,
-                "custo": null
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 2899.71,
-                    "valorImpostos": 0,
-                    "porcentagemCargaTributaria": 0,
+                    "valor": 547.9936,
+                    "valorImpostos": 55.19360000000001,
+                    "porcentagemCargaTributaria": 0.11200000000000002,
                     "custo": null
                 }
             ]
@@ -355,54 +378,54 @@ export function ResultadoSimulador(){
     "produtosAdquiridos": [
         {
             "antesReforma": {
-                "valor": 2222,
-                "valorImpostos": 81.103,
-                "valorDesonerado": 2140.897,
+                "valor": 300,
+                "valorImpostos": 27.75,
+                "valorDesonerado": 272.25,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 272.25
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 305.7912,
+                    "valorImpostos": 33.5412,
+                    "porcentagemCargaTributaria": 0.12320000000000002,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 300,
+                "valorImpostos": 10.95,
+                "valorDesonerado": 289.05,
                 "porcentagemCargaTributaria": 0.03788271925272444,
-                "custo": 2140.897
+                "custo": 289.05
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 2740.34816,
-                    "valorImpostos": 599.4511600000001,
-                    "porcentagemCargaTributaria": 0.28,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3333,
-                "valorImpostos": 233.31000000000003,
-                "valorDesonerado": 3099.69,
-                "porcentagemCargaTributaria": 0.07526881720430108,
-                "custo": 3099.69
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 3446.85528,
-                    "valorImpostos": 347.16528000000005,
-                    "porcentagemCargaTributaria": 0.11200000000000002,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 5555,
-                "valorImpostos": 513.8375,
-                "valorDesonerado": 5041.1625,
-                "porcentagemCargaTributaria": 0.10192837465564737,
-                "custo": 5041.1625
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 5605.7727,
-                    "valorImpostos": 564.6102000000001,
+                    "valor": 321.4236,
+                    "valorImpostos": 32.3736,
                     "porcentagemCargaTributaria": 0.112,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 200,
+                "valorImpostos": 18.5,
+                "valorDesonerado": 181.5,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 200
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 232.32,
+                    "valorImpostos": 50.82000000000001,
+                    "porcentagemCargaTributaria": 0.28,
                     "custo": null
                 }
             ]
@@ -411,17 +434,53 @@ export function ResultadoSimulador(){
     "locacaoBensImoveis": [
         {
             "antesReforma": {
-                "valor": 4988,
-                "valorImpostos": 461.39,
-                "valorDesonerado": 4526.61,
+                "valor": 600,
+                "valorImpostos": 0,
+                "valorDesonerado": 600,
+                "porcentagemCargaTributaria": 0,
+                "custo": 600
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 650.4,
+                    "valorImpostos": 50.40000000000001,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": 600
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 700,
+                "valorImpostos": 25.549999999999997,
+                "valorDesonerado": 674.45,
+                "porcentagemCargaTributaria": 0.037882719252724434,
+                "custo": 635.25
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2033",
+                    "valor": 731.1038000000001,
+                    "valorImpostos": 56.65380000000002,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": 674.45
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1500,
+                "valorImpostos": 138.75,
+                "valorDesonerado": 1361.25,
                 "porcentagemCargaTributaria": 0.10192837465564739,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 4906.84524,
-                    "valorImpostos": 380.23524000000003,
+                    "valor": 1475.595,
+                    "valorImpostos": 114.34500000000003,
                     "porcentagemCargaTributaria": 0.08400000000000002,
                     "custo": null
                 }
@@ -429,72 +488,18 @@ export function ResultadoSimulador(){
         },
         {
             "antesReforma": {
-                "valor": 2322,
-                "valorImpostos": 214.785,
-                "valorDesonerado": 2107.215,
+                "valor": 1620,
+                "valorImpostos": 149.85,
+                "valorDesonerado": 1470.15,
                 "porcentagemCargaTributaria": 0.10192837465564737,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": 2233.82106,
-                    "valorImpostos": 126.60606000000004,
-                    "porcentagemCargaTributaria": 0.060082174813675886,
-                    "custo": null
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 3433,
-                "valorImpostos": 125.30449999999999,
-                "valorDesonerado": 3307.6955,
-                "porcentagemCargaTributaria": 0.03788271925272444,
-                "custo": 3115.4475
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 3585.541922,
-                    "valorImpostos": 277.8464220000001,
-                    "porcentagemCargaTributaria": 0.08400000000000003,
-                    "custo": 3307.6955
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 2544,
-                "valorImpostos": 235.32,
-                "valorDesonerado": 2308.68,
-                "porcentagemCargaTributaria": 0.10192837465564739,
-                "custo": 2544
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 2452.20912,
-                    "valorImpostos": 143.52912,
-                    "porcentagemCargaTributaria": 0.06216934352097303,
-                    "custo": 2308.68
-                }
-            ]
-        },
-        {
-            "antesReforma": {
-                "valor": 2333,
-                "valorImpostos": 215.8025,
-                "valorDesonerado": 2117.1975,
-                "porcentagemCargaTributaria": 0.10192837465564737,
-                "custo": null
-            },
-            "depoisReforma": [
-                {
-                    "ano": "2033",
-                    "valor": 2244.6420900000003,
-                    "valorImpostos": 127.44459000000005,
-                    "porcentagemCargaTributaria": 0.0601949463854931,
+                    "valor": 1593.6426000000001,
+                    "valorImpostos": 123.49260000000004,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
                     "custo": null
                 }
             ]
@@ -503,28 +508,28 @@ export function ResultadoSimulador(){
     "compraVendaBensImoveis": [
         {
             "antesReforma": {
-                "valor": 22222,
-                "valorImpostos": 113053.5,
-                "valorDesonerado": -90831.5,
-                "porcentagemCargaTributaria": -1.244650809465879,
+                "valor": 5000,
+                "valorImpostos": 37000,
+                "valorDesonerado": -32000,
+                "porcentagemCargaTributaria": -1.15625,
                 "custo": null
             },
             "depoisReforma": [
                 {
                     "ano": "2033",
-                    "valor": -114947.91,
-                    "valorImpostos": -14116.410000000002,
-                    "porcentagemCargaTributaria": 0.1554131551279017,
+                    "valor": -37620,
+                    "valorImpostos": -4620,
+                    "porcentagemCargaTributaria": 0.144375,
                     "custo": null
                 }
             ]
         },
         {
             "antesReforma": {
-                "valor": 33333,
-                "valorImpostos": 169580.25,
-                "valorDesonerado": -136247.25,
-                "porcentagemCargaTributaria": -1.244650809465879,
+                "valor": 3000,
+                "valorImpostos": 18500,
+                "valorDesonerado": -15500,
+                "porcentagemCargaTributaria": -1.1935483870967742,
                 "custo": null
             },
             "depoisReforma": [
@@ -540,116 +545,243 @@ export function ResultadoSimulador(){
     ],
     "totalCompras": {
         "comprasProdutos": {
-            "valorAR": 11110,
-            "impostosAR": 828.2505,
-            "valorDesonerado": 10281.7495,
-            "creditoAR": 828.2505,
-            "custoAR": 10281.7495,
-            "porcentagemCustoEfetivoAR": 0,
-            "porcentagemCargaTributariaAR": 0.21507991111267288,
-            "valorDR": 11792.97614,
-            "impostosDR": 1511.2266400000003,
+            "valorAR": 800,
+            "impostosAR": 57.2,
+            "valorDesonerado": 742.8,
+            "creditoAR": 38.7,
+            "custoAR": 761.3,
+            "porcentagemCustoEfetivoAR": 0.9516249999999999,
+            "porcentagemCargaTributariaAR": 0.07700592353257944,
+            "valorDR": 859.5347999999999,
+            "impostosDR": 116.73480000000002,
             "creditoDR": 0,
             "custoDR": 0,
             "porcentagemCustoEfetivoDR": 0,
-            "porcentagemCargaTributariaDR": 0.504
+            "porcentagemCargaTributariaDR": 0.15715508885298873
         },
         "servicosTomados": {
-            "valorAR": 21109,
-            "impostosAR": 2179.782,
-            "valorDesonerado": 18929.218,
-            "creditoAR": 924.9075,
-            "custoAR": 20184.0925,
-            "porcentagemCargaTributariaAR": 0.11515436084047424,
-            "porcentagemCustoEfetivoAR": 0.9561842105263157,
-            "valorDR": 24229.399040000004,
-            "impostosDR": 5300.1810399999995,
-            "creditoDR": 5300.1810399999995,
-            "custoDR": 18929.218,
-            "porcentagemCustoEfetivoDR": 0.7812499999999999,
-            "porcentagemCargaTributariaDR": 1.12
+            "valorAR": 1000,
+            "impostosAR": 142.50000000000003,
+            "valorDesonerado": 857.5,
+            "creditoAR": 74,
+            "custoAR": 926,
+            "porcentagemCargaTributariaAR": 0.16618075801749274,
+            "porcentagemCustoEfetivoAR": 0.926,
+            "valorDR": 1097.6,
+            "impostosDR": 240.10000000000002,
+            "creditoDR": 240.10000000000002,
+            "custoDR": 857.5,
+            "porcentagemCustoEfetivoDR": 0.7812500000000001,
+            "porcentagemCargaTributariaDR": 0.28
         },
         "locacaoMoveis": {
-            "valorAR": 6666,
-            "impostosAR": 219.978,
-            "valorDesonerado": 6446.022,
-            "creditoAR": 0,
-            "custoAR": 6666,
-            "porcentagemCargaTributariaAR": 0.06825232678386764,
-            "porcentagemCustoEfetivoAR": 0,
-            "valorDR": 8250.90816,
-            "impostosDR": 1804.8861600000002,
-            "creditoDR": 1804.8861600000002,
-            "custoDR": 6446.022,
-            "porcentagemCustoEfetivoDR": 0,
-            "porcentagemCargaTributariaDR": 0.56
+            "valorAR": 900,
+            "impostosAR": 59.45,
+            "valorDesonerado": 840.55,
+            "creditoAR": 46.25,
+            "custoAR": 853.75,
+            "porcentagemCargaTributariaAR": 0.07072749985128786,
+            "porcentagemCustoEfetivoAR": 0.9486111111111111,
+            "valorDR": 1075.904,
+            "impostosDR": 235.35400000000004,
+            "creditoDR": 235.35400000000004,
+            "custoDR": 840.55,
+            "porcentagemCustoEfetivoDR": 0.78125,
+            "porcentagemCargaTributariaDR": 0.2800000000000001
         },
         "locacaoImoveis": {
-            "valorAR": 5977,
-            "impostosAR": 360.6245,
-            "valorDesonerado": 5616.3755,
-            "creditoAR": 317.5525,
-            "custoAR": 5659.4475,
-            "porcentagemCargaTributariaAR": 0.13981109390837182,
-            "porcentagemCustoEfetivoAR": 0,
-            "valorDR": 6037.751042,
-            "impostosDR": 421.3755420000001,
-            "creditoDR": 421.3755420000001,
-            "custoDR": 5616.3755,
+            "valorAR": 1300,
+            "impostosAR": 25.549999999999997,
+            "valorDesonerado": 1274.45,
+            "creditoAR": 64.75,
+            "custoAR": 1235.25,
+            "porcentagemCargaTributariaAR": 0.020047863784377572,
+            "porcentagemCustoEfetivoAR": 0.9501923076923077,
+            "valorDR": 1381.5038,
+            "impostosDR": 107.05380000000002,
+            "creditoDR": 107.05380000000002,
+            "custoDR": 1274.45,
+            "porcentagemCustoEfetivoDR": 0.4343093374046456,
+            "porcentagemCargaTributariaDR": 0.08400000000000002
+        },
+        "total": {
+            "valorAR": 4000,
+            "impostosAR": 284.7,
+            "valorDesonerado": 3715.3,
+            "creditoAR": 223.7,
+            "custoAR": 3776.3,
+            "porcentagemCargaTributariaAR": 0.07700592353257944,
+            "porcentagemCustoEfetivoAR": 0.9516249999999999,
+            "valorDR": 4414.5426,
+            "impostosDR": 699.2426000000002,
+            "creditoDR": 582.5078000000001,
+            "custoDR": 2972.5,
             "porcentagemCustoEfetivoDR": 0,
-            "porcentagemCargaTributariaDR": 0.14616934352097305
+            "porcentagemCargaTributariaDR": 0.15715508885298873
         }
     },
     "totalVendas": {
         "vendasProdutos": {
-            "valorAR": 5777,
-            "impostosAR": 642.15,
-            "valorDesonerado": 5134.85,
-            "porcentagemCargaTributariaAR": 0.2899930529240874,
-            "valorDR": 5724.885039999999,
-            "impostosDR": 590.0350400000001,
-            "porcentagemCargaTributariaDR": 0.392
+            "valorAR": 2810,
+            "impostosAR": 307.2,
+            "valorDesonerado": 2502.8,
+            "porcentagemCargaTributariaAR": 0.12274252836822758,
+            "valorDR": 2750.7147999999997,
+            "impostosDR": 247.9148,
+            "porcentagemCargaTributariaDR": 0.09905497842416493
         },
         "servicosPrestados": {
-            "valorAR": 13332,
-            "impostosAR": 1899.8100000000002,
-            "valorDesonerado": 11432.19,
-            "porcentagemCargaTributariaAR": 0.49854227405247814,
-            "valorDR": 13993.00056,
-            "impostosDR": 2560.8105600000004,
-            "porcentagemCargaTributariaDR": 0.672
+            "valorAR": 4500,
+            "impostosAR": 641.2500000000001,
+            "valorDesonerado": 3858.75,
+            "porcentagemCargaTributariaAR": 0.16618075801749274,
+            "valorDR": 4579.049999999999,
+            "impostosDR": 720.3000000000001,
+            "porcentagemCargaTributariaDR": 0.18666666666666668
         },
         "locacaoMoveis": {
-            "valorAR": 8888,
-            "impostosAR": 988.79,
-            "valorDesonerado": 7899.21,
-            "porcentagemCargaTributariaAR": 0.37003750732878743,
-            "valorDR": 10110.988800000001,
-            "impostosDR": 2211.7788,
-            "porcentagemCargaTributariaDR": 0.8400000000000001
+            "valorAR": 2700,
+            "impostosAR": 349.75,
+            "valorDesonerado": 2350.25,
+            "porcentagemCargaTributariaAR": 0.14881395596213168,
+            "valorDR": 3008.3199999999997,
+            "impostosDR": 658.07,
+            "porcentagemCargaTributariaDR": 0.28
         },
         "locacaoImoveis": {
-            "valorAR": 9643,
-            "impostosAR": 891.9775,
-            "valorDesonerado": 8751.0225,
-            "porcentagemCargaTributariaAR": 0.30578512396694213,
-            "valorDR": 9385.30839,
-            "impostosDR": 634.2858900000001,
-            "porcentagemCargaTributariaDR": 0.20427712119916902
+            "valorAR": 3120,
+            "impostosAR": 288.6,
+            "valorDesonerado": 2831.4,
+            "porcentagemCargaTributariaAR": 0.10192837465564739,
+            "valorDR": 3069.2376000000004,
+            "impostosDR": 237.83760000000007,
+            "porcentagemCargaTributariaDR": 0.08400000000000002
+        },
+        "total": {
+            "valorAR": 13130,
+            "impostosAR": 1586.8000000000002,
+            "valorDesonerado": 11543.199999999999,
+            "porcentagemCargaTributariaAR": 0.12274252836822758,
+            "valorDR": 13407.322400000001,
+            "impostosDR": 1864.1224000000004,
+            "porcentagemCargaTributariaDR": 0.09905497842416493
         }
     },
     "dre": {
+        "receitaBruta": {
+            "AR": 26260,
+            "DR": 23086.399999999998,
+            "diferencaReais": -3173.600000000002,
+            "diferencaPercentual": -0.12085300837776093
+        },
+        "deducoesTributos": {
+            "AR": 2726.2000000000003,
+            "DR": 0,
+            "diferencaReais": -2726.2000000000003,
+            "diferencaPercentual": -1
+        },
         "custoGeral": {
-            "AR": 15658.989500000001,
-            "DR": 8119.188
+            "AR": 761.3,
+            "DR": 428.75,
+            "diferencaReais": -332.54999999999995,
+            "diferencaPercentual": -0.4368185997635623
+        },
+        "lucroBruto": {
+            "AR": 22772.5,
+            "DR": 22657.649999999998,
+            "diferencaReais": -114.85000000000218,
+            "diferencaPercentual": -0.005043363706224709
         },
         "despesas": {
-            "AR": 27132.3,
-            "DR": 22872.427499999998
+            "AR": 3015,
+            "DR": 2543.75,
+            "diferencaReais": -471.25,
+            "diferencaPercentual": -0.15630182421227198
+        },
+        "lucrosAntesIrCs": {
+            "AR": 19757.5,
+            "DR": 20113.899999999998,
+            "diferencaReais": 356.3999999999978,
+            "diferencaPercentual": 0.018038719473617505
+        },
+        "irCs": {
+            "AR": 4741.8,
+            "DR": 4838.725999999999,
+            "diferencaReais": 96.92599999999857,
+            "diferencaPercentual": 0.02044076089248778
+        },
+        "lucroLiquido": {
+            "AR": 15015.7,
+            "DR": 15275.173999999999,
+            "diferencaReais": 259.47399999999834,
+            "diferencaPercentual": 0.017280180078184722
+        }
+    },
+    "caixa": {
+        "fornecedores": {
+            "AR": 8000,
+            "DR": 8829.0852,
+            "diferencaReais": 829.0851999999995,
+            "diferencaPercentual": 0.10363564999999994
+        },
+        "tributosCredito": {
+            "AR": 447.4,
+            "DR": 1165.0156000000002,
+            "diferencaReais": 717.6156000000002,
+            "diferencaPercentual": 1.6039687080911942
+        },
+        "clientes": {
+            "AR": 26260,
+            "DR": 26814.644800000002,
+            "diferencaReais": 554.6448000000019,
+            "diferencaPercentual": 0.02112127951256671
+        },
+        "tributosDebito": {
+            "AR": 3173.6000000000004,
+            "DR": 3728.2448000000004,
+            "diferencaReais": 554.6448,
+            "diferencaPercentual": 0.17476833879505924
+        },
+        "tributosRecolhidos": {
+            "AR": 2726.2000000000003,
+            "DR": 2563.2292,
+            "diferencaReais": -162.97080000000005,
+            "diferencaPercentual": -0.059779473259482074
+        },
+        "saldoCredor": {
+            "AR": 0,
+            "DR": 0,
+            "diferencaReais": 0,
+            "diferencaPercentual": 0
+        },
+        "resultado": {
+            "AR": 15533.800000000001,
+            "DR": 15422.330399999999,
+            "diferencaReais": -111.46960000000217,
+            "diferencaPercentual": -0.007175938920290088
+        },
+        "irCs": {
+            "AR": 4741.8,
+            "DR": 4838.725999999999,
+            "diferencaReais": 96.92599999999857,
+            "diferencaPercentual": 0.02044076089248778
+        },
+        "resultadoPosIrCs": {
+            "AR": 10792,
+            "DR": 10583.6044,
+            "diferencaReais": -208.39559999999983,
+            "diferencaPercentual": -0.01931019273535951
+        },
+        "resultadoSobreClientes": {
+            "AR": 0.5915384615384616,
+            "DR": 0.5751458024161483,
+            "diferencaReais": -0.016392659122313247,
+            "diferencaPercentual": -0.02771190748895607
         }
     }
 }
 
+/*
     const valorVendaAR = Object.values(objResultado.totalVendas).reduce((soma, area) => {
         return soma + area.valorAR;
     }, 0)
@@ -690,7 +822,7 @@ export function ResultadoSimulador(){
     return soma + area.creditoDR
     }, 0) 
 
-    const diferencaVendas = valorVendaDR - valorVendaAR
+
     const diferencaCompras = valorCompraDR - valorCompraAR
     const diferencaCustoCompras = custoCompraDR - custoCompraAR
     const diferencaTributosDebito = tributosDebitoDR - tributosDebitoAR
@@ -714,9 +846,9 @@ export function ResultadoSimulador(){
     const resultadoCaixaAR = caixa.clientes.AR - caixa.fornecedores.AR + caixa.tributosCredito.AR - caixa.tributosDebito.AR
     const resultadoCaixaDR = caixa.clientes.DR - caixa.fornecedores.DR + caixa.tributosCredito.DR - caixa.tributosDebito.DR
     const resultadoCaixaDiferenca = resultadoCaixaDR - resultadoCaixaAR
-    const resultadoCaixaDiferencaPercentual = resultadoCaixaDiferenca / resultadoCaixaAR 
-    const resultadoSemClientesAR = resultadoCaixaAR / caixa.clientes.AR
-    const resultadoSemClientesDR = resultadoCaixaDR / caixa.clientes.DR
+    const resultadoCaixaDiferencaPercentual = resultadoCaixaAR ? (resultadoCaixaDiferenca / resultadoCaixaAR) : 0 
+    const resultadoSemClientesAR = caixa.clientes.AR ? (resultadoCaixaAR / caixa.clientes.AR) : 0
+    const resultadoSemClientesDR = caixa.clientes.DR ? (resultadoCaixaDR / caixa.clientes.DR) : 0
 
     const caixaComResultado: tabelaCaixaType = {
         ...caixa,
@@ -726,7 +858,7 @@ export function ResultadoSimulador(){
             diferencaReais: resultadoCaixaDiferenca,
             diferencaPercentual: resultadoCaixaDiferencaPercentual
         },
-        resultadoSemClientes: {
+        resultadoSobreClientes: {
             AR: resultadoSemClientesAR,
             DR: resultadoSemClientesDR,
             diferencaReais: resultadoSemClientesDR - resultadoSemClientesAR,
@@ -750,11 +882,15 @@ export function ResultadoSimulador(){
     const tabelaDreComResultados = {
         
     }
+    */
 
+    const arrPropriedadesCaixa = Object.entries(objResultado.caixa)
+    const diferencaCustoCompras = objResultado.totalCompras.total.custoDR - objResultado.totalCompras.total.custoAR
+    const diferencaVendas = objResultado.totalVendas.total.valorDR - objResultado.totalVendas.total.valorAR
+    const representacaoPaupavel = objResultado.caixa.resultadoSobreClientes.diferencaPercentual * objResultado.caixa.clientes.AR
 
-    const arrPropriedadesCaixa = Object.entries(caixaComResultado)
-
-    const representacaoPaupavel = caixaComResultado.resultadoSemClientes.diferencaPercentual * caixaComResultado.clientes.AR
+    
+    
 
 
     function retornarValorDinheiro(num: number){
@@ -795,8 +931,19 @@ export function ResultadoSimulador(){
 
                 {/* DRE */}    
                 <div className="flex flex-col gap-8 items-center">
-                    <div className="w-full text-4xl flex flex-col gap-3">
+                    <div className="w-full text-3xl flex flex-col gap-3">
                         <span className="mb-4 text-4xl font-bold">DRE - Demonstração de Resultado do Exercício</span>
+                        <div className="flex items-start gap-2 ">
+                            <div className="flex items-center mt-[20px] ">
+                                <IndicadorColorido cor={`${objResultado.dre.lucroLiquido.diferencaReais > 0 ? "verde" : "vermelho"}`}/>
+                            </div>
+                            {
+                                objResultado.dre.lucroLiquido.diferencaReais > 0 ?
+                                <span className="">Seu Lucro Líquido aumentou em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, isso significa que você pode trabalhar o preço de venda em <span className="text-4xl textoGradiente">{Math.abs(objResultado.dre.lucroLiquido.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> para buscar mais competitividade e manter um preço equilibrado até o fim da cadeia (consumidor final)</span>
+                                :
+                                <span>A queda de <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> no Lucro Líquido exige ação: renegocie com fornecedores ou ajuste seus preços para manter a lucratividade</span>
+                            }
+                        </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
                         <div className="flex flex-col p-4">
@@ -811,7 +958,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.dre ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(tabelaDre).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(objResultado.dre).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {
@@ -846,12 +993,16 @@ export function ResultadoSimulador(){
                     <div className="w-full text-3xl flex flex-col gap-3">
                         <span className="mb-4 text-4xl font-bold">Impactos no Fluxo de Caixa</span>
                         <div className="flex items-center gap-2">
-                            <IndicadorColorido cor={`${resultadoCaixaDiferenca > 0? "verde" : "vermelho"}`}/>
-                            <span>Seu caixa {resultadoCaixaDiferenca > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(resultadoCaixaDiferenca).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(resultadoCaixaDiferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {resultadoCaixaDiferenca > 0? "positivo" : "negativo"} no resultado.</span>
+                            <div className="flex items-center mt-[0.3em] ">
+                                <IndicadorColorido cor={`${objResultado.caixa.resultado.diferencaReais > 0? "verde" : "vermelho"}`}/>
+                            </div>
+                            <span>Seu caixa {objResultado.caixa.resultado.diferencaReais > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.caixa.resultado.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.resultado.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {objResultado.caixa.resultado.diferencaReais > 0? "positivo" : "negativo"} no resultado.</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <IndicadorColorido cor={`${caixaComResultado.resultadoSemClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
-                            <span>Sua capacidade de gerar caixa {caixaComResultado.resultadoSemClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(caixaComResultado.resultadoSemClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
+                            <div className="flex items-center mt-[0.3em]">
+                                <IndicadorColorido cor={`${objResultado.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
+                            </div>
+                            <span>Sua capacidade de gerar caixa {objResultado.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.resultadoSobreClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -913,12 +1064,16 @@ export function ResultadoSimulador(){
                     <div className="w-full text-3xl flex flex-col gap-3">
                         <span className="mb-4 text-4xl font-bold">Impacto nas Compras</span>
                         <div className="flex items-center gap-2">
-                            <IndicadorColorido cor={`${diferencaCompras > 0 ? "vermelho" : "verde"}`}/>
-                            <span>O preço de compra sofreu {diferencaCompras > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(diferencaCompras / (caixa.fornecedores.AR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <div className="flex items-center mt-[0.3em]">
+                                <IndicadorColorido cor={`${objResultado.caixa.fornecedores.diferencaReais > 0 ? "vermelho" : "verde"}`}/>
+                            </div>
+                            <span>O preço de compra sofreu {objResultado.caixa.fornecedores.diferencaReais > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(objResultado.caixa.fornecedores.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.fornecedores.diferencaReais / (objResultado.caixa.fornecedores.AR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <IndicadorColorido cor={`${diferencaCustoCompras > 0 ? "vermelho" : "verde"}`}/>
-                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / custoCompraAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
+                            <div className="flex items-center mt-[0.3em]">
+                                <IndicadorColorido cor={`${diferencaCustoCompras > 0 ? "vermelho" : "verde"}`}/>
+                            </div>
+                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / objResultado.totalCompras.total.custoAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -986,8 +1141,10 @@ export function ResultadoSimulador(){
                     <div className="w-full text-3xl flex flex-col gap-3">
                         <span className="mb-4 text-4xl font-bold">Impacto nas Vendas</span>
                         <div className="flex items-center gap-2">
-                            <IndicadorColorido cor={`${diferencaVendas > 0 ? "vermelho" : "verde"}`} />
-                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (caixa.clientes.AR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <div className="flex items-center mt-[0.3em]">
+                                <IndicadorColorido cor={`${diferencaVendas > 0 ? "vermelho" : "verde"}`} />
+                            </div>
+                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (objResultado.caixa.clientes.AR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <span>
                             {

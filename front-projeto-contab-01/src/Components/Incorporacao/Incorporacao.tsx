@@ -11,7 +11,7 @@ export function Incorporacao(){
                             Incorporação
                         </div>
                         <div>
-                            <BotaoGeral onClickFn={() => {}} principalBranco={true} text="Adicionar Novo Imóvel (Locação)"/>
+                            <BotaoGeral onClickFn={() => {}} principalBranco={true} text="Adicionar Novo Imóvel (Incorporação)"/>
                         </div>
                     </div>
                 </div>

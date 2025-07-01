@@ -6,7 +6,8 @@ import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
 import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
-import { ToogleButton, toogleFn } from "../ToogleButton/ToogleButton"
+import { ToggleButton, toogleFn } from "../ToggleButton/ToggleButton"
+import { Xis } from "../Xis/Xis"
 
 
 
@@ -337,6 +338,8 @@ export function ProdutosAdquiridosInput(){
                     regimeTributarioOutro: regimeFornecedorAdd,
                     fornecedorIndustrial: fornecedorIndustrialAdd,
                     beneficio: 0,
+                    manterBeneficio: true,
+                    descricaoAnexo: "",
                     id: idAtual
                 }
                 novoArr.push(novoObjAtual)
@@ -711,7 +714,7 @@ export function ProdutosAdquiridosInput(){
                                             {metodoAdquiridoArr.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherMetodo(item)}
                                             >
                                                 {item}
@@ -744,22 +747,22 @@ export function ProdutosAdquiridosInput(){
                                             />
                                         </div>
                                     }
-                                    <ToogleButton valor={cnpjGenerico} onChangeFn={() => toogleFn(setCnpjGenerico, cnpjGenerico)} texto="CNPJ genérico" />
+                                    <ToggleButton valor={cnpjGenerico} onChangeFn={() => toogleFn(setCnpjGenerico, cnpjGenerico)} texto="CNPJ Genérico" />
                                     {/*<div className="flex flex-col items-start">
                                         <label htmlFor="cnpjGenerico">CNPJ genérico</label>
                                         <input checked={metodoAdd == "Por Operação"} onChange={(e) => checkCnpjGenericoInput(e)} type="checkbox" name="cnpjGenerico" id="cnpjGenerico" />
                                     </div>*/}
                                 </div>
                       
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Tipo do Operação:</label>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Tipo de Operação:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
                                         onClick={trocarDropTipoOperacao}
                                         className="flex gap-2 items-center justify-between p-2 cursor-pointer"
                                         >
                                             <div className=" opacity-50">
-                                                {tipoOperacaoAdd || "Escolha o tipo do aluguel"}
+                                                {tipoOperacaoAdd || "Escolha o Tipo de Operação"}
                                             </div>
                                             <div
                                                 className={`
@@ -785,7 +788,7 @@ export function ProdutosAdquiridosInput(){
                                             {tipoOperacaoAdquiridoArr.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherTipoOperacao(item)}
                                             >
                                                 {item}
@@ -797,7 +800,7 @@ export function ProdutosAdquiridosInput(){
                                 </div>
 
 
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">Fornecedor Industrial:</label>
 
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
@@ -832,7 +835,7 @@ export function ProdutosAdquiridosInput(){
                                             {simNaoArr.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherFornecedorIndustrial(item)}
                                             >
                                                 {item}
@@ -863,14 +866,14 @@ export function ProdutosAdquiridosInput(){
                                             />
                                         </div>
                                     }
-                                    <ToogleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM genérico" />
+                                    <ToggleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM Genérico" />
                                     {/*<div className="flex flex-col items-start">
                                         <label htmlFor="ncmGenerico">NCM genérico</label>
                                         <input checked={ncmGenerico} onChange={(e) => checkNcmGenericoInput(e)} type="checkbox" name="ncmGenerico" id="ncmGenerico" />
                                     </div>*/}
                                 </div>
                             
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">Regime Fornecedor:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
@@ -904,7 +907,7 @@ export function ProdutosAdquiridosInput(){
                                             {regimesAdquiridoArr.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherRegime(item)}
                                             >
                                                 {item}
@@ -976,7 +979,7 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <ToogleButton valor={creditoIcms} onChangeFn={() => toogleFn(setCreditoIcms, creditoIcms)} texto="Tem crédito ICMS"/>
+                                        <ToggleButton valor={creditoIcms} onChangeFn={() => toogleFn(setCreditoIcms, creditoIcms)} texto="Tem crédito ICMS"/>
                                         {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoIcms">Tem crédito ICMS?</label>
                                             <input checked={creditoIcms} onChange={(e) => checkTemCreditoIcmsInput(e)} type="checkbox" name="creditoIcms" id="creditoIcms" />
@@ -997,7 +1000,7 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <ToogleButton valor={creditoPisCofins} onChangeFn={() => toogleFn(setCreditoPisCofins, creditoPisCofins)} texto="Tem crédito PIS-COFINS"/>
+                                        <ToggleButton valor={creditoPisCofins} onChangeFn={() => toogleFn(setCreditoPisCofins, creditoPisCofins)} texto="Tem crédito PIS-COFINS"/>
                                         {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoPisCofins">Tem crédito PIS-COFINS?</label>
                                             <input checked={creditoPisCofins} onChange={(e) => checkTemCreditoPisCofinsInput(e)} type="checkbox" name="creditoPisCofins" id="creditoPisCofins" />
@@ -1018,7 +1021,7 @@ export function ProdutosAdquiridosInput(){
                                             className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
                                             />
                                         </div>
-                                        <ToogleButton valor={creditoIpi} onChangeFn={() => toogleFn(setCreditoIpi, creditoIpi)} texto="Tem crédito IPI"/>
+                                        <ToggleButton valor={creditoIpi} onChangeFn={() => toogleFn(setCreditoIpi, creditoIpi)} texto="Tem crédito IPI"/>
                                         {/*<div className="flex flex-col items-start">
                                             <label htmlFor="creditoIpi">Tem crédito IPI?</label>
                                             <input checked={creditoIpi} onChange={(e) => checkTemCreditoIpiInput(e)} type="checkbox" name="creditoIpi" id="creditoIpi" />
@@ -1084,9 +1087,7 @@ export function ProdutosAdquiridosInput(){
                                                         <div>{produto.aliquotas.pisCo !== null ? produto.aliquotas.pisCo + `% - ${produto.creditoPisCofins ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                         <div>{produto.aliquotas.ipi !== null ? produto.aliquotas.ipi + `% - ${produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                         <div>{produto.valorOperacao}</div>
-                                                        <div onClick={() => {apagarProdutoAdquiridoModal(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                        </div>
+                                                        <Xis onClickFn={apagarProdutoAdquiridoModal} id={produto.id} />
                                                     </div>
                                                 </>
                                         )
@@ -1162,9 +1163,7 @@ export function ProdutosAdquiridosInput(){
                                                 <div>{produto.aliquotas.pisCo !== null ? produto.aliquotas.pisCo + `% - ${produto.creditoPisCofins ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                 <div>{produto.aliquotas.ipi !== null ? produto.aliquotas.ipi + `% - ${produto.creditoIpi ? "Com Crédito" : "Sem Crédito"}` : ""}</div>
                                                 <div>{produto.valorOperacao}</div>
-                                                <div onClick={() => {apagarProdutoAdquirido(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                    <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                </div>
+                                                <Xis onClickFn={apagarProdutoAdquirido} id={produto.id} />
                                             </div>
                                         </>
                                 )

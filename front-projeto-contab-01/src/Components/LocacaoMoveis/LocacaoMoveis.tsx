@@ -8,6 +8,9 @@ import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import xis from "../../assets/images/xisContab.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoMoveis, MoveisLocacaoObj } from "../../Contextos/ContextoMoveis/ContextoMoveis"
+import { Xis } from "../Xis/Xis"
+import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
+import { ToggleButton } from "../ToggleButton/ToggleButton"
 
 type Props = {
     modoBranco: boolean
@@ -250,18 +253,8 @@ export default function LocacaoMoveis({modoBranco}: Props){
         trocarDropPrazoDeterminado()
     }
 
-    function escolherCreditaPisCofins(item: simNaoType){
-        switch(item){
-            case "Sim":
-                setCreditaPisCofinsAdd(true)
-                break
-
-            case "Não":
-                setCreditaPisCofinsAdd(false)
-                break
-        }
-
-        trocarDropCreditaPisCofins()
+    function escolherCreditaPisCofins(){
+        setCreditaPisCofinsAdd(!creditaPisCofinsAdd)
     }
 
     function escolherComOperador(item: simNaoType){
@@ -311,6 +304,26 @@ export default function LocacaoMoveis({modoBranco}: Props){
         setInfo1Aberto(true)
     }
 
+
+    function checkTemCreditoPisCofinsModal(id: number){
+        const novoArr = [...totalMoveisModal]
+        const index = novoArr.findIndex(item => item.id == id)
+            if(index > -1){
+                novoArr[index].creditaPisCofins = !novoArr[index].creditaPisCofins
+            }
+        setTotalMoveisModal(novoArr)
+    }
+
+    function checkTemCreditoPisCofinsResultado(id: number){
+        const novoArr = [...totalMoveisLocacao]
+        const index = novoArr.findIndex(item => item.id == id)
+            if(index > -1){
+                novoArr[index].creditaPisCofins = !novoArr[index].creditaPisCofins
+            }
+        setTotalMoveisLocacao(novoArr)
+    }
+
+
     function abrirModalLocacaoMoveisFn(){
         setModalLocacaoMoveisAberto(true)
     }
@@ -332,16 +345,11 @@ export default function LocacaoMoveis({modoBranco}: Props){
     }
 
 
-    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+    function alterarCompoeCusto(id: number){
         const objTotalMoveisClone = [...totalMoveisLocacao]
         const idEncontrado = objTotalMoveisClone.findIndex(item => item.id == id)
         if(idEncontrado > -1){
-            if(e.target.checked){
-                objTotalMoveisClone[idEncontrado].compoeCusto = true
-            }else{
-                objTotalMoveisClone[idEncontrado].compoeCusto = false
-            }
-
+            objTotalMoveisClone[idEncontrado].compoeCusto = !objTotalMoveisClone[idEncontrado].compoeCusto 
             setTotalMoveisLocacao(objTotalMoveisClone)
         }else{
             console.log("ID compoe custo não encontrado")
@@ -453,57 +461,57 @@ export default function LocacaoMoveis({modoBranco}: Props){
                             <div className="flex gap-8 p-6">
 
 
-                                <div className="flex flex-col">
-                                <label className="text-gray-400 w-[10vw]">Tipo do aluguel:</label>
-                                <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                                    <div
-                                    onClick={trocarDroptipoAluguel}
-                                    className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                                    >
-                                        <div className=" opacity-50">
-                                            {tipoAluguelAdd || "Escolha o tipo do aluguel"}
-                                        </div>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Tipo de Aluguel:</label>
+                                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
-                                            className={`
-                                            ${tipoAluguelAberto ? "rotate-180" : "rotate-0"}
-                                            transition-all ease-linear duration-500
-                                            `}
+                                        onClick={trocarDroptipoAluguel}
+                                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
                                         >
-                                            <img
-                                            src={setaSeletor}
-                                            alt="seta-seletor"
-                                            className="w-4 h-4"
-                                            />
+                                            <div className=" opacity-50">
+                                                {tipoAluguelAdd || "Escolha o tipo de aluguel"}
+                                            </div>
+                                            <div
+                                                className={`
+                                                ${tipoAluguelAberto ? "rotate-180" : "rotate-0"}
+                                                transition-all ease-linear duration-500
+                                                `}
+                                            >
+                                                <img
+                                                src={setaSeletor}
+                                                alt="seta-seletor"
+                                                className="w-4 h-4"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div
-                                    className={`
-                                        ${tipoAluguelAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                                        [transition:grid-template-rows_500ms]
-                                    `}
-                                    >
-                                    <div className="overflow-hidden">
-                                        {tiposAlugueis.map(item => (
                                         <div
-                                            key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
-                                            onClick={() => escolherTipoAluguel(item)}
+                                        className={`
+                                            ${tipoAluguelAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                            [transition:grid-template-rows_500ms]
+                                        `}
                                         >
-                                            {item}
+                                        <div className="overflow-hidden">
+                                            {tiposAlugueis.map(item => (
+                                            <div
+                                                key={item}
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                                onClick={() => escolherTipoAluguel(item)}
+                                            >
+                                                {item}
+                                            </div>
+                                            ))}
                                         </div>
-                                        ))}
+                                        </div>
                                     </div>
-                                    </div>
-                                </div>
                                 </div>
 
                                 {tipoAluguelAdd && (
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">
                                     {tipoAluguelAdd === "Aluguel recebido"
-                                        ? "Tipo do locatário:"
-                                        : "Tipo do locador"}
+                                        ? "Tipo do Locatário:"
+                                        : "Tipo do Locador"}
                                     </label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                     <div
@@ -542,7 +550,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                         {tiposOutro.map(item => (
                                             <div
                                             key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                            className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                             onClick={() => escolherTipoOutro(item)}
                                             >
                                             {item}
@@ -555,11 +563,11 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                 )}
 
                                 {tipoOutroAdd === "Pessoa jurídica" && (
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">
                                     {tipoAluguelAdd === "Aluguel recebido"
-                                        ? "Regime do locatário:"
-                                        : "Regime do locador"}
+                                        ? "Regime do Locatário:"
+                                        : "Regime do Locador"}
                                     </label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                     <div
@@ -597,7 +605,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                         {regimesOutro.map(item => (
                                             <div
                                             key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                            className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                             onClick={() => escolherRegimeOutro(item)}
                                             >
                                             {item}
@@ -609,7 +617,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                 </div>
                                 )}
 
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">Com Operador</label>
 
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
@@ -644,7 +652,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                             {arrSimNao.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherComOperador(item)}
                                             >
                                                 {item}
@@ -655,55 +663,8 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Credita Pis-Cofins</label>
-
-                                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                                        <div
-                                        onClick={trocarDropCreditaPisCofins}
-                                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                                        >
-                                        <div className="opacity-50">
-                                            {creditaPisCofinsAdd ? "Sim" : "Não"}
-                                        </div>
-                                        <div
-                                            className={`
-                                            ${creditaPisCofinsAberto ? "rotate-180" : "rotate-0"}
-                                            transition-all ease-linear duration-500
-                                            `}
-                                        >
-                                            <img
-                                            src={setaSeletor}
-                                            alt="seta-seletor"
-                                            className="w-4 h-4"
-                                            />
-                                        </div>
-                                        </div>
-
-                                        <div
-                                        className={`
-                                            ${creditaPisCofinsAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                                            [transition:grid-template-rows_500ms]
-                                        `}
-                                        >
-                                        <div className="overflow-hidden">
-                                            {arrSimNao.map(item => (
-                                            <div
-                                                key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
-                                                onClick={() => escolherCreditaPisCofins(item)}
-                                            >
-                                                {item}
-                                            </div>
-                                            ))}
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Prazo determinado:</label>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Prazo Determinado:</label>
 
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
@@ -737,7 +698,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                             {arrSimNao.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherPrazoDeterminado(item)}
                                             >
                                                 {item}
@@ -853,7 +814,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                             <div>Tipo da outra parte</div>
                                                             <div>Prazo determinado</div>
                                                             <div>Mão de obra</div>
-                                                            <div>Credita pis-cofins</div>
+                                                            <div>Crédito PIS-COFINS</div>
                                                             <div>Com operador</div>
                                                             <div>Valor locação</div>
                                                             <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
@@ -867,12 +828,10 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                         <div>{movel.tipoOutraParte}</div>
                                                         <div>{movel.prazoDeterminado ? "Sim" : "Não"}</div>
                                                         <div>{"R$ " + Number(movel.valorMaoObra).toLocaleString("pt-br")}</div>
-                                                        <div>{movel.creditaPisCofins ? "Sim" : "Não"}</div>
+                                                        <ToggleButtonMapeado texto="" valor={movel.creditaPisCofins} onChangeFn={() => checkTemCreditoPisCofinsModal(movel.id)} />
                                                         <div>{movel.comOperador ? "Sim" : "Não"}</div>
                                                         <div>{"R$ " + Number(movel.valorLocacao).toLocaleString("pt-br")}</div>
-                                                        <div onClick={() => {apagarMovelLocacaoModal(movel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                        </div>
+                                                        <Xis onClickFn={apagarMovelLocacaoModal} id={movel.id} />
                                                     </div>
                                                 </>
                                                 :
@@ -970,7 +929,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                         <div>Tipo da outra parte</div>
                                                         <div>Prazo determinado</div>
                                                         <div>Mão de obra</div>
-                                                        <div>Credita pis-cofins</div>
+                                                        <div>Crédito PIS-COFINS</div>
                                                         <div>Com operador</div>
                                                         <div>Valor locação</div>
                                                         <div>Compõe Custo</div>
@@ -985,15 +944,12 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                                     <div>{movel.tipoOutraParte}</div>
                                                     <div>{movel.prazoDeterminado ? "Sim" : "Não"}</div>
                                                     <div>{"R$ " + Number(movel.valorMaoObra).toLocaleString("pt-br")}</div>
-                                                    <div>{movel.creditaPisCofins ? "Sim" : "Não"}</div>
+                                                    <ToggleButtonMapeado texto="" valor={movel.creditaPisCofins} onChangeFn={() => checkTemCreditoPisCofinsResultado(movel.id)} />
                                                     <div>{movel.comOperador ? "Sim" : "Não"}</div>
                                                     <div>{"R$ " + Number(movel.valorLocacao).toLocaleString("pt-br")}</div>
-                                                    <div className="flex flex-col items-start">
-                                                        <input checked={movel.compoeCusto} onChange={(e) => alterarCompoeCusto(e, movel.id)} type="checkbox" name="compoeCustoMoveis" id="compoeCustoMoveis" />
-                                                    </div>
-                                                    <div onClick={() => {apagarMovelLocacao(movel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                    </div>
+                                                    <ToggleButtonMapeado texto="" valor={movel.compoeCusto} onChangeFn={() => alterarCompoeCusto(movel.id)} />
+
+                                                    <Xis onClickFn={apagarMovelLocacao} id={movel.id} />
                                                 </div>
                                             </>
                                             :

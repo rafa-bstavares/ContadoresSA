@@ -4,6 +4,7 @@ import lixeira from "../../assets/images/lixeira.svg"
 import { objAtividadeFinal } from "../SegundoPasso/SegundoPasso"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import xis from "../../assets/images/xisContab.svg"
+import { Xis } from "../Xis/Xis"
 
 type ObjInfosType = {
     cnae: string,
@@ -53,7 +54,16 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                 idAtual = maxId + 1
     
                 const novoArr = [...totalAtividadesPrestadas]
-                novoArr.push({atividade: atividadeSelecionada.descricao, faturamentoMensal: faturamentoSelecionado, id: idAtual, cnaePrincipal: atividadeSelecionada.cnae.toString(), beneficio: 0,anexo: atividadeSelecionada.anexo, prestacao: true})
+                novoArr.push({
+                    atividade: atividadeSelecionada.descricao, 
+                    faturamentoMensal: faturamentoSelecionado, 
+                    id: idAtual, 
+                    cnaePrincipal: atividadeSelecionada.cnae.toString(), 
+                    beneficio: 0,
+                    anexo: atividadeSelecionada.anexo, 
+                    prestacao: true,
+                    manterBeneficio: true
+                })
                 setTotalAtividadesPrestadas(novoArr)
                 setModalServicosPrestadosAberto(false)
                 setAtividadeSelecionada(undefined)
@@ -106,9 +116,9 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                                 alt="fechar modal locação"
                                 />
                             </div>
-                            <div className="flex items-start justify-center gap-6">
+                            <div className="flex items-start justify-center gap-6 bg-[#222222] p-6 rounded-xl">
                                 {/*Drop down com as atividades*/}
-                                <div className="flex flex-col gap-1">
+                                <div className="flex flex-col gap-1 max-w-[400px]">
                                     <label className="text-gray-400">Escolha um CNAE:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div onClick={trocarMenuAtividades} className="flex gap-2 items-center justify-between p-2 cursor-pointer">
@@ -126,7 +136,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                                         </div>
                                         <div className={` ${aberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                                             <div className={`overflow-hidden`}>
-                                                {arrInfosEmpresa.filter(item => item.anexo == "III" || item.anexo == "IV" || item.anexo == "V").map((item) => <div className="p-2 rounded-md cursor-pointer hover:bg-gray-300" onClick={() => escolherAtividadeFn(item)}>{item.descricao}</div>)}
+                                                {arrInfosEmpresa.filter(item => item.anexo == "III" || item.anexo == "IV" || item.anexo == "V").map((item) => <div className="p-2 rounded-md cursor-pointer hover:bg-premiumBg" onClick={() => escolherAtividadeFn(item)}>{item.descricao}</div>)}
                                             </div>
                                         </div>
                                 
@@ -161,19 +171,33 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
             </div>
 
 
-            <div className=" flex flex-col gap-4">
-                {totalAtividadesPrestadas.map(item => {
-                    return (
-                    <div className="flex gap-6 items-center mt-8">
-                        <div>{item.atividade}</div>
-                        <div>{"R$ " + item.faturamentoMensal.toLocaleString("pt-br")}</div>
-                        <div onClick={() => {apagarAtividade(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+            {totalAtividadesPrestadas.length > 0 &&
+                <div className=" flex flex-col gap-2 border-solid border-white border-2 rounded-2xl mt-8">
+                    {totalAtividadesPrestadas.map((item, index) => {
+                        return (
+                        <div className="">
+                            {
+                                index == 0 &&
+                                <div className={`grid grid-cols-[repeat(4,1fr)_auto] gap-10 items-center mb-4 p-4 font-bold`}>
+                                    <div>Atividade</div>
+                                    <div>CNAE</div>
+                                    <div>Faturamento</div>
+                                    <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
+                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                    </div>
+                                </div>
+                            }
+                            <div className={`grid grid-cols-[repeat(4,1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                <div>{item.atividade}</div>
+                                <div>{item.cnaePrincipal}</div>
+                                <div>{"R$ " + item.faturamentoMensal.toLocaleString("pt-br")}</div>
+                                <Xis onClickFn={apagarAtividade} id={item.id}/>
+                            </div>
                         </div>
-                    </div>
-                    )
-                })}
-            </div>
+                        )
+                    })}
+                </div>
+            }
         </div>
     )
 }

@@ -7,6 +7,7 @@ import xis from "../../assets/images/xisContab.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { DatePicker } from "../DatePicker/DatePicker"
 import BrDatePicker from "../BrDatePicker/BrDatePicker"
+import { Xis } from "../Xis/Xis"
 
 
 
@@ -362,8 +363,8 @@ export default function CompraEVendaImoveis(){
                                 >
                                     <div className={`overflow-hidden flex flex-col gap-8`}> {/* ESSE OVERFLOW-HIDDEN QUE ESTÁ FAZENDO O TOOLTIP NÃO APARECER TODO */}
                                         <div className="flex gap-8 p-6">
-                                            <div className="flex flex-col flex-1 ">
-                                                <label className="text-gray-400">É residencial?</label>
+                                            <div className="flex flex-col flex-1 max-w-[400px]">
+                                                <label className="text-gray-400">É Residencial?</label>
                                                 <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                                     <div onClick={trocarDropResidencial} className="flex gap-2 items-center justify-between p-2 cursor-pointer">
                                                         <div className="opacity-50">
@@ -383,7 +384,7 @@ export default function CompraEVendaImoveis(){
                                                             {
                                                                 arrSimNao.map(item => {
                                                                     return (
-                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-gray-300"onClick={() => escolherResidencial(item)} >{item}</div>
+                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"onClick={() => escolherResidencial(item)} >{item}</div>
                                                                     )
                                                                 })
                                                             }
@@ -391,8 +392,8 @@ export default function CompraEVendaImoveis(){
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col flex-1">
-                                                <label className="text-gray-400">Tipo operação</label>
+                                            <div className="flex flex-col flex-1 max-w-[400px]">
+                                                <label className="text-gray-400">Tipo de Operação</label>
                                                 <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                                     <div onClick={trocarDropTipoOperacao} className="flex gap-2 items-center justify-between p-2 cursor-pointer">
                                                         <div className="opacity-50">
@@ -412,7 +413,7 @@ export default function CompraEVendaImoveis(){
                                                             {
                                                                 arrTipoOperacao.map(item => {
                                                                     return (
-                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-gray-300"onClick={() => escolherTipoOperacao(item)} >{item}</div>
+                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"onClick={() => escolherTipoOperacao(item)} >{item}</div>
                                                                     )
                                                                 })
                                                             }
@@ -420,8 +421,8 @@ export default function CompraEVendaImoveis(){
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col flex-1">
-                                                <label className="text-gray-400">Tipo imóvel</label>
+                                            <div className="flex flex-col flex-1 max-w-[400px]">
+                                                <label className="text-gray-400">Tipo Imóvel</label>
                                                 <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                                     <div onClick={trocarDropTipoImovel} className="flex gap-2 items-center justify-between p-2 cursor-pointer">
                                                         <div className="opacity-50">
@@ -441,7 +442,7 @@ export default function CompraEVendaImoveis(){
                                                             {
                                                                 arrTipoImovel.map(item => {
                                                                     return (
-                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-gray-300"onClick={() => escolherTipoImovel(item)} >{item}</div>
+                                                                        <div className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"onClick={() => escolherTipoImovel(item)} >{item}</div>
                                                                     )
                                                                 })
                                                             }
@@ -482,12 +483,12 @@ export default function CompraEVendaImoveis(){
                                         <div className="flex gap-8 p-6">
                                             {/* Cada novo input entra aqui */}
                                             <div className="flex flex-col ">
-                                                <label className="text-gray-400" htmlFor="valorImovel">Valor venda:</label>
+                                                <label className="text-gray-400" htmlFor="valorImovel">Valor Venda:</label>
                                                 <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="valorImovel" onChange={(e) => mudarValorVendaImovelAdd(e)}/>
                                             </div>
 
                                             <div className="flex flex-col ">
-                                                <label className="text-gray-400" htmlFor="valorAquisicao">Valor aquisição:</label>
+                                                <label className="text-gray-400" htmlFor="valorAquisicao">Valor Aquisição:</label>
                                                 <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="valorAquisicao" onChange={(e) => mudarValorAquisicaoAdd(e)}/>
                                             </div>
 
@@ -541,9 +542,7 @@ export default function CompraEVendaImoveis(){
                                                         <div>{imovel.tipoImovel}</div>
                                                         <div>{"R$ " + imovel.valorVendaImovel.toLocaleString("pt-br")}</div>
                                                         <div>{"R$ " + imovel.valorAquisicao.toLocaleString("pt-br")}</div>
-                                                        <div onClick={() => {apagarImovelCompraVendaModal(imovel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                        </div>        
+                                                        <Xis onClickFn={apagarImovelCompraVendaModal} id={imovel.id} />     
                                                     </div>
                                                 </>
                                             )
@@ -614,9 +613,7 @@ export default function CompraEVendaImoveis(){
                                             <div>{imovel.tipoImovel}</div>
                                             <div>{"R$ " + imovel.valorVendaImovel.toLocaleString("pt-br")}</div>
                                             <div>{"R$ " + imovel.valorAquisicao.toLocaleString("pt-br")}</div>
-                                            <div onClick={() => {apagarImovelCompraVenda(imovel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                            </div>        
+                                            <Xis onClickFn={apagarImovelCompraVenda} id={imovel.id} />        
                                         </div>
                                     </>
                                 )

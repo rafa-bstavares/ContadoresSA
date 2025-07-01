@@ -9,6 +9,8 @@ import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import xis from "../../assets/images/xisContab.svg"
 import lixeira from "../../assets/images/lixeira.svg"
+import { Xis } from "../Xis/Xis"
+import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
 
 type Props = {
     modoBranco: boolean
@@ -346,15 +348,11 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
     }
 
 
-    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+    function alterarCompoeCusto(id: number){
         const objTotalImoveisClone = [...totalImoveisLocacao]
         const idEncontrado = objTotalImoveisClone.findIndex(item => item.id == id)
         if(idEncontrado > -1){
-            if(e.target.checked){
-                objTotalImoveisClone[idEncontrado].compoeCusto = true
-            }else{
-                objTotalImoveisClone[idEncontrado].compoeCusto = false
-            }
+            objTotalImoveisClone[idEncontrado].compoeCusto = !objTotalImoveisClone[idEncontrado].compoeCusto
 
             setTotalImoveisLocacao(objTotalImoveisClone)
         }else{
@@ -515,64 +513,19 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                     >
                         <div className="overflow-hidden flex flex-col gap-8"> {/* ESSE OVERFLOW-HIDDEN QUE ESTÁ FAZENDO O TOOLTIP NÃO APARECER TODO */}
                             <div className="flex gap-8 p-6">
-                                <div className="flex flex-col">
-                                <label className="text-gray-400 w-[10vw]">É residencial?</label>
-                                <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                                    <div
-                                    onClick={trocarDropResidencial}
-                                    className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                                    >
-                                    <div className=" opacity-50">
-                                        {residencialAdd ? "Sim" : "Não"}
-                                    </div>
-                                    <div
-                                        className={`
-                                        ${residencialAberto ? "rotate-180" : "rotate-0"}
-                                        transition-all ease-linear duration-500
-                                        `}
-                                    >
-                                        <img
-                                        src={setaSeletor}
-                                        alt="seta-seletor"
-                                        className="w-4 h-4"
-                                        />
-                                    </div>
-                                    </div>
-
-                                    <div
-                                    className={`
-                                        ${residencialAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                                        [transition:grid-template-rows_500ms]
-                                    `}
-                                    >
-                                    <div className="overflow-hidden">
-                                        {arrSimNao.map(item => (
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">É Residencial?</label>
+                                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
-                                            key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
-                                            onClick={() => escolherResidencial(item)}
+                                        onClick={trocarDropResidencial}
+                                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
                                         >
-                                            {item}
-                                        </div>
-                                        ))}
-                                    </div>
-                                    </div>
-                                </div>
-                                </div>
-
-                                <div className="flex flex-col">
-                                <label className="text-gray-400 w-[10vw]">Tipo do aluguel:</label>
-                                <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                                    <div
-                                    onClick={trocarDroptipoAluguel}
-                                    className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                                    >
                                         <div className=" opacity-50">
-                                            {tipoAluguelAdd || "Escolha o tipo do aluguel"}
+                                            {residencialAdd ? "Sim" : "Não"}
                                         </div>
                                         <div
                                             className={`
-                                            ${tipoAluguelAberto ? "rotate-180" : "rotate-0"}
+                                            ${residencialAberto ? "rotate-180" : "rotate-0"}
                                             transition-all ease-linear duration-500
                                             `}
                                         >
@@ -582,35 +535,80 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                             className="w-4 h-4"
                                             />
                                         </div>
-                                    </div>
-
-                                    <div
-                                    className={`
-                                        ${tipoAluguelAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                                        [transition:grid-template-rows_500ms]
-                                    `}
-                                    >
-                                    <div className="overflow-hidden">
-                                        {tiposAlugueis.map(item => (
-                                        <div
-                                            key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
-                                            onClick={() => escolherTipoAluguel(item)}
-                                        >
-                                            {item}
                                         </div>
-                                        ))}
-                                    </div>
+
+                                        <div
+                                        className={`
+                                            ${residencialAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                            [transition:grid-template-rows_500ms]
+                                        `}
+                                        >
+                                        <div className="overflow-hidden">
+                                            {arrSimNao.map(item => (
+                                            <div
+                                                key={item}
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                                onClick={() => escolherResidencial(item)}
+                                            >
+                                                {item}
+                                            </div>
+                                            ))}
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Tipo de Aluguel:</label>
+                                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                                        <div
+                                        onClick={trocarDroptipoAluguel}
+                                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
+                                        >
+                                            <div className=" opacity-50">
+                                                {tipoAluguelAdd || "Escolha o tipo de Aluguel"}
+                                            </div>
+                                            <div
+                                                className={`
+                                                ${tipoAluguelAberto ? "rotate-180" : "rotate-0"}
+                                                transition-all ease-linear duration-500
+                                                `}
+                                            >
+                                                <img
+                                                src={setaSeletor}
+                                                alt="seta-seletor"
+                                                className="w-4 h-4"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div
+                                        className={`
+                                            ${tipoAluguelAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                            [transition:grid-template-rows_500ms]
+                                        `}
+                                        >
+                                        <div className="overflow-hidden">
+                                            {tiposAlugueis.map(item => (
+                                            <div
+                                                key={item}
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                                onClick={() => escolherTipoAluguel(item)}
+                                            >
+                                                {item}
+                                            </div>
+                                            ))}
+                                        </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {tipoAluguelAdd && (
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">
                                     {tipoAluguelAdd === "Aluguel recebido"
-                                        ? "Tipo do locatário:"
-                                        : "Tipo do locador"}
+                                        ? "Tipo do Locatário:"
+                                        : "Tipo do Locador"}
                                     </label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                     <div
@@ -649,7 +647,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                         {tiposOutro.map(item => (
                                             <div
                                             key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                            className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                             onClick={() => escolherTipoOutro(item)}
                                             >
                                             {item}
@@ -662,7 +660,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                 )}
 
                                 {tipoOutroAdd === "Pessoa jurídica" && (
-                                <div className="flex flex-col">
+                                <div className="flex flex-col max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">
                                     {tipoAluguelAdd === "Aluguel recebido"
                                         ? "Regime do locatário:"
@@ -704,7 +702,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                         {regimesOutro.map(item => (
                                             <div
                                             key={item}
-                                            className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                            className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                             onClick={() => escolherRegimeOutro(item)}
                                             >
                                             {item}
@@ -716,8 +714,8 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                 </div>
                                 )}
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Condomínio destacado:</label>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Condomínio Destacado:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
                                         onClick={trocarDropCondominioEmbutido}
@@ -754,7 +752,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                             {arrSimNao.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherCobrancaCondominio(item)}
                                             >
                                                 {item}
@@ -765,8 +763,8 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Prazo determinado:</label>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Prazo Determinado:</label>
 
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
@@ -800,7 +798,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                             {arrSimNao.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherPrazoDeterminado(item)}
                                             >
                                                 {item}
@@ -848,7 +846,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                 htmlFor="valorAluguel"
                                 className="flex gap-2 items-center text-gray-400 "
                             >
-                                Valor aluguel
+                                Valor Aluguel
                                 <div className="text-gray-400 text-sm">*sem condomínio</div>
                             </label>
                             <input
@@ -864,7 +862,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                 htmlFor="valorCondominio"
                                 className="text-gray-400"
                             >
-                                Valor condomínio:
+                                Valor Condomínio:
                             </label>
                             <input
                                 className="outline-none rounded-md border-2 border-solid border-gray-300 p-1 "
@@ -960,6 +958,9 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                             <div>Juros</div>
                                                             <div>Acréscimos</div>
                                                             <div>Quantidade</div>
+                                                            <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
+                                                                <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                                            </div>
                                                         </div>
                                                     }
                                 
@@ -974,9 +975,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                         <div>{"R$ " + Number(imovel.juros).toLocaleString("pt-br")}</div>
                                                         <div>{imovel.acrescimos}</div>
                                                         <div>{imovel.quantidade}</div>
-                                                        <div onClick={() => {apagarImovelLocacaoModal(imovel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                        </div>
+                                                        <Xis onClickFn={apagarImovelLocacaoModal} id={imovel.id} />
                                                     </div>
                                                 </>
                                                 :
@@ -1091,6 +1090,9 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                         <div>Acréscimos</div>
                                                         <div>Compõe Custo</div>
                                                         <div>Quantidade</div>
+                                                        <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
+                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
+                                                        </div>
                                                     </div>
                                                 }
                             
@@ -1104,13 +1106,9 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                                     <div>{"R$ " + Number(imovel.valorCondominio).toLocaleString("pt-br")}</div>
                                                     <div>{"R$ " + Number(imovel.juros).toLocaleString("pt-br")}</div>
                                                     <div>{imovel.acrescimos}</div>
-                                                    <div className="flex flex-col items-start">
-                                                        <input checked={imovel.compoeCusto} onChange={(e) => alterarCompoeCusto(e, imovel.id)} type="checkbox" name="compoeCusto" id="compoeCusto" />
-                                                    </div>
+                                                    <ToggleButtonMapeado texto="" valor={imovel.compoeCusto} onChangeFn={() => alterarCompoeCusto(imovel.id)}/>
                                                     <div>{imovel.quantidade}</div>
-                                                    <div onClick={() => {apagarImovelLocacao(imovel.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                    </div>
+                                                    <Xis onClickFn={apagarImovelLocacao} id={imovel.id} />
                                                 </div>
                                             </>
                                             :

@@ -14,7 +14,9 @@ export type ProdutoVendidoObj = {
     pisCofins: number,
     ipi: number,
     beneficio: number,
-    id: number
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
+    id: number,
 }
 
 
@@ -45,6 +47,8 @@ export type ProdutoAdquiridoObj = {
     regimeTributarioOutro: string,
     fornecedorIndustrial: boolean,
     beneficio: number,
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
     id: number,
 }
 

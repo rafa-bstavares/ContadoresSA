@@ -7,12 +7,14 @@ import { PrismaEmpresaRepository } from "../../repositories/prisma/prisma-empres
 
 
 export const infosEmpresaSchema = z.object({
-    atividade: z.string(),
-    faturamentoMensal: z.number(),
-    id: z.number(),
-    cnaePrincipal: z.string(),
-    beneficio: z.number(),
-    anexo: z.string()
+        atividade: z.string(),
+        faturamentoMensal: z.number(),
+        id: z.number(),
+        cnaePrincipal: z.string(),
+        beneficio: z.number(),
+        anexo: z.string(),
+        manterBeneficio: z.boolean(),
+        prestacao: z.boolean()
     })
 
 export const objAtividadeAdquirida = z.object({
@@ -25,7 +27,8 @@ export const objAtividadeAdquirida = z.object({
     metodo: z.enum(["Por CNPJ", "Por Operação"]),
     beneficio: z.number(),
     compoeCusto: z.boolean(),
-    operacao: z.string()
+    operacao: z.string(),
+    manterBeneficio: z.boolean()
 })
 
 const objTotalMoveisLocacao = z.object({
@@ -82,6 +85,8 @@ export const ProdutoVendidoObj = z.object({
     pisCofins: z.number(),
     ipi: z.number(),
     beneficio: z.number(),
+    manterBeneficio: z.boolean(),
+    descricaoAnexo: z.string(),
     id: z.number()
 })
 
@@ -109,6 +114,8 @@ export const ProdutoAdquiridoObj = z.object({
     regimeTributarioOutro: z.string(),
     fornecedorIndustrial: z.boolean(),
     beneficio: z.number(),
+    manterBeneficio: z.boolean(),
+    descricaoAnexo: z.string(),
     id: z.number()
 })
 

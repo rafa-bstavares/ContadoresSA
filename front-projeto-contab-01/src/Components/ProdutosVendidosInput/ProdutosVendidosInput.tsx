@@ -5,9 +5,10 @@ import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, Produ
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
-import { ToogleButton, toogleFn } from "../ToogleButton/ToogleButton"
+import { ToggleButton, toogleFn } from "../ToggleButton/ToggleButton"
 import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
+import { Xis } from "../Xis/Xis"
 
 
 
@@ -336,6 +337,8 @@ export function ProdutosVendidosInput(){
                 pisCofins: icms ? Number(icms.replace(",", ".")) : 0,
                 valorOperacao: Number(valorOperacaoAdd),
                 beneficio: 0,
+                manterBeneficio: true,
+                descricaoAnexo: "",
                 id: idAtual
              }
             novoArr.push(novoObjAtual)
@@ -399,13 +402,13 @@ export function ProdutosVendidosInput(){
     }
 
 
-    function checkNcmGenericoInput(e: React.ChangeEvent<HTMLInputElement>){
+    /*function checkNcmGenericoInput(e: React.ChangeEvent<HTMLInputElement>){
         if(e.target.checked){
             setNcmGenerico(true)
         }else{
             setNcmGenerico(false)
         }
-    }
+    }*/
 
     function apagarProdutoVendido(id: number){
         const novoArr = [...totalProdutosVendidos]
@@ -481,15 +484,15 @@ export function ProdutosVendidosInput(){
                             <div className="flex gap-8 p-6">
 
 
-                                <div className="flex flex-col">
-                                    <label className="text-gray-400 w-[10vw]">Tipo do Operação:</label>
+                                <div className="flex flex-col max-w-[400px]">
+                                    <label className="text-gray-400 w-[10vw]">Tipo de Operação:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
                                         onClick={trocarDropTipoOperacao}
                                         className="flex gap-2 items-center justify-between p-2 cursor-pointer"
                                         >
                                             <div className=" opacity-50">
-                                                {tipoOperacaoAdd || "Escolha o tipo do aluguel"}
+                                                {tipoOperacaoAdd || "Escolha o tipo de Operação"}
                                             </div>
                                             <div
                                                 className={`
@@ -515,7 +518,7 @@ export function ProdutosVendidosInput(){
                                             {tipoOperacaoVendidoArr.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherTipoOperacao(item)}
                                             >
                                                 {item}
@@ -545,7 +548,7 @@ export function ProdutosVendidosInput(){
                                             />
                                         </div>
                                     }
-                                    <ToogleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM genérico"/>
+                                    <ToggleButton valor={ncmGenerico} onChangeFn={() => toogleFn(setNcmGenerico, ncmGenerico)} texto="NCM Genérico"/>
                                     {/*<div className="flex flex-col items-start">
                                         <label htmlFor="ncmGenericoVendidos">NCM genérico?</label>
                                         <input checked={ncmGenerico} onChange={(e) => checkNcmGenericoInput(e)} type="checkbox" name="ncmGenericoVendidos" id="ncmGenericoVendidos" />
@@ -720,9 +723,7 @@ export function ProdutosVendidosInput(){
                                                         <div>{produto.pisCofins}</div>
                                                         <div>{produto.ipi}</div>
                                                         <div>{produto.valorOperacao}</div>
-                                                        <div onClick={() => {apagarProdutoVendidoModal(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                            <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                        </div>
+                                                        <Xis onClickFn={apagarProdutoVendidoModal} id={produto.id} />
                                                     </div>
                                                 </>
                                         )
@@ -796,9 +797,7 @@ export function ProdutosVendidosInput(){
                                                 <div>{produto.pisCofins}</div>
                                                 <div>{produto.ipi}</div>
                                                 <div>{produto.valorOperacao}</div>
-                                                <div onClick={() => {apagarProdutoVendido(produto.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                    <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                </div>
+                                                <Xis onClickFn={apagarProdutoVendido} id={produto.id} />
                                             </div>
                                         </>
                                 )

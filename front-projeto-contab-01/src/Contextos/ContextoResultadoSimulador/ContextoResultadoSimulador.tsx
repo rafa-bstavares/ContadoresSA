@@ -31,6 +31,7 @@ export type totalComprasType = {
     servicosTomados: objAreaComprasType,
     locacaoMoveis: objAreaComprasType,
     locacaoImoveis: objAreaComprasType,
+    total: objAreaComprasType
 }
 
 export type totalVendasType = {
@@ -38,6 +39,7 @@ export type totalVendasType = {
     servicosPrestados: objAreaVendasType,
     locacaoMoveis: objAreaVendasType,
     locacaoImoveis: objAreaVendasType,
+    total: objAreaVendasType
 }
 
 export type linhasDreType = {
@@ -45,25 +47,30 @@ export type linhasDreType = {
   despesas: {AR: number, DR: number},
 }
 
+export type linhaArDrDiferencas = {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number}
+
 export type tabelaDreType = {
-  receitaBruta: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  deducoesTributos: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  custoGeral: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  lucroBruto: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  despesas: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  lucrosAntesIrCs: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  irCs: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
+  receitaBruta: linhaArDrDiferencas,
+  deducoesTributos: linhaArDrDiferencas,
+  custoGeral: linhaArDrDiferencas,
+  lucroBruto: linhaArDrDiferencas,
+  despesas: linhaArDrDiferencas,
+  lucrosAntesIrCs: linhaArDrDiferencas,
+  irCs: linhaArDrDiferencas,
+  lucroLiquido: linhaArDrDiferencas
 }
 
 export type tabelaCaixaType = {
-  fornecedores: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  tributosCredito: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  clientes: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  tributosDebito: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  tributosRecolhidos: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  saldoCredor: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  resultado: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
-  resultadoSemClientes: {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number},
+  fornecedores: linhaArDrDiferencas,
+  tributosCredito: linhaArDrDiferencas,
+  clientes: linhaArDrDiferencas,
+  tributosDebito: linhaArDrDiferencas,
+  tributosRecolhidos: linhaArDrDiferencas,
+  saldoCredor: linhaArDrDiferencas,
+  resultado: linhaArDrDiferencas,
+  irCs: linhaArDrDiferencas,
+  resultadoPosIrCs: linhaArDrDiferencas,
+  resultadoSobreClientes: linhaArDrDiferencas,
 }
 
 
@@ -98,7 +105,8 @@ export type objRespostaFinalType = {
     compraVendaBensImoveis: objItemFinal[],
     totalCompras: totalComprasType,
     totalVendas: totalVendasType,
-    dre: linhasDreType
+    dre: tabelaDreType,
+    caixa: tabelaCaixaType
 }
 
 type TiposContextoResultadoSimulador = {       
@@ -175,6 +183,21 @@ const valorInicialResultadoSimulador = {
                     porcentagemCustoEfetivoDR: 0,
                     porcentagemCargaTributariaDR: 0,   
                   },
+                  total: {
+                    valorAR: 0,
+                    impostosAR: 0,
+                    valorDesonerado: 0,
+                    custoAR: 0, 
+                    creditoAR: 0,
+                    porcentagemCustoEfetivoAR: 0,
+                    porcentagemCargaTributariaAR: 0,
+                    valorDR: 0,
+                    impostosDR: 0,
+                    custoDR: 0,
+                    creditoDR: 0,
+                    porcentagemCustoEfetivoDR: 0,
+                    porcentagemCargaTributariaDR: 0,   
+                  },
               },
               totalVendas: {
                   vendasProdutos: {
@@ -213,10 +236,37 @@ const valorInicialResultadoSimulador = {
                     impostosDR: 0,
                     porcentagemCargaTributariaDR: 0,   
                   },
+                  total: {
+                    valorAR: 0,
+                    impostosAR: 0,
+                    valorDesonerado: 0, 
+                    porcentagemCargaTributariaAR: 0,
+                    valorDR: 0,
+                    impostosDR: 0,
+                    porcentagemCargaTributariaDR: 0,   
+                  },
               },
               dre: {
-                custoGeral: {AR: 0, DR: 0},
-                despesas: {AR: 0, DR: 0}
+                receitaBruta: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                deducoesTributos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                custoGeral: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucroBruto: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                despesas: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucrosAntesIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucroLiquido: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+              },
+              caixa: {
+                fornecedores: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosCredito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                clientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosDebito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosRecolhidos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                saldoCredor: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultado: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultadoPosIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultadoSobreClientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
               }
           }  
 

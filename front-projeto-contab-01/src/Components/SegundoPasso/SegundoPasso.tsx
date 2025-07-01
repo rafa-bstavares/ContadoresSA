@@ -29,7 +29,6 @@ import { ModalPerguntaBeneficios } from '../ModalPerguntaBeneficios/ModalPergunt
 import { ModalConferirBeneficios } from '../ModalConferirBeneficios/ModalConferirBeneficios'
 import { ContextoResultadoSimulador, objRespostaFinalType } from '../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador'
 import { useNavigate } from 'react-router-dom'
-import { ToogleButton } from '../ToogleButton/toogleButton'
 
 
 type ObjInfosType = {
@@ -47,6 +46,7 @@ export type objAtividadeFinal = {
     beneficio: number,
     anexo: string,
     prestacao: boolean,
+    manterBeneficio: boolean
 
 }
 
@@ -62,7 +62,8 @@ export type objAtividadesAdquitidasType = {
     metodo: metodosType,
     beneficio: number,
     compoeCusto: boolean,
-    operacao: string
+    operacao: string,
+    manterBeneficio: boolean
 }
 
 export type objIsCheckedType = {
@@ -105,7 +106,6 @@ export function SegundoPasso({modoBranco}: Props){
     const [totalAtividadesAdquiridas, setTotalAtividadesAdquiridas] = useState<objAtividadesAdquitidasType[]>([])
     const [modalPerguntaBeneficiosAberto, setModalPerguntaBeneficiosAberto] = useState<boolean>(false)
     const [modalBeneficiosAberto, setModalBeneficiosAberto] = useState<boolean>(false)
-    const [testeToogle, setTesteToogle] = useState<boolean>(false)
     const [objIsChecked, setObjIsChecked] = useState<objIsCheckedType>({
         isCheckedImoveis: false,
         isCheckedServicos: false,
@@ -129,10 +129,6 @@ export function SegundoPasso({modoBranco}: Props){
 
     const navigate = useNavigate()
 
-
-    function testeToogleFn(){
-        setTesteToogle(!testeToogle)
-    }
 
 
     async function conferirBeneficios(){

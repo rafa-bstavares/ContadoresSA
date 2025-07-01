@@ -2,6 +2,7 @@
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react"
 import { beneficiosPorNcmType } from "../ModalConferirBeneficios/ModalConferirBeneficios"
 import { ContextoProduto } from "../../Contextos/ContextoProduto/ContextoProduto"
+import { ToggleButton } from "../ToggleButton/ToggleButton"
 
 type Props = {
     index: number, 
@@ -15,6 +16,8 @@ export function ItemBeneficioNcm({index, linhaBeneficio, beneficiosPorNcm, setBe
 
 
     const [beneficioAtual, setBeneficioAtual] = useState<string>(linhaBeneficio.reducao.toString().replace(".", ","))
+    const [aliquotaIvaAtual, setAliquotaIvaAtual] = useState<number>(linhaBeneficio.aliquotaIva)
+    const [manterBeneficioAtual, setManterBeneficioAtual] = useState<boolean>(linhaBeneficio.manter)
 
     const {setTotalProdutosAdquiridos, setTotalProdutosVendidos, totalProdutosAdquiridos, totalProdutosVendidos} = useContext(ContextoProduto)
 
@@ -67,6 +70,7 @@ export function ItemBeneficioNcm({index, linhaBeneficio, beneficiosPorNcm, setBe
         // O retornaInputPorcentagem sempre retorna uma string no formato brasileiro de porcentagem, ou seja, o único caracter possível além de números é vírgula
         let inputTratado = retornaInputPorcentagemTratado(e)
 
+        // Mudar valor na tela do modal
         setBeneficioAtual(inputTratado ? inputTratado : "")
 
 
@@ -80,6 +84,9 @@ export function ItemBeneficioNcm({index, linhaBeneficio, beneficiosPorNcm, setBe
             const idxEditar = totalProdutosAdquiridosClone.findIndex(produtosAdquiridosClone => produtosAdquiridosClone.id == item.id)
             if(idxEditar > -1){
                 totalProdutosAdquiridos[idxEditar].beneficio = Number(inputTratado)
+                // Mudar a aliquota IVA
+                const novoValorAliquotaIVA = 0.28 - (Number(inputTratado) * 0.28)
+                setAliquotaIvaAtual(novoValorAliquotaIVA)
             }
 
             setTotalProdutosAdquiridos(totalProdutosAdquiridosClone)
@@ -89,6 +96,9 @@ export function ItemBeneficioNcm({index, linhaBeneficio, beneficiosPorNcm, setBe
             const idxEditar = totalProdutosVendidosClone.findIndex(produtosVendidosClone => produtosVendidosClone.id == item.id)
             if(idxEditar > -1){
                 totalProdutosVendidos[idxEditar].beneficio = Number(inputTratado)
+                // Mudar a aliquota IVA
+                const novoValorAliquotaIVA = 0.28 - (Number(inputTratado) * 0.28)
+                setAliquotaIvaAtual(novoValorAliquotaIVA)
             }
             setTotalProdutosVendidos(totalProdutosVendidosClone)
         }
@@ -102,21 +112,57 @@ export function ItemBeneficioNcm({index, linhaBeneficio, beneficiosPorNcm, setBe
             setBeneficiosPorNcm(beneficiosPorNcmClone)
     }
 
+    function retornarValorPorcentagem(num: number){
+        return (num * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"
+    }
+
+    function mudarManterBeneficio(item: beneficiosPorNcmType){
+        // Alterar os Arrays que vão para o backend
+        if(item.origem == "Produto Adquirido"){          
+            const totalProdutosAdquiridosClone = [...totalProdutosAdquiridos]
+            const idxEditar = totalProdutosAdquiridosClone.findIndex(produtosAdquiridosClone => produtosAdquiridosClone.id == item.id)
+            if(idxEditar > -1){
+                // Mudar manter beneficio tela modal
+                setManterBeneficioAtual(!manterBeneficioAtual)
+
+                //mudar manter beneficio que vai pro backend
+                totalProdutosAdquiridos[idxEditar].manterBeneficio = !manterBeneficioAtual
+            }
+
+            setTotalProdutosAdquiridos(totalProdutosAdquiridosClone)
+
+        }else if(item.origem == "Produto Vendido"){
+            const totalProdutosVendidosClone = [...totalProdutosVendidos]
+            const idxEditar = totalProdutosVendidosClone.findIndex(produtosVendidosClone => produtosVendidosClone.id == item.id)
+            if(idxEditar > -1){
+                // Mudar manter beneficio tela modal
+                setManterBeneficioAtual(!manterBeneficioAtual)
+
+                //mudar manter beneficio que vai pro backend
+                totalProdutosVendidos[idxEditar].manterBeneficio = !manterBeneficioAtual
+            }
+            setTotalProdutosVendidos(totalProdutosVendidosClone)
+        }
+    }
+
 
     return (
-        <div className={`grid grid-cols-[repeat(4,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+        <div className={`grid grid-cols-[100px_300px_repeat(3,_100px)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
             <div>{linhaBeneficio.ncm}</div>
+            <div>{linhaBeneficio.descricaoAnexo}</div>
             <div className="flex flex-col">
                 <input
                 value={beneficioAtual}
                 onChange={(e) => mudarBeneficioFn(e, linhaBeneficio)}
                 inputMode="numeric"
                 pattern="\d*"
-                className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2"
+                className="flex flex-col border-gray-300 border-solid border-2 rounded-md p-2 w-[100px]"
                 /> 
             </div>
-            <div>{linhaBeneficio.aliquotaIva}</div>
-            <div>{linhaBeneficio.manter}</div>
+            <div>{retornarValorPorcentagem(aliquotaIvaAtual)}</div>
+            <div>
+                <ToggleButton onChangeFn={() => mudarManterBeneficio(linhaBeneficio)} valor={manterBeneficioAtual} texto=""/>
+            </div>
         </div>
     )
 }

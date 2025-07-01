@@ -9,7 +9,9 @@ export interface objAtividadeFinal {
     id: number,
     cnaePrincipal: string,
     beneficio: number,
-    anexo: string
+    anexo: string,
+    manterBeneficio: boolean,
+    prestacao: boolean
 }
 
 export interface objAtividadesAdquitidasType {
@@ -22,7 +24,8 @@ export interface objAtividadesAdquitidasType {
   metodo: "Por CNPJ" | "Por Operação",
   beneficio: number,
   compoeCusto: boolean,
-  operacao: string
+  operacao: string,
+  manterBeneficio: boolean
 }
 
 export type aliquotasParametrosBodyType = {iss: number | null, icms: number | null, pisCo: number | null, ipi: number | null}
@@ -148,6 +151,8 @@ export interface ProdutoVendidoObj {
     pisCofins: number,
     ipi: number,
     beneficio: number,
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
     id: number
 }
 
@@ -168,6 +173,8 @@ export interface ProdutoAdquiridoObj {
     regimeTributarioOutro: string,
     fornecedorIndustrial: boolean,
     beneficio: number,
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
     id: number
 }
 
@@ -766,6 +773,7 @@ export class calcularSimplificadoUseCase{
               servicosTomados: objAreaComprasType,
               locacaoMoveis: objAreaComprasType,
               locacaoImoveis: objAreaComprasType,
+              total: objAreaComprasType
           }
 
           type totalVendasType = {
@@ -773,6 +781,7 @@ export class calcularSimplificadoUseCase{
               servicosPrestados: objAreaVendasType,
               locacaoMoveis: objAreaVendasType,
               locacaoImoveis: objAreaVendasType,
+              total: objAreaVendasType
           }
 
           type linhasDreType = {
@@ -800,7 +809,33 @@ export class calcularSimplificadoUseCase{
           type objItemFinal = {
             antesReforma: objAntesReforma,
             depoisReforma: objDepoisReforma[]
-          }      
+          }    
+          
+          type linhaArDrDiferencas = {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number}
+
+          type tabelaDreType = {
+            receitaBruta: linhaArDrDiferencas,
+            deducoesTributos: linhaArDrDiferencas,
+            custoGeral: linhaArDrDiferencas,
+            lucroBruto: linhaArDrDiferencas,
+            despesas: linhaArDrDiferencas,
+            lucrosAntesIrCs: linhaArDrDiferencas,
+            irCs: linhaArDrDiferencas,
+            lucroLiquido: linhaArDrDiferencas
+          }
+
+          type tabelaCaixaType = {
+            fornecedores: linhaArDrDiferencas,
+            tributosCredito: linhaArDrDiferencas,
+            clientes: linhaArDrDiferencas,
+            tributosDebito: linhaArDrDiferencas,
+            tributosRecolhidos: linhaArDrDiferencas,
+            saldoCredor: linhaArDrDiferencas,
+            resultado: linhaArDrDiferencas,
+            irCs: linhaArDrDiferencas,
+            resultadoPosIrCs: linhaArDrDiferencas,
+            resultadoSobreClientes: linhaArDrDiferencas,
+          }
 
           type objRespostaFinalType = {
               servicosPrestados: objItemFinal[],
@@ -812,9 +847,9 @@ export class calcularSimplificadoUseCase{
               compraVendaBensImoveis: objItemFinal[],
               totalCompras: totalComprasType,
               totalVendas: totalVendasType,
-              dre: linhasDreType
+              dre: tabelaDreType,
+              caixa: tabelaCaixaType
           }
-
 
           let respostaFinalCalculo: objRespostaFinalType = {
               servicosPrestados: [],
@@ -885,6 +920,21 @@ export class calcularSimplificadoUseCase{
                     porcentagemCustoEfetivoDR: 0,
                     porcentagemCargaTributariaDR: 0,   
                   },
+                  total: {
+                    valorAR: 0,
+                    impostosAR: 0,
+                    valorDesonerado: 0,
+                    creditoAR: 0,
+                    custoAR: 0, 
+                    porcentagemCargaTributariaAR: 0,
+                    porcentagemCustoEfetivoAR: 0,
+                    valorDR: 0,
+                    impostosDR: 0,
+                    creditoDR: 0,
+                    custoDR: 0,
+                    porcentagemCustoEfetivoDR: 0,
+                    porcentagemCargaTributariaDR: 0,   
+                  },
               },
               totalVendas: {
                   vendasProdutos: {
@@ -923,12 +973,46 @@ export class calcularSimplificadoUseCase{
                     impostosDR: 0,
                     porcentagemCargaTributariaDR: 0,   
                   },
+                  total: {
+                    valorAR: 0,
+                    impostosAR: 0,
+                    valorDesonerado: 0, 
+                    porcentagemCargaTributariaAR: 0,
+                    valorDR: 0,
+                    impostosDR: 0,
+                    porcentagemCargaTributariaDR: 0,   
+                  },
               },
               dre: {
-                custoGeral: {AR: 0, DR: 0},
-                despesas: {AR: 0, DR: 0}  
+                receitaBruta: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                deducoesTributos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                custoGeral: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucroBruto: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                despesas: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucrosAntesIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                lucroLiquido: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+              },
+              caixa: {
+                fornecedores: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosCredito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                clientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosDebito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                tributosRecolhidos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                saldoCredor: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultado: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultadoPosIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                resultadoSobreClientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
               }
           }      
+
+
+          let dreCustoGeralAR = 0
+          let dreCustoGeralDR = 0
+          let dreDespesasAR = 0
+          let dreDespesasDR = 0
+          let valorImpostosPermanecerTotal = 0
 
 
           // Total Atividades == Total Atividades (serviços) Prestadas
@@ -962,6 +1046,7 @@ export class calcularSimplificadoUseCase{
                     console.log("faturamento Mensal atividade: " + item.faturamentoMensal)
                     const faturamentoMensalServico = item.faturamentoMensal
                     let valorImpostosAtuais = 0
+                    let valorImpostosPermanecer = 0
                     let faturamentoMensalDesonerado = 0
                     let porcentagemCargaTributariaAtual = 0
                     let valorImpostosNovos = 0
@@ -989,13 +1074,20 @@ export class calcularSimplificadoUseCase{
             
                             const reparticaoAtual = dadosAnexo?.reparticao[faixaIndex]
                             let porcentagemTributosExcluir = 0
-        
                             const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
                             tributosExcluir.forEach(tributoExcluir => {
-        
                                 porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
-        
                             })
+
+                            let porcentagemTributosPermanecer = 0
+                            const tributosPermanecer: (keyof linhaReparticao)[] = ["irpj", "csll", "cpp"]
+                            tributosPermanecer.forEach(tributoPermanecer => {
+                                porcentagemTributosPermanecer += reparticaoAtual[tributoPermanecer]
+                            })
+                            const aliquotaEfetivaPermanecer = aliquotaEfetiva * porcentagemTributosPermanecer
+                            valorImpostosPermanecer = (faturamentoMensalServico * aliquotaEfetivaPermanecer)
+                            valorImpostosPermanecerTotal += valorImpostosPermanecer
+
                             
                             const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
                             console.log("Alíquota desonerada: " + aliquotaEfetivaDesonerada)
@@ -1047,7 +1139,7 @@ export class calcularSimplificadoUseCase{
                               // Conferir se tem Benefício
                               if(item.beneficio){  
                                 // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                                reducaoIva = item.beneficio
+                                reducaoIva = item.manterBeneficio ? item.beneficio : 0
                                 aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                                 aliquotaEfetivaIbs = (ibsBruto * aliquotaEfetivaIva) / ivaBruto
                                 aliquotaEfetivaCbs = (cbsBruto * aliquotaEfetivaIva) / ivaBruto
@@ -1157,13 +1249,23 @@ export class calcularSimplificadoUseCase{
 
                     respostaFinalCalculo.servicosPrestados.push(respServicoPrestadoAtual)
 
+                    // Somar para tabela vendas
                     respostaFinalCalculo.totalVendas.servicosPrestados.valorAR += faturamentoMensalServico
                     respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR += valorImpostosAtuais
                     respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado += faturamentoMensalDesonerado
                     respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
                     respostaFinalCalculo.totalVendas.servicosPrestados.valorDR += valorMensalServicoAposReforma
                     respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR += valorImpostosNovos
-                    respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado                           
+                    respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado   
+                    
+                    // Completando linha total
+                    respostaFinalCalculo.totalVendas.total.valorAR += faturamentoMensalServico
+                    respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalVendas.total.valorDesonerado += faturamentoMensalDesonerado
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
+                    respostaFinalCalculo.totalVendas.total.valorDR += valorMensalServicoAposReforma
+                    respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado        
 
                 })
               }else if(meuRegime == 'Lucro Presumido'){
@@ -1190,7 +1292,7 @@ export class calcularSimplificadoUseCase{
                   // Conferir se tem benefício
                   if(atividade.beneficio){
                     // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                    reducaoIva = atividade.beneficio
+                    reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
                     aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                     aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                     aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
@@ -1247,6 +1349,13 @@ export class calcularSimplificadoUseCase{
                     respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado      
 
 
+                    respostaFinalCalculo.totalVendas.total.valorAR += faturamentoMensalAtividade
+                    respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalVendas.total.valorDesonerado += faturamentoDesonerado
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
+                    respostaFinalCalculo.totalVendas.total.valorDR += novoValorServiço
+                    respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado 
                 })
                 
 
@@ -1278,7 +1387,7 @@ export class calcularSimplificadoUseCase{
                     // Conferir se tem benefício
                     if(atividade.beneficio){
                       // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                      reducaoIva = atividade.beneficio
+                      reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
                       aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                       aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                       aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
@@ -1326,7 +1435,15 @@ export class calcularSimplificadoUseCase{
                     respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
                     respostaFinalCalculo.totalVendas.servicosPrestados.valorDR += novoValorServiço
                     respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR += valorImpostosNovos
-                    respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado              
+                    respostaFinalCalculo.totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado     
+                    
+                    respostaFinalCalculo.totalVendas.total.valorAR += faturamentoMensalAtividade
+                    respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalVendas.total.valorDesonerado += faturamentoDesonerado
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
+                    respostaFinalCalculo.totalVendas.total.valorDR += novoValorServiço
+                    respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado  
 
 
                 })
@@ -1398,7 +1515,7 @@ export class calcularSimplificadoUseCase{
                       // Conferir se tem benefício
                       if(atividade.beneficio){
                         // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                        reducaoIva = atividade.beneficio
+                        reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
                         aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                         aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                         aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
@@ -1579,7 +1696,7 @@ export class calcularSimplificadoUseCase{
                           // Conferir se tem beneficio
                           if(atividade.beneficio){
                             // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                            reducaoIva = atividade.beneficio
+                            reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
                             aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                             aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                             aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
@@ -1709,7 +1826,7 @@ export class calcularSimplificadoUseCase{
 
                           // Conferir se tem beneficio
                           if(atividade.beneficio){
-                            reducaoIva = atividade.beneficio
+                            reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
                             aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
                             aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                             aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
@@ -1851,6 +1968,21 @@ export class calcularSimplificadoUseCase{
                     respostaFinalCalculo.totalCompras.servicosTomados.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.servicosTomados.custoDR / respostaFinalCalculo.totalCompras.servicosTomados.valorDR
                     respostaFinalCalculo.totalCompras.servicosTomados.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.servicosTomados.impostosDR / respostaFinalCalculo.totalCompras.servicosTomados.valorDesonerado
 
+                    // preenchendo total
+                    respostaFinalCalculo.totalCompras.total.valorAR += valorServicoAR
+                    respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalCompras.total.valorDesonerado += valorServicoDesonerado
+                    respostaFinalCalculo.totalCompras.total.creditoAR += creditoAR 
+                    respostaFinalCalculo.totalCompras.total.custoAR += custoAR 
+                    respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.servicosTomados.custoAR / respostaFinalCalculo.totalCompras.servicosTomados.valorAR
+                    respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.servicosTomados.impostosAR /  respostaFinalCalculo.totalCompras.servicosTomados.valorDesonerado
+                    respostaFinalCalculo.totalCompras.total.valorDR += valorMensalServicoDR
+                    respostaFinalCalculo.totalCompras.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalCompras.total.creditoDR += creditoDR
+                    respostaFinalCalculo.totalCompras.total.custoDR += custoDR
+                    respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.servicosTomados.custoDR / respostaFinalCalculo.totalCompras.servicosTomados.valorDR
+                    respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.servicosTomados.impostosDR / respostaFinalCalculo.totalCompras.servicosTomados.valorDesonerado
+
 
                     if(atividade.compoeCusto){
                       // Aqui temos um problema de nomeclatura:
@@ -1860,11 +1992,11 @@ export class calcularSimplificadoUseCase{
                       // Ou seja ele representa a parte que eu to gastando que retorna dinheiro pra mim no futuro.
                       console.log("ATIVIDADE COM CUSTO")
                       console.log(atividade)
-                      respostaFinalCalculo.dre.custoGeral.AR += custoAR
-                      respostaFinalCalculo.dre.custoGeral.DR += custoDR
+                      dreCustoGeralAR += custoAR
+                      dreCustoGeralDR += custoDR
                     }else{
-                      respostaFinalCalculo.dre.despesas.AR += custoAR
-                      respostaFinalCalculo.dre.despesas.DR += custoDR
+                      dreDespesasAR += custoAR
+                      dreDespesasDR += custoDR
                     }
 
               })
@@ -2157,14 +2289,29 @@ export class calcularSimplificadoUseCase{
                       respostaFinalCalculo.totalCompras.locacaoImoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoImoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoImoveis.valorDR
                       respostaFinalCalculo.totalCompras.locacaoImoveis.custoDR += custoDR
 
+                      // preenchendo total
+                      respostaFinalCalculo.totalCompras.total.valorAR += valorBase
+                      respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
+                      respostaFinalCalculo.totalCompras.total.valorDesonerado += valorDesonerado
+                      respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoImoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoImoveis.valorDesonerado
+                      respostaFinalCalculo.totalCompras.total.creditoAR += creditoAtual
+                      respostaFinalCalculo.totalCompras.total.custoAR += custoAtual
+                      respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoImoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoImoveis.valorAR
+                      respostaFinalCalculo.totalCompras.total.valorDR += valorFinalSimu1
+                      respostaFinalCalculo.totalCompras.total.impostosDR += valorNovosTributos
+                      respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoImoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoImoveis.valorDesonerado
+                      respostaFinalCalculo.totalCompras.total.creditoDR += creditoDR
+                      respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoImoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoImoveis.valorDR
+                      respostaFinalCalculo.totalCompras.total.custoDR += custoDR
+
                       if(imovel.compoeCusto){
                         console.log("imovel COM CUSTO")
                         console.log(imovel)
-                        respostaFinalCalculo.dre.custoGeral.AR += custoAtual
-                        respostaFinalCalculo.dre.custoGeral.DR += custoDR
+                        dreCustoGeralAR += custoAtual
+                        dreCustoGeralDR += custoDR
                       }else{
-                        respostaFinalCalculo.dre.despesas.AR += custoAtual
-                        respostaFinalCalculo.dre.despesas.DR += custoDR
+                        dreDespesasAR += custoAtual
+                        dreDespesasDR += custoDR
                       }
 
                     }else if(imovel.tipoAluguel == "Aluguel recebido"){
@@ -2175,6 +2322,15 @@ export class calcularSimplificadoUseCase{
                       respostaFinalCalculo.totalVendas.locacaoImoveis.valorDR += valorFinalSimu1
                       respostaFinalCalculo.totalVendas.locacaoImoveis.impostosDR += valorNovosTributos
                       respostaFinalCalculo.totalVendas.locacaoImoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoImoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoImoveis.valorDesonerado
+
+                      // preenchendo total
+                      respostaFinalCalculo.totalVendas.total.valorAR += valorBase
+                      respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                      respostaFinalCalculo.totalVendas.total.valorDesonerado += valorDesonerado
+                      respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoImoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoImoveis.valorDesonerado 
+                      respostaFinalCalculo.totalVendas.total.valorDR += valorFinalSimu1
+                      respostaFinalCalculo.totalVendas.total.impostosDR += valorNovosTributos
+                      respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoImoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoImoveis.valorDesonerado
                     }
 
 
@@ -2336,6 +2492,7 @@ export class calcularSimplificadoUseCase{
                 let creditoDR = 0
                 let temCreditoIva = false
                 let valorImpostosAtuais = 0
+                let valorImpostosPermanecer = 0
                 if(movel.tipoAluguel == 'Aluguel pago'){
                   // o locador é o OUTRO
                   if(movel.regimeOutro == "Lucro Presumido"){
@@ -2399,12 +2556,63 @@ export class calcularSimplificadoUseCase{
                         if(faixa){ 
                           if(movel.comOperador){
                             // Considerar Anexo III completo
-                            const aliquotaDesonerar = faixa?.aliquota
-                            valorImpostosAtuais = valorBase * aliquotaDesonerar
+                            const valorDeduzirAtual = faixa?.valorDeduzir
+      	                    const aliquotaAtual = faixa?.aliquota
+
+                            const aliquotaEfetiva = (rbt12 * aliquotaAtual - valorDeduzirAtual) / rbt12
+
+                            const reparticaoAtual = dadosAnexo?.reparticao[faixaIndex]
+                            let porcentagemTributosExcluir = 0
+                            const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
+                            tributosExcluir.forEach(tributoExcluir => {
+                                porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                            })
+
+                            // Calculando impostos que irão permanecer após a reforma
+                            let porcentagemTributosPermanecer = 0
+                            const tributosPermanecer: (keyof linhaReparticao)[] = ["irpj", "csll", "cpp"]
+                            tributosPermanecer.forEach(tributoPermanecer => {
+                                porcentagemTributosPermanecer += reparticaoAtual[tributoPermanecer]
+                            })
+                            const aliquotaEfetivaPermanecer = aliquotaEfetiva * porcentagemTributosPermanecer
+                            valorImpostosPermanecer = (valorBase * aliquotaEfetivaPermanecer)
+                            valorImpostosPermanecerTotal += valorImpostosPermanecer
+
+
+                            const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
+
+                            valorImpostosAtuais = valorBase * aliquotaEfetivaDesonerada
+
+
                           }else{
                             // retirando o iss
-                            const aliquotaDesonerar = faixa.aliquota - (dadosAnexo.reparticao[faixaIndex].iss * (faixa.aliquota))
-                            valorImpostosAtuais = valorBase * aliquotaDesonerar
+                            const valorDeduzirAtual = faixa?.valorDeduzir
+      	                    const aliquotaAtual = faixa?.aliquota
+
+                            const aliquotaEfetiva = (rbt12 * aliquotaAtual - valorDeduzirAtual) / rbt12
+
+                            const reparticaoAtual = dadosAnexo?.reparticao[faixaIndex]
+                            let porcentagemTributosExcluir = 0
+                            // PARA NÃO CONTAR A REDUÇÃO DO ISS, SÓ NÃO INCLUIR ELE NO ARRAY DE IMPOSTOS ABAIXO
+                            const tributosExcluir: (keyof linhaReparticao)[] = ["cofins", "pis", "icms", "ipi"]
+                            tributosExcluir.forEach(tributoExcluir => {
+                                porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                            })
+
+                            // Calculando impostos que irão permanecer após a reforma
+                            let porcentagemTributosPermanecer = 0
+                            const tributosPermanecer: (keyof linhaReparticao)[] = ["irpj", "csll", "cpp"]
+                            tributosPermanecer.forEach(tributoPermanecer => {
+                                porcentagemTributosPermanecer += reparticaoAtual[tributoPermanecer]
+                            })
+                            const aliquotaEfetivaPermanecer = aliquotaEfetiva * porcentagemTributosPermanecer
+                            valorImpostosPermanecer = (valorBase * aliquotaEfetivaPermanecer)
+                            valorImpostosPermanecerTotal += valorImpostosPermanecer
+
+
+                            const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
+
+                            valorImpostosAtuais = valorBase * aliquotaEfetivaDesonerada
                           }
                         }else{
                           console.log("Não está encontrando faixa")
@@ -2499,14 +2707,29 @@ export class calcularSimplificadoUseCase{
                   respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR += custoDR
                   respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
 
+                  //preenchendo total
+                  respostaFinalCalculo.totalCompras.total.valorAR += valorBase
+                  respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo.totalCompras.total.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado
+                  respostaFinalCalculo.totalCompras.total.creditoAR += creditoAtual
+                  respostaFinalCalculo.totalCompras.total.custoAR += custoAR
+                  respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR
+                  respostaFinalCalculo.totalCompras.total.valorDR += novoValorTotal
+                  respostaFinalCalculo.totalCompras.total.impostosDR += valorImpostosNovos
+                  respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado 
+                  respostaFinalCalculo.totalCompras.total.creditoDR += creditoDR
+                  respostaFinalCalculo.totalCompras.total.custoDR += custoDR
+                  respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
+
                   if(movel.compoeCusto){
                     console.log("Movel COM CUSTO")
                     console.log(movel)
-                    respostaFinalCalculo.dre.custoGeral.AR += custoAR
-                    respostaFinalCalculo.dre.custoGeral.DR += custoDR
+                    dreCustoGeralAR += custoAR
+                    dreCustoGeralDR += custoDR
                   }else{
-                    respostaFinalCalculo.dre.despesas.AR += custoAR
-                    respostaFinalCalculo.dre.despesas.DR += custoDR
+                    dreDespesasAR += custoAR
+                    dreDespesasDR += custoDR
                   }
 
               }else if(movel.tipoAluguel == "Aluguel recebido"){
@@ -2517,6 +2740,15 @@ export class calcularSimplificadoUseCase{
                   respostaFinalCalculo.totalVendas.locacaoMoveis.valorDR += novoValorTotal
                   respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR += valorImpostosNovos
                   respostaFinalCalculo.totalVendas.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+
+                  //preenchendo total
+                  respostaFinalCalculo.totalVendas.total.valorAR += valorBase
+                  respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo.totalVendas.total.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+                  respostaFinalCalculo.totalVendas.total.valorDR += novoValorTotal
+                  respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
+                  respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
               }
 
               })
@@ -2549,6 +2781,7 @@ export class calcularSimplificadoUseCase{
               let creditoAtual = 0
               let temCreditoIva = false
               let valorImpostosAtuais = 0
+              let valorImpostosPermanecer = 0
 
               // IMPOSTOS ATUAIS (ANTES DA REFORMA) ***************************************************************************************************************
 
@@ -2566,9 +2799,35 @@ export class calcularSimplificadoUseCase{
                     const faixa = dadosAnexo?.tabela1[faixaIndex]    
 
                     if(faixa){
-                        const aliquotaDesonerar = faixa.aliquota
-                        console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                        valorImpostosAtuais = valorBase * aliquotaDesonerar
+
+                        const valorDeduzirAtual = faixa?.valorDeduzir
+                        const aliquotaAtual = faixa?.aliquota
+
+                        const aliquotaEfetiva = (rbt12 * aliquotaAtual - valorDeduzirAtual) / rbt12
+
+                        const reparticaoAtual = dadosAnexo?.reparticao[faixaIndex]
+                        let porcentagemTributosExcluir = 0
+                        const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
+                        tributosExcluir.forEach(tributoExcluir => {
+                            porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                        })
+
+                        // Calculando impostos que irão permanecer
+                        let porcentagemTributosPermanecer = 0
+                        const tributosPermanecer: (keyof linhaReparticao)[] = ["irpj", "csll", "cpp"]
+                        tributosPermanecer.forEach(tributoPermanecer => {
+                            porcentagemTributosPermanecer += reparticaoAtual[tributoPermanecer]
+                        })
+                        const aliquotaEfetivaPermanecer = aliquotaEfetiva * porcentagemTributosPermanecer
+                        valorImpostosPermanecer = (valorBase * aliquotaEfetivaPermanecer)
+                        valorImpostosPermanecerTotal += valorImpostosPermanecer
+              
+
+                        const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
+
+                        valorImpostosAtuais = (valorBase * aliquotaEfetivaDesonerada)
+          
+                        console.log("aliquota a desonerar: " + aliquotaEfetivaDesonerada)
                     }else{
                       console.log("Não está encontrando faixa")
                     }
@@ -2588,9 +2847,36 @@ export class calcularSimplificadoUseCase{
                     const faixa = dadosAnexo?.tabela1[faixaIndex]    
 
                     if(faixa){
-                        const aliquotaDesonerar = faixa.aliquota
-                        console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                        valorImpostosAtuais = valorBase * aliquotaDesonerar
+
+                        const valorDeduzirAtual = faixa?.valorDeduzir
+                        const aliquotaAtual = faixa?.aliquota
+
+                        const aliquotaEfetiva = (rbt12 * aliquotaAtual - valorDeduzirAtual) / rbt12
+
+                        const reparticaoAtual = dadosAnexo?.reparticao[faixaIndex]
+                        let porcentagemTributosExcluir = 0
+                        const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
+                        tributosExcluir.forEach(tributoExcluir => {
+                            porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                        })
+
+                        
+                        // Calculando impostos que irão permanecer
+                        let porcentagemTributosPermanecer = 0
+                        const tributosPermanecer: (keyof linhaReparticao)[] = ["irpj", "csll", "cpp"]
+                        tributosPermanecer.forEach(tributoPermanecer => {
+                            porcentagemTributosPermanecer += reparticaoAtual[tributoPermanecer]
+                        })
+                        const aliquotaEfetivaPermanecer = aliquotaEfetiva * porcentagemTributosPermanecer
+                        valorImpostosPermanecer = (valorBase * aliquotaEfetivaPermanecer)
+                        valorImpostosPermanecerTotal += valorImpostosPermanecer
+
+
+                        const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
+
+                        valorImpostosAtuais = (valorBase * aliquotaEfetivaDesonerada)
+
+                        console.log("aliquota a desonerar: " + aliquotaEfetivaDesonerada)
                     }else{
                       console.log("Não está encontrando faixa")
                     }
@@ -2631,7 +2917,7 @@ export class calcularSimplificadoUseCase{
 
               if(produtoVendido.beneficio){
                 // Se vier um numero maior que zero
-                reducaoIva = produtoVendido.beneficio
+                reducaoIva = produtoVendido.manterBeneficio ? produtoVendido.beneficio : 0
               }else{
                 // se vier zero ou qualquer tipo de null, undefined...
                 reducaoIva = 0
@@ -2677,7 +2963,16 @@ export class calcularSimplificadoUseCase{
               respostaFinalCalculo.totalVendas.vendasProdutos.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.vendasProdutos.impostosAR / respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado
               respostaFinalCalculo.totalVendas.vendasProdutos.valorDR += novoValorProduto
               respostaFinalCalculo.totalVendas.vendasProdutos.impostosDR += novosImpostos
-              respostaFinalCalculo.totalVendas.vendasProdutos.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.vendasProdutos.impostosDR / respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado               
+              respostaFinalCalculo.totalVendas.vendasProdutos.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.vendasProdutos.impostosDR / respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado    
+              
+              // preenchendo total
+              respostaFinalCalculo.totalVendas.total.valorAR += valorBase
+              respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+              respostaFinalCalculo.totalVendas.total.valorDesonerado += valorDesonerado
+              respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.vendasProdutos.impostosAR / respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado
+              respostaFinalCalculo.totalVendas.total.valorDR += novoValorProduto
+              respostaFinalCalculo.totalVendas.total.impostosDR += novosImpostos
+              respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.vendasProdutos.impostosDR / respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado 
 
             })
 
@@ -2762,7 +3057,7 @@ export class calcularSimplificadoUseCase{
               
               if(produtoAdquirido.beneficio){
                 // Se vier um numero maior que zero
-                reducaoIva = produtoAdquirido.beneficio
+                reducaoIva = produtoAdquirido.manterBeneficio ? produtoAdquirido.beneficio : 0
               }else{
                 // se vier zero ou qualquer tipo de null, undefined...
                 reducaoIva = 0
@@ -2813,12 +3108,25 @@ export class calcularSimplificadoUseCase{
               respostaFinalCalculo.totalCompras.comprasProdutos.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.comprasProdutos.impostosDR / respostaFinalCalculo.totalCompras.comprasProdutos.valorDesonerado
               respostaFinalCalculo.totalCompras.comprasProdutos.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.comprasProdutos.custoDR / respostaFinalCalculo.totalCompras.comprasProdutos.valorDR
 
+              // preencher total
+              respostaFinalCalculo.totalCompras.total.valorAR += valorBase
+              respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
+              respostaFinalCalculo.totalCompras.total.valorDesonerado += valorDesonerado
+              respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.comprasProdutos.impostosAR / respostaFinalCalculo.totalCompras.comprasProdutos.valorDesonerado
+              respostaFinalCalculo.totalCompras.total.creditoAR += creditoAtual
+              respostaFinalCalculo.totalCompras.total.custoAR += custoAR
+              respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.comprasProdutos.custoAR / respostaFinalCalculo.totalCompras.comprasProdutos.valorAR
+              respostaFinalCalculo.totalCompras.total.valorDR += novoValorProduto
+              respostaFinalCalculo.totalCompras.total.impostosDR += novosImpostos
+              respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.comprasProdutos.impostosDR / respostaFinalCalculo.totalCompras.comprasProdutos.valorDesonerado
+              respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.comprasProdutos.custoDR / respostaFinalCalculo.totalCompras.comprasProdutos.valorDR
+
               if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
-                respostaFinalCalculo.dre.custoGeral.AR += custoAR
-                respostaFinalCalculo.dre.custoGeral.DR += 0
+                dreCustoGeralAR += custoAR
+                dreCustoGeralDR += 0
               }else{
-                respostaFinalCalculo.dre.despesas.AR += custoAR
-                respostaFinalCalculo.dre.despesas.DR += 0
+                dreDespesasAR += custoAR
+                dreDespesasDR += 0
               }
       
 
@@ -2829,8 +3137,258 @@ export class calcularSimplificadoUseCase{
 
           // No final de tudo realizo a soma de colunas para fazer a tabela da DRE
           
+          // TABELA CAIXA
+            
+              // Fornecedores
+          const valorCompraAR = Object.values(respostaFinalCalculo.totalCompras).reduce((soma, area) => {
+              return soma + area.valorAR;
+          }, 0)
+          
+          const valorCompraDR = Object.values(respostaFinalCalculo.totalCompras).reduce((soma, area) => {
+              return soma + area.valorDR;
+          }, 0)
+
+          const diferencaCompras = valorCompraDR - valorCompraAR
+
+              // Tributos Crédito
+          const tributosCreditoAR = Object.values(respostaFinalCalculo.totalCompras).reduce((soma, area) => {
+            return soma + area.creditoAR
+          }, 0) 
+
+          const tributosCreditoDR = Object.values(respostaFinalCalculo.totalCompras).reduce((soma, area) => {
+            return soma + area.creditoDR
+          }, 0) 
+
+          const diferencaTributosCredito = tributosCreditoDR - tributosCreditoAR
+
+              // Clientes
+          const valorVendaAR = Object.values(respostaFinalCalculo.totalVendas).reduce((soma, area) => {
+              return soma + area.valorAR;
+          }, 0)
+        
+          const valorVendaDR = Object.values(respostaFinalCalculo.totalVendas).reduce((soma, area) => {
+              return soma + area.valorDR;
+          }, 0)
+
+          const diferencaVendas = valorVendaDR - valorVendaAR
+
+              // Tributos Débito
+          const tributosDebitoAR = Object.values(respostaFinalCalculo.totalVendas).reduce((soma, area) => {
+              return soma + area.impostosAR
+          }, 0) 
+
+          let tributosDebitoDR = Object.values(respostaFinalCalculo.totalVendas).reduce((soma, area) => {
+            return soma + area.impostosDR
+          }, 0)
 
 
+          // TABELA DRE
+
+              // Receita Bruta
+          const valorVendaDesonerado = Object.values(respostaFinalCalculo.totalVendas).reduce((soma, area) => {
+              return soma + area.valorDesonerado;
+          }, 0)
+
+          const diferencaReceitaBruta = valorVendaDesonerado - valorVendaAR
+
+            // Deduções Tributos
+          let deducoesTributosAR = 0
+          let deducoesTributosDR = 0
+
+          if(meuRegime == "Simples Nacional"){
+              deducoesTributosAR = valorImpostosPermanecerTotal + tributosDebitoAR // tributosDébitoAR é a soma de todos os impostos excluídos das operções de VENDA
+              deducoesTributosDR = valorImpostosPermanecerTotal
+          }else if(meuRegime == "Lucro Presumido" || meuRegime == "Lucro Real"){
+              deducoesTributosAR = tributosDebitoAR - tributosCreditoAR
+              deducoesTributosDR = 0
+          }
+
+          const diferencaDeducoesTributos = deducoesTributosDR - deducoesTributosAR
+
+          
+              // Custo Geral
+          const diferencaReaisCustoDre = dreCustoGeralDR - dreCustoGeralAR
+          const diferencaReaisDespesasDre = dreDespesasDR - dreDespesasAR
+
+              // Lucro Bruto
+          const lucroBrutoAR = valorVendaAR - deducoesTributosAR - dreCustoGeralAR
+          const lucroBrutoDR = valorVendaDesonerado - deducoesTributosDR - dreCustoGeralDR
+          const diferencaLucroBruto = lucroBrutoDR - lucroBrutoAR
+
+              // Lucro Antes IR/CS (Lucro Antes IR/CS = Receita Bruta - Deduções Tributos - Custo Mercadoria - Despesas)
+          const lucroAntesIrCsAR = valorVendaAR - deducoesTributosAR - dreCustoGeralAR - dreDespesasAR
+          const lucroAntesIrCsDR = valorVendaDesonerado - deducoesTributosDR - dreCustoGeralDR - dreDespesasDR
+          const diferencaLucroAntesIrCs = lucroAntesIrCsDR - lucroAntesIrCsAR
+
+              // IR/CS
+          let irCsAR = 0
+          let irCsDR = 0
+              
+          if(meuRegime == "Lucro Real"){
+              // AR
+              if(lucroAntesIrCsAR > 0){
+                const valor1 = lucroAntesIrCsAR * 0.24
+                const adicional = lucroAntesIrCsAR > 20000 ? (lucroAntesIrCsAR - 20000) * 0.1 : 0
+
+                irCsAR = valor1 + adicional
+
+              }else{
+                irCsAR = 0
+              }
+
+              // DR
+              if(lucroAntesIrCsDR > 0){
+                const valor1 = lucroAntesIrCsDR * 0.24
+                const adicional = lucroAntesIrCsDR > 20000 ? (lucroAntesIrCsDR - 20000) * 0.1 : 0
+
+                irCsDR = valor1 + adicional
+
+              }else{
+                irCsDR = 0
+              }
+
+          }else if(meuRegime == "Lucro Presumido"){
+              const valorTotalServicosPrestadosAR = respostaFinalCalculo.totalVendas.servicosPrestados.valorAR
+              const valorDesoneradoServicosPrestados = respostaFinalCalculo.totalVendas.servicosPrestados.valorDesonerado
+
+              const valorTotalLocacaoMoveisAR = respostaFinalCalculo.totalVendas.locacaoMoveis.valorAR
+              const valorTotalLocacaoImoveisAR = respostaFinalCalculo.totalVendas.locacaoImoveis.valorAR
+              const valorTotalLocacaoAR = valorTotalLocacaoImoveisAR + valorTotalLocacaoMoveisAR
+
+              const valorDesoneradoLocacaoMoveisAR = respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+              const valorDesoneradoLocacaoImoveisAR = respostaFinalCalculo.totalVendas.locacaoImoveis.valorDesonerado
+              const valorDesoneradoLocacaoAR = valorDesoneradoLocacaoImoveisAR + valorDesoneradoLocacaoMoveisAR
+
+              const valorTotalProdutosVendidosAR = respostaFinalCalculo.totalVendas.vendasProdutos.valorAR
+              const valorDesoneradoProdutosVendidos = respostaFinalCalculo.totalVendas.vendasProdutos.valorDesonerado
+
+              const arrCalculoIrCs: {valorAR: number, valorDesonerado: number, aliquota: number, aliquotaIrpjCsll: number}[] = [
+                {valorAR: valorTotalServicosPrestadosAR, valorDesonerado: valorDesoneradoServicosPrestados, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                {valorAR: valorTotalLocacaoAR, valorDesonerado: valorDesoneradoLocacaoAR, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                {valorAR: valorTotalProdutosVendidosAR, valorDesonerado: valorDesoneradoProdutosVendidos, aliquota: 0.08, aliquotaIrpjCsll: 0.0228 },
+              ]
+
+              arrCalculoIrCs.forEach(item => {
+                  const valor1 = item.valorAR * item.aliquota
+                  const adicional = valor1 > 20000 ? ((valor1 - 20000) * 0.1) : 0
+                  const irpjCsll = item.valorAR * item.aliquotaIrpjCsll
+                  const irCsARAtual = irpjCsll + adicional
+                  irCsAR += irCsARAtual
+
+                  const valor1Desonerado = item.valorDesonerado * item.aliquota
+                  const adicionalDR = valor1Desonerado > 20000 ? ((valor1Desonerado - 20000) * 0.1) : 0
+                  const irpjCsllDR = item.valorDesonerado * item.aliquotaIrpjCsll
+                  const irCsDRAtual = irpjCsllDR + adicionalDR
+                  irCsDR += irCsDRAtual
+
+              })
+
+
+
+          }else{
+              irCsAR = 0
+              irCsDR = 0
+          }
+
+          const diferencaIrCs = irCsDR - irCsAR
+
+
+              // Lucro Líquido
+          const lucroLiquidoAR = lucroAntesIrCsAR - irCsAR
+          const lucroLiquidoDR = lucroAntesIrCsDR - irCsDR
+          const diferencaLucroLiquido = lucroLiquidoDR - lucroLiquidoAR
+          const diferencaPercentualLucroLiquido = lucroLiquidoAR ? (diferencaLucroLiquido / lucroLiquidoAR) : 0
+  
+
+          const tabelaDre: tabelaDreType = {
+              receitaBruta: {AR: valorVendaAR, DR: valorVendaDesonerado, diferencaReais: diferencaReceitaBruta, diferencaPercentual: valorVendaAR ? (diferencaReceitaBruta / valorVendaAR) : 0},
+              deducoesTributos: {AR: deducoesTributosAR, DR: deducoesTributosDR, diferencaReais: diferencaDeducoesTributos, diferencaPercentual: deducoesTributosAR ? diferencaDeducoesTributos / deducoesTributosAR : 0},
+              custoGeral: {AR: dreCustoGeralAR, DR: dreCustoGeralDR, diferencaReais: diferencaReaisCustoDre, diferencaPercentual: dreCustoGeralAR ? (diferencaReaisCustoDre / dreCustoGeralAR) : 0},
+              lucroBruto: {AR: lucroBrutoAR, DR: lucroBrutoDR, diferencaReais: diferencaLucroBruto, diferencaPercentual: lucroBrutoAR ? (diferencaLucroBruto / lucroBrutoAR) : 0},
+              despesas: {AR: dreDespesasAR, DR: dreDespesasDR, diferencaReais: diferencaReaisDespesasDre, diferencaPercentual: dreDespesasAR ? diferencaReaisDespesasDre / dreDespesasAR : 0},
+              lucrosAntesIrCs: {AR: lucroAntesIrCsAR, DR: lucroAntesIrCsDR, diferencaReais: diferencaLucroAntesIrCs, diferencaPercentual: lucroAntesIrCsAR ? (diferencaLucroAntesIrCs / lucroAntesIrCsAR) : 0},
+              irCs: {AR: irCsAR, DR: irCsDR, diferencaReais: diferencaIrCs, diferencaPercentual: irCsAR ? (diferencaIrCs / irCsAR) : 0},
+              lucroLiquido: {AR: lucroLiquidoAR, DR: lucroLiquidoDR, diferencaReais: diferencaLucroLiquido, diferencaPercentual: diferencaPercentualLucroLiquido}
+          }
+
+          respostaFinalCalculo.dre = tabelaDre
+
+
+          // CONTINUANDO TABELA CAIXA...
+
+          //Todas as contas com tributosDebitoDR preciso fazer depois de terminar a DRE, pois em caso de simples nacional, preciso somar o valor do deducoesTributosDR ao tributoDebitoDr
+      
+          if(meuRegime == "Simples Nacional"){
+              tributosDebitoDR += deducoesTributosDR
+          }
+
+          const diferencaTributosDebito = tributosDebitoDR - tributosDebitoAR
+
+              // Tributos Recolhidos
+          const tributosRecolhidosAR = ((tributosDebitoAR - tributosCreditoAR) > 0 ? (tributosDebitoAR - tributosCreditoAR) : 0)
+          const tributosRecolhidosDR = ((tributosDebitoDR - tributosCreditoDR) > 0 ? (tributosDebitoDR - tributosCreditoDR) : 0)
+          
+              // Saldo Credor
+          const saldoCredorAR = ((tributosCreditoAR - tributosDebitoAR) > 0 ? (tributosCreditoAR - tributosDebitoAR) : 0)
+          const saldoCredorDR = ((tributosCreditoDR - tributosDebitoDR) > 0 ? (tributosCreditoDR - tributosDebitoDR) : 0)
+  
+              // Contrução da tabela Caixa Sem Resultados
+          const caixa = {
+              fornecedores: {AR: valorCompraAR, DR: valorCompraDR, diferencaReais: diferencaCompras, diferencaPercentual: valorCompraAR ? diferencaCompras / valorCompraAR : 0},
+              tributosCredito: {AR: tributosCreditoAR, DR: tributosCreditoDR, diferencaReais: diferencaTributosCredito, diferencaPercentual: tributosCreditoAR ? diferencaTributosCredito / tributosCreditoAR : 0},
+              clientes: {AR: valorVendaAR, DR: valorVendaDR, diferencaReais: diferencaVendas, diferencaPercentual: valorVendaAR ? diferencaVendas / valorVendaAR : 0},
+              tributosDebito: {AR: tributosDebitoAR, DR: tributosDebitoDR, diferencaReais: diferencaTributosDebito, diferencaPercentual: tributosDebitoAR ? diferencaTributosDebito / tributosDebitoAR : 0},
+              tributosRecolhidos: {AR: tributosRecolhidosAR, DR: tributosRecolhidosDR, diferencaReais: tributosRecolhidosDR - tributosRecolhidosAR, diferencaPercentual: tributosRecolhidosAR ? (tributosRecolhidosDR - tributosRecolhidosAR) / tributosRecolhidosAR : 0},
+              saldoCredor: {AR: saldoCredorAR, DR: saldoCredorDR, diferencaReais: saldoCredorDR - saldoCredorAR, diferencaPercentual: saldoCredorAR ? (saldoCredorDR - saldoCredorAR) / saldoCredorAR : 0},
+          }
+
+            // Construindo tabela Caixa Com Resultados
+          const resultadoCaixaAR = caixa.clientes.AR - caixa.fornecedores.AR + caixa.tributosCredito.AR - caixa.tributosDebito.AR
+          const resultadoCaixaDR = caixa.clientes.DR - caixa.fornecedores.DR + caixa.tributosCredito.DR - caixa.tributosDebito.DR
+          const resultadoCaixaDiferenca = resultadoCaixaDR - resultadoCaixaAR
+          const resultadoCaixaDiferencaPercentual = resultadoCaixaAR ? (resultadoCaixaDiferenca / resultadoCaixaAR) : 0 
+          const resultadoSobreClientesAR = caixa.clientes.AR ? (resultadoCaixaAR / caixa.clientes.AR) : 0
+          const resultadoSobreClientesDR = caixa.clientes.DR ? (resultadoCaixaDR / caixa.clientes.DR) : 0
+
+          const resultadoPosIrCsAR = resultadoCaixaAR - irCsAR
+          const resultadoPosIrCsDR = resultadoCaixaDR - irCsDR
+          const diferencaResultadoPosIrCs = resultadoPosIrCsDR - resultadoPosIrCsAR
+          const diferencaPercentualResultadoPosIrCs = resultadoPosIrCsAR ? (diferencaResultadoPosIrCs / resultadoPosIrCsAR) : 0
+
+          const caixaComResultado: tabelaCaixaType = {
+              ...caixa,
+              resultado: {
+                  AR: resultadoCaixaAR,
+                  DR: resultadoCaixaDR,
+                  diferencaReais: resultadoCaixaDiferenca,
+                  diferencaPercentual: resultadoCaixaDiferencaPercentual
+              },
+              irCs: {
+                AR: irCsAR,
+                DR: irCsDR,
+                diferencaReais: diferencaIrCs,
+                diferencaPercentual: irCsAR ? (diferencaIrCs / irCsAR) : 0
+              },
+              resultadoPosIrCs: {
+                AR: resultadoPosIrCsAR,
+                DR: resultadoPosIrCsDR,
+                diferencaReais: diferencaResultadoPosIrCs,
+                diferencaPercentual: diferencaPercentualResultadoPosIrCs
+              },
+              resultadoSobreClientes: {
+                  AR: resultadoSobreClientesAR,
+                  DR: resultadoSobreClientesDR,
+                  diferencaReais: resultadoSobreClientesDR - resultadoSobreClientesAR,
+                  diferencaPercentual: (resultadoSobreClientesDR - resultadoSobreClientesAR) / resultadoSobreClientesAR
+              }
+          }
+
+          respostaFinalCalculo.caixa = caixaComResultado
+
+
+
+
+          
 
 
           return respostaFinalCalculo

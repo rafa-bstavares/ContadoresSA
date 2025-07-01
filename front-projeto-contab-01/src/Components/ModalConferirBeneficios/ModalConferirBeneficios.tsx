@@ -32,7 +32,8 @@ export type beneficiosPorNcmType = {
     manter: boolean, 
     id: number,
     origem: "Produto Adquirido" | "Produto Vendido",
-    naTela: boolean
+    naTela: boolean,
+    descricaoAnexo: string
 }
 
 type Props = {
@@ -56,6 +57,7 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
     function fecharModal(){
         setModalBeneficiosAberto(false)
     }
+
 
 
 /*
@@ -219,10 +221,11 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
                     ncm: produtoAdquirido.ncm, 
                     reducao: produtoAdquirido.beneficio, 
                     aliquotaIva: (0.28 - (produtoAdquirido.beneficio * 0.28)), 
-                    manter: true,
+                    manter: produtoAdquirido.manterBeneficio,
                     id: produtoAdquirido.id,
                     origem: "Produto Adquirido",
-                    naTela: produtoAdquirido.beneficio > 0 
+                    naTela: produtoAdquirido.beneficio > 0 ,
+                    descricaoAnexo:  produtoAdquirido.descricaoAnexo
                 }
 
                 novoArrBeneficiosNcm.push(objAtual)
@@ -235,10 +238,11 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
                     ncm: produtoVendido.ncm,  
                     reducao: produtoVendido.beneficio, 
                     aliquotaIva: (0.28 - (produtoVendido.beneficio * 0.28)), 
-                    manter: true,
+                    manter: produtoVendido.manterBeneficio,
                     id: produtoVendido.id,
                     origem: "Produto Vendido",
-                    naTela: produtoVendido.beneficio > 0
+                    naTela: produtoVendido.beneficio > 0,
+                    descricaoAnexo: produtoVendido.descricaoAnexo
                 }
 
                 novoArrBeneficiosNcm.push(objAtual)
@@ -271,26 +275,26 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
 
     return (
         <div className="fixed left-0 top-0 right-0 h-screen bg-black/90 flex justify-center items-center">
-            <div className="flex flex-col gap-6 rounded-2xl bg-fundoCinzaEscuro p-12"> 
+            <div className="flex flex-col gap-6 rounded-2xl bg-fundoCinzaEscuro p-12 overflow-y-scroll max-h-[90vh]"> 
                 <div className="flex justify-end">
                     <div onClick={fecharModal} className="w-6 h-6 cursor-pointer">
                         <img className="w-full h-full object-cover" src={xis} alt="fechar modal login" />
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    <div>
-                        Benefícios Por Cnae
-                    </div>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-12">
                         {
                             beneficiosPorCnae.length > 0 ? 
-                            <div>
+                            <div className="border-solid border-2 border-white rounded-2xl">
+                                <div className="py-2 px-8 mb-2 text-xl opacity-80">
+                                    Beneficios Por CNAE
+                                </div>
                                 {beneficiosPorCnae.filter(item => item.naTela).map((linhaBeneficio, index) => {
                                     return (
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(5,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[100px_300px_repeat(3,_100px)] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>CNAE</div>
                                                         <div>Descrição</div>
                                                         <div>Redução</div>
@@ -309,14 +313,18 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
                         }
                         {
                             beneficiosPorNcm.length > 0 ? 
-                            <div>
+                            <div className="border-solid border-2 border-white rounded-2xl">
+                                <div className="py-2 px-8 mb-2 text-xl opacity-80">
+                                    Beneficios Por NCM
+                                </div>
                                 {beneficiosPorNcm.filter(item => item.naTela).map((linhaBeneficio, index) => {
                                     return (
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(4,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[100px_300px_repeat(3,_100px)] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>NCM</div>
+                                                        <div>Descrição</div>
                                                         <div>Redução</div>
                                                         <div>Alíquota IVA</div>
                                                         <div>Manter Benefício</div>

@@ -83,7 +83,7 @@ export class BeneficiosUseCase{
                 const data = XLSX.utils.sheet_to_json<linhaTabelaNcmType>(worksheet)
 
 
-                let arrNcms: {ncmLinha: string, reducao: number}[] = []
+                let arrNcms: {ncmLinha: string, reducao: number, descricaoAnexo: string}[] = []
 
                 data.forEach((linhaTabelaNcm) => {
                     const ncmLinhaTabela = linhaTabelaNcm.NCM
@@ -94,19 +94,21 @@ export class BeneficiosUseCase{
                     // conferir se o NCM da linha atual da tabela está contido no NCM input
                     if(ncmInputAtualStr.slice(0, tamanhoNcmLinhaAtual) == ncmLinhaTabela){
                         if(tamanhoNcmLinhaAtual >= tamanhoMinNcm){
-                            arrNcms.push({ncmLinha: ncmLinhaTabela, reducao: linhaTabelaNcm["REDUÇÃO BASE"]})
+                            arrNcms.push({ncmLinha: ncmLinhaTabela, reducao: linhaTabelaNcm["REDUÇÃO BASE"], descricaoAnexo: linhaTabelaNcm["DESCRIÇÃO ANEXO"]})
                         }
                     }
 
                 })
 
                 let reducaoIva = 0
+                let descricaoAnexoFinal = ""
 
                 if(arrNcms.length > 0){
                     let maiorReducao = 0
                     arrNcms.forEach(item => {
                         if(item.reducao > maiorReducao){
                             maiorReducao = item.reducao
+                            descricaoAnexoFinal = item.descricaoAnexo
                         }
                     })
 
@@ -116,6 +118,7 @@ export class BeneficiosUseCase{
 
 
                 arrBeneficioAtualClone[indexInput].beneficio = reducaoIva
+                arrBeneficioAtualClone[indexInput].descricaoAnexo = descricaoAnexoFinal
 
 
             })

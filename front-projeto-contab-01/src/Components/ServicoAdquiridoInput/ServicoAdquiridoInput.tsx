@@ -7,6 +7,8 @@ import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import xis from "../../assets/images/xisContab.svg"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import { metodosType } from "../SegundoPasso/SegundoPasso"
+import { Xis } from "../Xis/Xis"
+import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
 
 
 type Props = {
@@ -109,15 +111,11 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
     }
 
 
-    function alterarCompoeCusto(e: React.ChangeEvent<HTMLInputElement>, id: number){
+    function alterarCompoeCusto(id: number){
         const objTotalServAdqClone = [...totalAtividadesAdquiridas]
         const idEncontrado = objTotalServAdqClone.findIndex(item => item.id == id)
         if(idEncontrado > -1){
-            if(e.target.checked){
-                objTotalServAdqClone[idEncontrado].compoeCusto = true
-            }else{
-                objTotalServAdqClone[idEncontrado].compoeCusto = false
-            }
+            objTotalServAdqClone[idEncontrado].compoeCusto = !objTotalServAdqClone[idEncontrado].compoeCusto
 
             setTotalAtividadesAdquiridas(objTotalServAdqClone)
         }else{
@@ -199,7 +197,8 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                     operacao,
                     beneficio: 0,
                     compoeCusto: false,
-                    metodo: metodoAdd
+                    metodo: metodoAdd,
+                    manterBeneficio: true
                 };
                 let novoArr = [...totalServicosTomadosModal]
                 novoArr.push(novoObj)
@@ -263,18 +262,25 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
         setTotalAtividadesAdquiridas(novoArr)
     
     }
-    
 
-    function checkTemCreditoPisCofins(e: React.ChangeEvent<HTMLInputElement>, id: number){
-        const novoArr = [...totalAtividadesAdquiridas]
+    function checkTemCreditoPisCofinsModal(id: number){
+        console.log("ATIVOU FUINCAO PISCOFINSD MODAL")
+        const novoArr = [...totalServicosTomadosModal]
         const index = novoArr.findIndex(item => item.id == id)
         if(index > -1){
-            if(e.target.checked){
-                novoArr[index].temCreditoPisCofins = true
-            }else{
-                novoArr[index].temCreditoPisCofins = false
-            }
+            novoArr[index].temCreditoPisCofins = !novoArr[index].temCreditoPisCofins
         }
+        setTotalServicosTomadosModal(novoArr) 
+    }
+    
+
+    function checkTemCreditoPisCofins(id: number){
+        const novoArr = [...totalAtividadesAdquiridas]
+        const index = novoArr.findIndex(item => item.id == id)
+            if(index > -1){
+                novoArr[index].temCreditoPisCofins = !novoArr[index].temCreditoPisCofins
+            }
+        setTotalAtividadesAdquiridas(novoArr)
     }
 
     function abrirModalServicosTomadosFn(){
@@ -324,10 +330,10 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                 alt="fechar modal locação"
                                 />
                             </div>
-                            <div className="flex items-start justify-center gap-6">
+                            <div className="flex items-start justify-center gap-6 bg-[#222222] p-6 rounded-xl">
 
 
-                                <div className="flex flex-col gap-1">
+                                <div className="flex flex-col gap-1 max-w-[400px]">
                                     <label className="text-gray-400 w-[10vw]">Método:</label>
                                     <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                                         <div
@@ -361,7 +367,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                             {metodos.map(item => (
                                             <div
                                                 key={item}
-                                                className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                 onClick={() => escolherMetodo(item)}
                                             >
                                                 {item}
@@ -377,7 +383,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     metodoAdd == "Por Operação" &&
                                     <div className="flex flex-col gap-1">
                                         <label className="text-gray-400 w-[10vw]">Operações:</label>
-                                        <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                                        <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md max-w-[400px]">
                                             <div
                                             onClick={trocarDropOperacao}
                                             className="flex gap-2 items-center justify-between p-2 cursor-pointer"
@@ -409,7 +415,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                                 {operacoes.map(item => (
                                                 <div
                                                     key={item}
-                                                    className="p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                                                    className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
                                                     onClick={() => escolherOperacao(item)}
                                                 >
                                                     {item}
@@ -455,7 +461,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                                         <div>Regime Tributário</div>
                                                         {
                                                             objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
-                                                            <div>Crédito</div>
+                                                            <div>Crédito PIS-COFINS</div>
                                                         }
                                                         <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
                                                             <img className="w-3 h-3" src={lixeira} alt="lixeira" />
@@ -493,14 +499,13 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                                     }
                                                     {
                                                         objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
-                                                        <div className="flex gap-2">
+                                                        <ToggleButtonMapeado texto="" valor={totalServicosTomadosModal[index].temCreditoPisCofins} onChangeFn={() => checkTemCreditoPisCofinsModal(item.id)} />
+                                                        /*<div className="flex gap-2">
                                                             <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
-                                                            <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
-                                                        </div>
+                                                            <label htmlFor="temCreditoPisCofins">Tem Crédito PIS-COFINS</label>
+                                                        </div>*/
                                                     }
-                                                    <div onClick={() => {apagarAtividadeModal(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                                    </div>
+                                                    <Xis onClickFn={apagarAtividadeModal} id={item.id} />
                                                 </div>
                                             </div>
                                         )
@@ -533,10 +538,10 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
 
             {
                 totalAtividadesAdquiridas.length > 0 &&
-                <div className=" flex flex-col gap-2 border-solid border-white border-2 rounded-2xl">
+                <div className=" flex flex-col gap-2 border-solid border-white border-2 rounded-2xl mt-8">
                     {totalAtividadesAdquiridas.map((item, index) => {
                         return (    
-                            <div className="mt-8">
+                            <div className="">
                                 {
                                     index == 0 &&
                                     <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
@@ -546,7 +551,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                         <div>Regime Tributário</div>
                                         {
                                             objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
-                                            <div>Crédito</div>
+                                            <div>Crédito PIS-COFINS</div>
                                         }
                                         <div>Compõe Custo</div>
                                         <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
@@ -555,7 +560,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     </div> 
                                 }
 
-                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(6,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                     <div>{item.metodo}</div>
                                     <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
                                     <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
@@ -588,17 +593,10 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     }
                                     {
                                         objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" && 
-                                        <div className="flex gap-2">
-                                            <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
-                                            <label htmlFor="temCreditoPisCofins">Tem crédito pis-cofins</label>
-                                        </div>
+                                        <ToggleButtonMapeado texto="" valor={totalAtividadesAdquiridas[index].temCreditoPisCofins} onChangeFn={() => checkTemCreditoPisCofins(item.id)} />
                                     }
-                                    <div className="flex flex-col items-start">
-                                        <input checked={item.compoeCusto} onChange={(e) => alterarCompoeCusto(e, item.id)} type="checkbox" name="compoeCustoServAdq" id="compoeCustoServAdq" />
-                                    </div>
-                                    <div onClick={() => {apagarAtividade(item.id)}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer">
-                                        <img className="w-3 h-3" src={lixeira} alt="lixeira" />
-                                    </div>
+                                    <ToggleButtonMapeado texto="" valor={totalAtividadesAdquiridas[index].compoeCusto} onChangeFn={() => alterarCompoeCusto(item.id)} />
+                                    <Xis onClickFn={apagarAtividade} id={item.id}/>
                                 </div>
                             </div>
                         )
