@@ -1007,6 +1007,23 @@ export class calcularSimplificadoUseCase{
               }
           }      
 
+          type objAnoAAnoType = {
+            ano: "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033",
+            porcentagemCbs: number,
+            porcentagemIbs: number,
+            porcentagemIcmsIss: number
+          }
+
+          const anoAano: objAnoAAnoType[] = [
+            {ano: "2027", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "2028", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "2029", porcentagemCbs: 1, porcentagemIbs: 0.1, porcentagemIcmsIss: 0.9},
+            {ano: "2030", porcentagemCbs: 1, porcentagemIbs: 0.2, porcentagemIcmsIss: 0.8},
+            {ano: "2031", porcentagemCbs: 1, porcentagemIbs: 0.3, porcentagemIcmsIss: 0.7},
+            {ano: "2032", porcentagemCbs: 1, porcentagemIbs: 0.4, porcentagemIcmsIss: 0.6},
+            {ano: "2033", porcentagemCbs: 1, porcentagemIbs: 1, porcentagemIcmsIss: 0},
+          ]
+
 
           let dreCustoGeralAR = 0
           let dreCustoGeralDR = 0
@@ -1022,6 +1039,23 @@ export class calcularSimplificadoUseCase{
             // faturamentoMensalServico -> Faturamento mensal com o serviço específico que está sendo analisado no momento
 
               if(meuRegime == "Simples Nacional"){
+          
+                let pisCo = 0
+                let iss = 0
+                let icms = 0
+                let ipi = 0
+
+                let respServicoPrestadoAtual: objItemFinal = {
+                  antesReforma: {
+                    valor: 0,
+                    valorImpostos: 0,
+                    valorDesonerado: 0,
+                    porcentagemCargaTributaria: 0,
+                    custo: null
+                  },
+                  depoisReforma: []
+                }
+
                 console.log("COMEÇO ANÁLISE")
 
                 let faturamentoMensal = 0
@@ -1077,6 +1111,21 @@ export class calcularSimplificadoUseCase{
                             const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
                             tributosExcluir.forEach(tributoExcluir => {
                                 porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                              if(tributoExcluir == "pis"){
+                                pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                              }
+                              if(tributoExcluir == "cofins"){
+                                pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                              }
+                              if(tributoExcluir == "icms"){
+                                icms += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                              }
+                              if(tributoExcluir == "iss"){
+                                iss += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                              }
+                              if(tributoExcluir == "ipi"){
+                                ipi += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                              }
                             })
 
                             let porcentagemTributosPermanecer = 0
@@ -1119,6 +1168,18 @@ export class calcularSimplificadoUseCase{
                             console.log("faturamento mensal da atividade desonerado: " + faturamentoMensalDesonerado)
                             const valorImpostosDesonerados = (faturamentoMensalServico - faturamentoMensalDesonerado)
                             console.log("Valor dos impostos desonerados: " + valorImpostosDesonerados)
+
+
+                            const objRespostaFinalAR = {
+                                valor: faturamentoMensalServico,
+                                valorImpostos: valorImpostosAtuais,
+                                valorDesonerado: faturamentoMensalDesonerado,
+                                porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                                custo: null
+                              }
+
+                            respServicoPrestadoAtual.antesReforma = objRespostaFinalAR
+
         
                             const valorIvaBruto = faturamentoMensalDesonerado * ivaBruto
                             const valorIbsBruto = faturamentoMensalDesonerado * ibsBruto
@@ -1129,6 +1190,50 @@ export class calcularSimplificadoUseCase{
         
         
                             }else{
+
+                              // ANÁLISE DR
+
+                              anoAano.forEach(objAno => {
+
+                                if(objAno.ano == "2026"){
+
+                                }else{
+                                  // CALCULAR VALOR IVA
+                                  let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                                  let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                                    // conferir se há redução no IVA
+                                  if(item.beneficio){
+                                    const reducaoIva = item.manterBeneficio ? item.beneficio : 0
+                                    aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoIva)
+                                    aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoIva)
+                                  }
+                                  const valorIbsAnoVigente = faturamentoMensalDesonerado * aliquotaIbsAnoVigente
+                                  const valorCbsAnoVigente = faturamentoMensalDesonerado * aliquotaCbsAnoVigente
+                                  const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                                  // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                                  const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                                  const valorIssAnoVigente = (faturamentoMensalDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                                  // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                                  const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                                  const valorIcmsAnoVigente = ((faturamentoMensalDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                                  // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                                  const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                                  const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoMensalDesonerado
+                                  const novoValorAnoVigente = faturamentoMensalDesonerado + valorImpostosAnoVigente
+                                  const objAnoVigente: objDepoisReforma = {
+                                      ano: objAno.ano,
+                                      valor: novoValorAnoVigente,
+                                      valorImpostos: valorImpostosAnoVigente,
+                                      porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                      custo: null
+                                  }
+                                  respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                                }
+                              })
         
                               let reducaoIva = 0
         
@@ -1228,7 +1333,8 @@ export class calcularSimplificadoUseCase{
                     console.log("FIM ATIVIDADE " + (index + 1))
                     console.log("///////////////////")
 
-                    const respServicoPrestadoAtual: objItemFinal = {
+
+                    /*const respServicoPrestadoAtual: objItemFinal = {
                       antesReforma: {
                         valor: faturamentoMensalServico,
                         valorImpostos: valorImpostosAtuais,
@@ -1245,7 +1351,7 @@ export class calcularSimplificadoUseCase{
                           custo: null,
                         }
                       ]
-                    }
+                    }*/
 
                     respostaFinalCalculo.servicosPrestados.push(respServicoPrestadoAtual)
 
@@ -1269,9 +1375,22 @@ export class calcularSimplificadoUseCase{
 
                 })
               }else if(meuRegime == 'Lucro Presumido'){
+
+                  let respServicoPrestadoAtual: objItemFinal = {
+                    antesReforma: {
+                      valor: 0,
+                      valorImpostos: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributaria: 0,
+                      custo: null
+                    },
+                    depoisReforma: []
+                  }
+
                   // Prestação de serviços lucro presumido
                   const pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
                   const iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
+                  const icms = this.parametrosEntrada.tabelaLucroPresumido.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.icms / 100 : 0
 
                   const aliquotaDesonerada = pisCo + iss
 
@@ -1289,6 +1408,67 @@ export class calcularSimplificadoUseCase{
                   const faturamentoMensalAtividade = atividade.faturamentoMensal
                   const valorImpostosAtuais = (faturamentoMensalAtividade * aliquotaDesonerada)
 
+                  const faturamentoDesonerado = faturamentoMensalAtividade - valorImpostosAtuais
+                  const porcentagemCargaTributariaAtual = valorImpostosAtuais / faturamentoDesonerado
+
+                  const objServPrestadoAtualAR = {
+                      valor: faturamentoMensalAtividade,
+                      valorImpostos: valorImpostosAtuais,
+                      valorDesonerado: faturamentoDesonerado,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                      custo: null
+                    }
+
+                  respServicoPrestadoAtual.antesReforma = objServPrestadoAtualAR
+
+
+
+                  // ANÁLISE DR
+
+                  anoAano.forEach(objAno => {
+
+                    if(objAno.ano == "2026"){
+
+                    }else{
+                      // CALCULAR VALOR IVA
+                      let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                      let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                        // conferir se há redução no IVA
+                      if(atividade.beneficio){
+                        reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                        aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoIva)
+                        aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoIva)
+                      }
+                      const valorIbsAnoVigente = faturamentoDesonerado * aliquotaIbsAnoVigente
+                      const valorCbsAnoVigente = faturamentoDesonerado * aliquotaCbsAnoVigente
+                      const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                      // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                      const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                      const valorIssAnoVigente = (faturamentoDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                      // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                      const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                      const valorIcmsAnoVigente = ((faturamentoDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                      // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                      const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                      const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoDesonerado
+                      const novoValorAnoVigente = faturamentoDesonerado + valorImpostosAnoVigente
+                      const objAnoVigente: objDepoisReforma = {
+                          ano: objAno.ano,
+                          valor: novoValorAnoVigente,
+                          valorImpostos: valorImpostosAnoVigente,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                          custo: null
+                      }
+                      respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                    }
+                  })
+
+                  // TIRAR DAQUI
+
                   // Conferir se tem benefício
                   if(atividade.beneficio){
                     // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
@@ -1297,10 +1477,6 @@ export class calcularSimplificadoUseCase{
                     aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
                     aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
                   }
-
-
-                  const faturamentoDesonerado = faturamentoMensalAtividade - valorImpostosAtuais
-                  const porcentagemCargaTributariaAtual = valorImpostosAtuais / faturamentoDesonerado
 
                   const valorImpostosNovos = faturamentoDesonerado * aliquotaEfetivaIva
                   const porcentagemCargaTributariaAposReforma = valorImpostosNovos / faturamentoDesonerado
@@ -1318,8 +1494,13 @@ export class calcularSimplificadoUseCase{
                   console.log("Valor CBS: " + valorCbs)
 
                   console.log("novo valor do serviço: " + novoValorServiço)
+                  
 
-                   const respServicoPrestadoAtual: objItemFinal = {
+
+
+
+
+                  /* const respServicoPrestadoAtual: objItemFinal = {
                       antesReforma: {
                         valor: faturamentoMensalAtividade,
                         valorImpostos: valorImpostosAtuais,
@@ -1336,7 +1517,7 @@ export class calcularSimplificadoUseCase{
                           custo: null,
                         }
                       ]
-                    }
+                    }*/
         
                     respostaFinalCalculo.servicosPrestados.push(respServicoPrestadoAtual)
 
@@ -1365,8 +1546,20 @@ export class calcularSimplificadoUseCase{
               }else if(meuRegime == 'Lucro Real'){
                   // Prestação de serviços lucro real
 
+                  let respServicoPrestadoAtual: objItemFinal = {
+                    antesReforma: {
+                      valor: 0,
+                      valorImpostos: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributaria: 0,
+                      custo: null
+                    },
+                    depoisReforma: []
+                  }
+
                   const pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
                   const iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
+                  const icms = this.parametrosEntrada.tabelaLucroReal.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.icms / 100 : 0
 
                   const aliquotaDesonerada = pisCo + iss
 
@@ -1384,17 +1577,76 @@ export class calcularSimplificadoUseCase{
                     const faturamentoMensalAtividade = atividade.faturamentoMensal
                     const valorImpostosAtuais = (faturamentoMensalAtividade * aliquotaDesonerada)
 
-                    // Conferir se tem benefício
-                    if(atividade.beneficio){
-                      // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                      reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
-                      aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-                      aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-                      aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
-                    }
+
 
                   const faturamentoDesonerado = faturamentoMensalAtividade - valorImpostosAtuais
                   const porcentagemCargaTributariaAtual = valorImpostosAtuais / faturamentoDesonerado
+
+                  const objServPrestadoAtualAR = {
+                        valor: faturamentoMensalAtividade,
+                        valorImpostos: valorImpostosAtuais,
+                        valorDesonerado: faturamentoDesonerado,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                        custo: null
+                  }
+
+                  respServicoPrestadoAtual.antesReforma = objServPrestadoAtualAR
+
+
+                  // ANÁLISE DR
+
+                  anoAano.forEach(objAno => {
+
+                    if(objAno.ano == "2026"){
+
+                    }else{
+                      // CALCULAR VALOR IVA
+                      let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                      let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                        // conferir se há redução no IVA
+                      if(atividade.beneficio){
+                        reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                        aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoIva)
+                        aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoIva)
+                      }
+                      const valorIbsAnoVigente = faturamentoDesonerado * aliquotaIbsAnoVigente
+                      const valorCbsAnoVigente = faturamentoDesonerado * aliquotaCbsAnoVigente
+                      const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                      // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                      const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                      const valorIssAnoVigente = (faturamentoDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                      // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                      const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                      const valorIcmsAnoVigente = ((faturamentoDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                      // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                      const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                      const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoDesonerado
+                      const novoValorAnoVigente = faturamentoDesonerado + valorImpostosAnoVigente
+                      const objAnoVigente: objDepoisReforma = {
+                          ano: objAno.ano,
+                          valor: novoValorAnoVigente,
+                          valorImpostos: valorImpostosAnoVigente,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                          custo: null
+                      }
+                      respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                    }
+                  })
+
+                  // TIRAR DAQUI
+                  
+                  // Conferir se tem benefício
+                  if(atividade.beneficio){
+                    // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
+                    reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                    aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
+                    aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
+                    aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
+                  }
 
                   const valorImpostosNovos = faturamentoDesonerado * aliquotaEfetivaIva
                   const porcentagemCargaTributariaAposReforma = valorImpostosNovos / faturamentoDesonerado
@@ -1407,8 +1659,14 @@ export class calcularSimplificadoUseCase{
                   console.log("Valor CBS: " + (aliquotaEfetivaCbs * faturamentoDesonerado))
 
                   console.log("novo valor do serviço: " + novoValorServiço)
+                  
 
-                   const respServicoPrestadoAtual: objItemFinal = {
+
+
+
+
+
+                   /*const respServicoPrestadoAtual: objItemFinal = {
                       antesReforma: {
                         valor: faturamentoMensalAtividade,
                         valorImpostos: valorImpostosAtuais,
@@ -1425,7 +1683,7 @@ export class calcularSimplificadoUseCase{
                           custo: null,
                         }
                       ]
-                    }
+                    }*/
 
                     respostaFinalCalculo.servicosPrestados.push(respServicoPrestadoAtual)
 
@@ -1457,10 +1715,10 @@ export class calcularSimplificadoUseCase{
               console.log("////////////////////////")
               console.log("Análise Serviços adquiridos")
 
-              const iss = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss / 100 : 0
-              const icms = this.parametrosEntrada.tabelaSimplesNacional.servicos.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.icms / 100 : 0
-              const ipi = this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi / 100 : 0
-              const pisCo = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo / 100 : 0
+              let iss = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss / 100 : 0
+              let icms = this.parametrosEntrada.tabelaSimplesNacional.servicos.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.icms / 100 : 0
+              let ipi = this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi / 100 : 0
+              let pisCo = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo / 100 : 0
               const ibsBruto = this.parametrosEntrada.aliquotaIbs / 100
               const cbsBruto = this.parametrosEntrada.aliquotaCbs / 100
               const ivaBruto = this.parametrosEntrada.aliquotaIva / 100
@@ -1468,9 +1726,35 @@ export class calcularSimplificadoUseCase{
               // Soma aliquotas dos parametros de entrada
               let aliquotaDesonerada = 0
 
+              const operacoesReducoes: {operacao: string, reducao: number, colunaParametros: "comercio" | "industria" | "serviços" | "locação"}[] = [
+                {operacao: "Serviços Profissionais - Regulamentados", reducao: 0.3, colunaParametros: "serviços"},
+                {operacao: "Limpeza", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Publicidade e Propaganda", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Segurança", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Frete Intermunicipal", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Frete - Operação interna", reducao: 0, colunaParametros: "comercio"},
+                {operacao: "Frete - Operação Interestadual", reducao: 0, colunaParametros: "comercio"},
+                {operacao: "Seguros", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Manutenção Equipamentos ou veículos", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Licenciamento e Suporte técnico", reducao: 0, colunaParametros: "serviços"},
+                {operacao: "Despesas com viagem e hotel", reducao: 1, colunaParametros: "serviços"},
+                {operacao: "Serviços Médicos", reducao: 0.6, colunaParametros: "serviços"},
+              ]
+
 
 
               totalAtividadesAdquiridas.forEach((atividade, index) => {
+
+                let respServicoTomadoAtual: objItemFinal = {
+                  antesReforma: {
+                    valor: 0,
+                    valorImpostos: 0,
+                    valorDesonerado: 0,
+                    porcentagemCargaTributaria: 0,
+                    custo: null
+                  },
+                  depoisReforma: []
+                }
 
                 let valorServicoAR = 0
                 let valorImpostosAtuais = 0
@@ -1483,6 +1767,7 @@ export class calcularSimplificadoUseCase{
                 let creditoAR = 0
                 let creditoDR = 0
                 let custoDR = 0
+                let temCreditoIva = true
 
                   if(atividade.regimeTributario == "Simples Nacional"){
                     console.log("atividade " + (index + 1) + " é do simples nacional")
@@ -1501,88 +1786,121 @@ export class calcularSimplificadoUseCase{
                     let aliquotaEfetivaIbs = ibsBruto
                     let aliquotaEfetivaCbs = cbsBruto
 
+                    // ANÁLISE AR
+
                     valorServicoAR = atividade.faturamento
 
                     console.log("MÉTODO ATUAL:")
                     console.log(atividade.metodo)
+                      // encontrar alíquota desonerada dependendo do método
                     if(atividade.metodo == "Por CNPJ"){
-
                       aliquotaDesonerada = iss + icms + ipi + pisCo
-
-                      valorServicoDesonerado = valorServicoAR - (valorServicoAR * aliquotaDesonerada)
-                      // Caso método == cnpj
-                      
-                      // Conferir se tem benefício
-                      if(atividade.beneficio){
-                        // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                        reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
-                        aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-                        aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-                        aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
-                      }
-
-
-
                     }else{
                       // método é operação, aplicar redução da operação específica nas alíquotas
                       console.log("Método: por operação")
-
-                      const operacoesReducoes: {operacao: string, reducao: number, colunaParametros: "comercio" | "industria" | "serviços" | "locação"}[] = [
-                        {operacao: "Serviços Profissionais - Regulamentados", reducao: 0.3, colunaParametros: "serviços"},
-                        {operacao: "Limpeza", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Publicidade e Propaganda", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Segurança", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Frete Intermunicipal", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Frete - Operação interna", reducao: 0, colunaParametros: "comercio"},
-                        {operacao: "Frete - Operação Interestadual", reducao: 0, colunaParametros: "comercio"},
-                        {operacao: "Seguros", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Manutenção Equipamentos ou veículos", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Licenciamento e Suporte técnico", reducao: 0, colunaParametros: "serviços"},
-                        {operacao: "Despesas com viagem e hotel", reducao: 1, colunaParametros: "serviços"},
-                        {operacao: "Serviços Médicos", reducao: 0.6, colunaParametros: "serviços"},
-                      ]
-
                       // Encontrando a linha que corresponde a operação da atividade atual
                       const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
 
                       if(objOperacaoAtual){
-
                         if(objOperacaoAtual.colunaParametros == "comercio"){
-                          const pisCofinsComercio = this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo / 100 : 0
-                          const icmsComercio = this.parametrosEntrada.tabelaSimplesNacional.comercial.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.icms / 100 : 0
-                          aliquotaDesonerada = pisCofinsComercio + icmsComercio
+                          pisCo = this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.pisCo / 100 : 0
+                          icms = this.parametrosEntrada.tabelaSimplesNacional.comercial.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.icms / 100 : 0
+                          iss = this.parametrosEntrada.tabelaSimplesNacional.comercial.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.iss / 100 : 0
+                          ipi = this.parametrosEntrada.tabelaSimplesNacional.comercial.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.comercial.ipi / 100 : 0
                               console.log("eentrou comercio")
                         }else if(objOperacaoAtual.colunaParametros == "serviços"){
-                          const pisCofinsServico = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo / 100 : 0
-                          const issServico = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss / 100 : 0
+                          pisCo = this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.pisCo / 100 : 0
+                          iss = this.parametrosEntrada.tabelaSimplesNacional.servicos.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.iss / 100 : 0
+                          icms = this.parametrosEntrada.tabelaSimplesNacional.servicos.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.icms / 100 : 0
+                          ipi = this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.servicos.ipi / 100 : 0
                               console.log("eentrou comercio")
-                          aliquotaDesonerada = pisCofinsServico + issServico
                         }
-
+                        aliquotaDesonerada = pisCo + icms + iss + ipi
                         console.log("aliquota desonerada utilizada objOperacaoAtual")
                         console.log(aliquotaDesonerada)
-
-
-                        reducaoIva = objOperacaoAtual.reducao
-
-                          aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-
-                          aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-
-                          aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
                       }else{
                         console.log("Não foi encontrado operação com o nome enviado pelo frontend")
                       }
 
-
                       // Como a atividade (regime do outro) é do SIMPLES NACIONAL
-                      
                   
                     }
 
                     valorImpostosAtuais = (valorServicoAR * aliquotaDesonerada)
                     valorServicoDesonerado = valorServicoAR - valorImpostosAtuais
                     porcentagemCargaTributariaAR = valorImpostosAtuais / valorServicoDesonerado
+
+                    // To considerando que Serviço Tomado quando regime fornecedor é Simples Nacional tenho crédito IVA 100%
+                    temCreditoIva = true
+
+                    // ANÁLISE DR
+
+                    anoAano.forEach(objAno => {
+                        if(objAno.ano == "2026"){
+
+                        }else{
+                          let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                          let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+
+                          if(atividade.metodo == "Por CNPJ"){                
+                            // Conferir se tem benefício
+                            if(atividade.beneficio){
+                              // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
+                              reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                              aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+                              aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                            }
+                          }else{
+                            // método é operação, aplicar redução da operação específica nas alíquotas
+                            console.log("Método: por operação")
+
+                            // Encontrando a linha que corresponde a operação da atividade atual
+                            const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
+
+                            if(objOperacaoAtual){
+                              // Não preciso pegar as alíquotas das tabelas corretas novamente, isso com certeza já foi feito no "if(cnpj){}else if(metodo){}" anterior na ANÁLISE AR. 
+                              reducaoIva = objOperacaoAtual.reducao
+                              aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+                              aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                            }else{
+                              console.log("Não foi encontrado operação com o nome enviado pelo frontend")
+                            }
+                            // Como a atividade (regime do outro) é do SIMPLES NACIONAL
+                        
+                          }
+
+                          const valorIbsAnoVigente = valorServicoDesonerado * aliquotaIbsAnoVigente
+                          const valorCbsAnoVigente = valorServicoDesonerado * aliquotaCbsAnoVigente
+                          const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                          // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                          const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                          const valorIssAnoVigente = (valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                          // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                          const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                          const valorIcmsAnoVigente = ((valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+                          
+                          // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                          const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                          const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
+                          const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                          const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
+                          const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+
+                          const objAnoVigente: objDepoisReforma = {
+                              ano: objAno.ano,
+                              valor: novoValorAnoVigente,
+                              valorImpostos: valorImpostosAnoVigente,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                              custo: custoAnoVigente
+                          }
+                          respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+                        }
+
+                    })
+
+                    // TIRAR DAQUI (NA VDD AQUI AINDA TEM Q CONFERIR PRA PASSAR A SIMU 2 PRA DENTRO DO ANO A ANO)
 
                     //SIMULAÇÃO 1 (optante simples nacional, regime regular IBS/CBS)
                     console.log("Simulação 1: ")
@@ -1646,7 +1964,7 @@ export class calcularSimplificadoUseCase{
                     if(meuRegime == "Lucro Real"){
                         if(atividade.temCreditoPisCofins){
                           console.log("Nosso cliente é do lucro real e tem credito pis cofins")
-                          creditoAR = (custoAR * 0.0925)
+                          creditoAR = (custoAR * pisCo)
                           custoAR = custoAR - creditoAR
                         }else{
                           console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
@@ -1659,8 +1977,7 @@ export class calcularSimplificadoUseCase{
                     custoDR = valorServicoDesonerado
                     creditoDR = valorImpostosNovos
 
-                    console.log("Seu novo custo será: " + custoDR
-                    )
+                    console.log("Seu novo custo será: " + custoDR)
 
 
 
@@ -1669,86 +1986,56 @@ export class calcularSimplificadoUseCase{
                     if(atividade.regimeTributario == "Lucro Presumido"){
                         console.log("atividade " + (index + 1) + " é do lucro presumido")
                         // LUCRO PRESUMIDO
-                        const pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
-                        const iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
+                        let pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
+                        let iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
+                        let icms = this.parametrosEntrada.tabelaLucroPresumido.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.icms / 100 : 0
+                        let ipi = this.parametrosEntrada.tabelaLucroPresumido.servicos.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.ipi / 100 : 0
 
                         let aliquotaDesonerada = 0
-
-                      
-                        //CONFERIR REDUÇÃO IVA CNAE
 
                         let reducaoIva = 0
         
                         let aliquotaEfetivaIva = ivaBruto 
                         let aliquotaEfetivaIbs = ibsBruto
                         let aliquotaEfetivaCbs = cbsBruto
+
+                        // ANÁLISE AR
+
                         valorServicoAR = atividade.faturamento
 
                         // Se cair aqui é pq é serviço, tem só CNAE
                         console.log("MÉTODO ATUAL:")
                         console.log(atividade.metodo)
+
+                          // conferindo aliquota desonerada 
                         if(atividade.metodo == "Por CNPJ"){
                           // Caso método == cnpj
-                          
-                          aliquotaDesonerada = pisCo + iss
-                          valorServicoDesonerado = valorServicoAR - (valorServicoAR * aliquotaDesonerada)
-                          
-                          // Conferir se tem beneficio
-                          if(atividade.beneficio){
-                            // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
-                            reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
-                            aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-                            aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-                            aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
-                          }
-
+                          aliquotaDesonerada = pisCo + iss + icms + ipi
                         }else{
                           // método é operação, aplicar redução da operação específica nas alíquotas
 
                           console.log("MÉTODO É OPERAÇAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO")
 
-                          const operacoesReducoes: {operacao: string, reducao: number, colunaParametros: "comercio" | "industria" | "serviços" | "locação"}[] = [
-                            {operacao: "Serviços Profissionais - Regulamentados", reducao: 0.3, colunaParametros: "serviços"},
-                            {operacao: "Limpeza", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Publicidade e Propaganda", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Segurança", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Frete Intermunicipal", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Frete - Operação interna", reducao: 0, colunaParametros: "comercio"},
-                            {operacao: "Frete - Operação Interestadual", reducao: 0, colunaParametros: "comercio"},
-                            {operacao: "Seguros", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Manutenção Equipamentos ou veículos", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Licenciamento e Suporte técnico", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Despesas com viagem e hotel", reducao: 1, colunaParametros: "serviços"},
-                            {operacao: "Serviços Médicos", reducao: 0.6, colunaParametros: "serviços"},
-                          ]
-
                           const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
                           if(objOperacaoAtual){
 
-
-
                             if(objOperacaoAtual.colunaParametros == "comercio"){
-                              const pisCofinsComercio = this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo / 100 : 0
-                              const issComercio = this.parametrosEntrada.tabelaLucroPresumido.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.iss / 100 : 0
+                              pisCo = this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.pisCo / 100 : 0
+                              iss = this.parametrosEntrada.tabelaLucroPresumido.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.iss / 100 : 0
+                              icms = this.parametrosEntrada.tabelaLucroPresumido.comercial.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.icms / 100 : 0
+                              ipi = this.parametrosEntrada.tabelaLucroPresumido.comercial.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.comercial.ipi / 100 : 0
                             console.log("eentrou comercio")
-                              aliquotaDesonerada = pisCofinsComercio + issComercio
                             }else if(objOperacaoAtual.colunaParametros == "serviços"){
-                              const pisCofinsServico = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
-                              const issServico = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
-                            console.log("eentrou comercio")
-                              aliquotaDesonerada = pisCofinsServico + issServico
-                            }
+                              pisCo = this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.pisCo / 100 : 0
+                              iss = this.parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0
+                              icms = this.parametrosEntrada.tabelaLucroPresumido.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.icms / 100 : 0
+                              ipi = this.parametrosEntrada.tabelaLucroPresumido.servicos.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.servicos.ipi / 100 : 0
+                            console.log("eentrou serviços")
 
+                            }
+                            aliquotaDesonerada = pisCo + iss + icms + ipi
                             console.log("aliquota desonerada utilizada objOperacaoAtual")
                             console.log(aliquotaDesonerada)
-
-                            reducaoIva = objOperacaoAtual.reducao
-
-                              aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-
-                              aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-
-                              aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
                           }else{
                             console.log("Não foi encontrado operação com o nome enviado pelo frontend")
                           }
@@ -1760,6 +2047,82 @@ export class calcularSimplificadoUseCase{
                         valorImpostosAtuais = (valorServicoAR * aliquotaDesonerada)
                         valorServicoDesonerado = valorServicoAR - valorImpostosAtuais
                         porcentagemCargaTributariaAR = valorImpostosAtuais / valorServicoDesonerado
+
+                        // To considerando que Serviço Tomado quando regime fornecedor é Lucro Presumido tenho crédito IVA 100%
+                        temCreditoIva = true
+
+                        // ANÁLISE DR
+
+                        anoAano.forEach(objAno => {
+                          if(objAno.ano == "2026"){
+
+                          }else{
+                            let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                            let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                            // conferir reducoes IVA
+                            if(atividade.metodo == "Por CNPJ"){
+                              // Caso método == cnpj
+                              
+                              // Conferir se tem beneficio
+                              if(atividade.beneficio){
+                                // Se tiver benefício, ajustar os valores, se não tiver, deixar como foi setado antes
+                                reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                                aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+                                aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                              }
+
+                            }else{
+                              // método é operação, aplicar redução da operação específica nas alíquotas
+                              console.log("MÉTODO É OPERAÇAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO")
+                              const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
+                              if(objOperacaoAtual){
+                                // Não preciso pegar as alíquotas das tabelas corretas novamente, isso com certeza já foi feito no "if(cnpj){}else if(metodo){}" anterior na ANÁLISE AR.
+                                reducaoIva = objOperacaoAtual.reducao
+
+                                  aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+
+                                  aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                              }else{
+                                console.log("Não foi encontrado operação com o nome enviado pelo frontend")
+                              }
+                            }
+
+                            const valorIbsAnoVigente = valorServicoDesonerado * aliquotaIbsAnoVigente
+                            const valorCbsAnoVigente = valorServicoDesonerado * aliquotaCbsAnoVigente
+                            const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                            // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                            const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                            const valorIssAnoVigente = (valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                            // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                            const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                            const valorIcmsAnoVigente = ((valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                            // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                            const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                            const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
+                            const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                            const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
+                            const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+
+                            const objAnoVigente: objDepoisReforma = {
+                                ano: objAno.ano,
+                                valor: novoValorAnoVigente,
+                                valorImpostos: valorImpostosAnoVigente,
+                                porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                custo: custoAnoVigente
+                            }
+                            respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+                          }
+
+
+                        })
+
+
+
+
+
                         
                         valorImpostosNovos = valorServicoDesonerado * aliquotaEfetivaIva
 
@@ -1800,8 +2163,10 @@ export class calcularSimplificadoUseCase{
                     }else if(atividade.regimeTributario == "Lucro Real"){
                         console.log("atividade " + (index + 1) + " é do lucro real")
                         // LUCRO REAL
-                        const pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
-                        const iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
+                        let pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
+                        let iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
+                        let icms = this.parametrosEntrada.tabelaLucroReal.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.icms / 100 : 0
+                        let ipi = this.parametrosEntrada.tabelaLucroReal.servicos.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.ipi / 100 : 0
 
                         let aliquotaDesonerada = 0 
 
@@ -1813,84 +2178,122 @@ export class calcularSimplificadoUseCase{
                         let aliquotaEfetivaIva = ivaBruto
                         let aliquotaEfetivaIbs = ibsBruto
                         let aliquotaEfetivaCbs = cbsBruto
+
+                      // ANÁLISE AR
+
                         valorServicoAR = atividade.faturamento
 
                         // Se cair aqui é pq é serviço, tem só CNAE
                         console.log("MÉTODO ATUAL:")
                         console.log(atividade.metodo)
+                        // definir aliquotas desoneradas
                         if(atividade.metodo == "Por CNPJ"){
                           // Caso método == cnpj
-
-                          aliquotaDesonerada = pisCo + iss
-                          valorServicoDesonerado = valorServicoAR - (valorServicoAR * aliquotaDesonerada)
-
-                          // Conferir se tem beneficio
-                          if(atividade.beneficio){
-                            reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
-                            aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-                            aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-                            aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
-                          }
-
+                          aliquotaDesonerada = pisCo + iss + icms + ipi
                         }else{
                           // método é operação, aplicar redução da operação específica nas alíquotas
-
                           console.log("MÉTODO É OPERAÇAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO")
-
-
-                          const operacoesReducoes: {operacao: string, reducao: number, colunaParametros: "comercio" | "industria" | "serviços" | "locação"}[] = [
-                            {operacao: "Serviços Profissionais - Regulamentados", reducao: 0.3, colunaParametros: "serviços"},
-                            {operacao: "Limpeza", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Publicidade e Propaganda", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Segurança", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Frete Intermunicipal", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Frete - Operação interna", reducao: 0, colunaParametros: "comercio"},
-                            {operacao: "Frete - Operação Interestadual", reducao: 0, colunaParametros: "comercio"},
-                            {operacao: "Seguros", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Manutenção Equipamentos ou veículos", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Licenciamento e Suporte técnico", reducao: 0, colunaParametros: "serviços"},
-                            {operacao: "Despesas com viagem e hotel", reducao: 1, colunaParametros: "serviços"},
-                            {operacao: "Serviços Médicos", reducao: 0.6, colunaParametros: "serviços"},
-                          ]
 
                           const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
                           if(objOperacaoAtual){
 
                             if(objOperacaoAtual.colunaParametros == "comercio"){
                               console.log("eentrou comercio")
-                              const pisCofinsComercio = this.parametrosEntrada.tabelaLucroReal.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.pisCo / 100 : 0
-                              const issComercio = this.parametrosEntrada.tabelaLucroReal.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.iss / 100 : 0
-                              aliquotaDesonerada = pisCofinsComercio + issComercio
+                              pisCo = this.parametrosEntrada.tabelaLucroReal.comercial.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.pisCo / 100 : 0
+                              iss = this.parametrosEntrada.tabelaLucroReal.comercial.iss !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.iss / 100 : 0
+                              icms = this.parametrosEntrada.tabelaLucroReal.comercial.icms !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.icms / 100 : 0
+                              ipi = this.parametrosEntrada.tabelaLucroReal.comercial.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.comercial.ipi / 100 : 0
                             }else if(objOperacaoAtual.colunaParametros == "serviços"){
                               console.log("eentrou serviço")
-                              const pisCofinsServico = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
-                              const issServico = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
-                              aliquotaDesonerada = pisCofinsServico + issServico
+                              pisCo = this.parametrosEntrada.tabelaLucroReal.servicos.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.pisCo / 100 : 0
+                              iss = this.parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0
+                              icms = this.parametrosEntrada.tabelaLucroReal.servicos.icms !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.icms / 100 : 0
+                              ipi = this.parametrosEntrada.tabelaLucroReal.servicos.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.servicos.ipi / 100 : 0
                             }
+                            aliquotaDesonerada = pisCo + iss + icms + ipi
 
                             console.log("aliquota desonerada do objOperacao")
                             console.log(aliquotaDesonerada)
-
-
-                            reducaoIva = objOperacaoAtual.reducao
-
-                              aliquotaEfetivaIva = aliquotaEfetivaIva - (reducaoIva * aliquotaEfetivaIva)
-
-                              aliquotaEfetivaIbs = aliquotaEfetivaIbs - (reducaoIva * aliquotaEfetivaIbs)
-
-                              aliquotaEfetivaCbs = aliquotaEfetivaCbs - (reducaoIva * aliquotaEfetivaCbs)
                           }else{
                             console.log("Não foi encontrado operação com o nome enviado pelo frontend")
                           }
 
-
                         }
 
-                      console.log("aliquota desonerada no FINAL SERVICOS TOMADOS")
-                      console.log(aliquotaDesonerada)
-                      valorImpostosAtuais = (valorServicoAR * aliquotaDesonerada)
-                      valorServicoDesonerado = valorServicoAR - valorImpostosAtuais
-                      porcentagemCargaTributariaAR = valorImpostosAtuais / valorServicoDesonerado
+                        console.log("aliquota desonerada no FINAL SERVICOS TOMADOS")
+                        console.log(aliquotaDesonerada)
+                        valorImpostosAtuais = (valorServicoAR * aliquotaDesonerada)
+                        valorServicoDesonerado = valorServicoAR - valorImpostosAtuais
+                        porcentagemCargaTributariaAR = valorImpostosAtuais / valorServicoDesonerado
+
+                        // To considerando que Serviço Tomado quando regime fornecedor é Lucro Real tenho crédito IVA 100%
+                        temCreditoIva = true
+
+                        // ANÁLISE DR
+
+                        anoAano.forEach(objAno => {
+                          if(objAno.ano == '2026'){
+
+                          }else{
+                            let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                            let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+
+                            // conferindo beneficios IVA
+                            if(atividade.metodo == "Por CNPJ"){
+                              // Caso método == cnpj
+                              // Conferir se tem beneficio
+                              if(atividade.beneficio){
+                                reducaoIva = atividade.manterBeneficio ? atividade.beneficio : 0
+                                aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+                                aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                              }
+
+                            }else{
+                              // método é operação, aplicar redução da operação específica nas alíquotas
+                              console.log("MÉTODO É OPERAÇAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO")
+
+                              const objOperacaoAtual = operacoesReducoes.find(item => item.operacao == atividade.operacao)
+                              if(objOperacaoAtual){
+                                  // Não preciso pegar as alíquotas das tabelas corretas novamente, isso com certeza já foi feito no "if(cnpj){}else if(metodo){}" anterior na ANÁLISE AR.
+                                  reducaoIva = objOperacaoAtual.reducao
+                                  aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (reducaoIva * aliquotaIbsAnoVigente)
+                                  aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (reducaoIva * aliquotaCbsAnoVigente)
+                              }else{
+                                console.log("Não foi encontrado operação com o nome enviado pelo frontend")
+                              }
+
+
+                            }
+
+                            const valorIbsAnoVigente = valorServicoDesonerado * aliquotaIbsAnoVigente
+                            const valorCbsAnoVigente = valorServicoDesonerado * aliquotaCbsAnoVigente
+                            const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                            // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                            const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                            const valorIssAnoVigente = (valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                            // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                            const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                            const valorIcmsAnoVigente = ((valorServicoDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                            // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                            const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                            const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
+                            const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                            const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
+                            const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                            const objAnoVigente: objDepoisReforma = {
+                                ano: objAno.ano,
+                                valor: novoValorAnoVigente,
+                                valorImpostos: valorImpostosAnoVigente,
+                                porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                custo: custoAnoVigente
+                            }
+                            respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+                          }
+                        })
+
                       
                       valorImpostosNovos = valorServicoDesonerado * aliquotaEfetivaIva
                       porcentagemCargaTributariaDR = valorImpostosNovos / valorServicoDesonerado
@@ -1933,7 +2336,17 @@ export class calcularSimplificadoUseCase{
 
                   }
 
-                   const respServicoPrestadoAtual: objItemFinal = {
+                  const objServicoTomadoAtualAR = {
+                        valor: valorServicoAR,
+                        valorImpostos: valorImpostosAtuais,
+                        valorDesonerado: valorServicoDesonerado,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                        custo: custoAR
+                      }
+
+                  respServicoTomadoAtual.antesReforma = objServicoTomadoAtualAR
+
+                   /*const respServicoTomadoAtual: objItemFinal = {
                       antesReforma: {
                         valor: valorServicoAR,
                         valorImpostos: valorImpostosAtuais,
@@ -1950,9 +2363,9 @@ export class calcularSimplificadoUseCase{
                           custo: custoDR,
                         }
                       ]
-                    }
+                    }*/
 
-                    respostaFinalCalculo.servicosTomados.push(respServicoPrestadoAtual)
+                    respostaFinalCalculo.servicosTomados.push(respServicoTomadoAtual)
 
                     respostaFinalCalculo.totalCompras.servicosTomados.valorAR += valorServicoAR
                     respostaFinalCalculo.totalCompras.servicosTomados.impostosAR += valorImpostosAtuais
@@ -2036,6 +2449,24 @@ export class calcularSimplificadoUseCase{
 
 
               totalImoveisLocacao.forEach((imovel, index) => {
+              let pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+              let iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+              let icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+              let ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0
+
+
+
+                let respImovelLocacaoAtual: objItemFinal = {
+                  antesReforma: {
+                    valor: 0,
+                    valorImpostos: 0,
+                    valorDesonerado: 0,
+                    porcentagemCargaTributaria: 0,
+                    custo: null
+                  },
+                  depoisReforma: []
+                }
+
                 console.log("IMOVEL " + (index + 1))
 
                 //
@@ -2066,12 +2497,18 @@ export class calcularSimplificadoUseCase{
                     // O outro que é o locador
                     if(imovel.tipoOutraParte == 'Pessoa jurídica'){
                       if(imovel.regimeOutro == 'Lucro Presumido'){
-                          aliquotaDesonerar = 0.0365
-                          console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                          pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+                          iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+                          icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+                          ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0
                       }else if(imovel.regimeOutro == 'Lucro Real'){
-                          aliquotaDesonerar = 0.0925
-                          console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                          pisCo = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
+                          iss = this.parametrosEntrada.tabelaLucroReal.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.iss / 100 : 0
+                          icms = this.parametrosEntrada.tabelaLucroReal.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.icms / 100 : 0
+                          ipi = this.parametrosEntrada.tabelaLucroReal.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.ipi / 100 : 0
                       }
+                      aliquotaDesonerar = pisCo + iss + icms + ipi
+                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
                     }
                     // Caso seja PF manterá a aliquota a desonerar como zero, logo, não haverá desoneração
 
@@ -2079,9 +2516,9 @@ export class calcularSimplificadoUseCase{
                     //Aqui o valor base já tem que estar com redução??
                     if(meuRegime == 'Lucro Real' && imovel.residencial == false && (imovel.regimeOutro == 'Lucro Presumido' || imovel.regimeOutro == 'Lucro Real')){
                         console.log("tem crédito atual de: ")
-                        creditoAtual = valorBase * 0.0925
+                        creditoAtual = valorBase * pisCo
                         console.log(creditoAtual)
-                        console.log("aliquota usada para calcular o credito: " + 0.0925)
+                        console.log("aliquota usada para calcular o credito: " + pisCo)
                     }
 
                     // Nós não sabemos se o simples (mesmo sendo nosso cliente) vai ser regime regular ou não, logo vamos colocar que tem crédito por padrao, mas na hora de apresentar os resultados, precisamos falar que ele terá crédito se ele optar, caso não será um custo
@@ -2094,17 +2531,24 @@ export class calcularSimplificadoUseCase{
                     //Minha empresa é o locador
                     // Conferir se eu sou PF ou PJ, como ainda não coloquei a opção de eu ser PF, vai como se todos fossem PJ inicialmente
                     if(meuRegime == 'Lucro Presumido'){
-                      aliquotaDesonerar = 0.0365
+                        pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+                        iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+                        icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+                        ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0                    
                     }else if(meuRegime == 'Lucro Real'){
-                        aliquotaDesonerar = 0.0925
+                        pisCo = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
+                        iss = this.parametrosEntrada.tabelaLucroReal.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.iss / 100 : 0
+                        icms = this.parametrosEntrada.tabelaLucroReal.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.icms / 100 : 0
+                        ipi = this.parametrosEntrada.tabelaLucroReal.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.ipi / 100 : 0
                     }
+                    aliquotaDesonerar = pisCo + iss + icms + ipi
 
                     // CRÉDITO ATUAL (antes da reforma): como o outro é o locatário:
                     if(imovel.regimeOutro == 'Lucro Real' && imovel.residencial == false && (meuRegime == "Lucro Presumido" || meuRegime == "Lucro Real")){
                         console.log("tem crédito atual de: ")
-                        creditoAtual = valorBase * 0.0925
+                        creditoAtual = valorBase * pisCo
                         console.log(creditoAtual)
-                        console.log("aliquota usada para calcular o credito: " + 0.0925)
+                        console.log("aliquota usada para calcular o credito: " + pisCo)
                     } 
                   
                     //CRÉDITO NOVO (sempre olhamos para o locatário) - falta adicionar ou pf-regime regular
@@ -2132,6 +2576,106 @@ export class calcularSimplificadoUseCase{
 
 
                 // ONERAR NOVOS IMPOSTOS
+
+
+                anoAano.forEach(objAno => {
+                  if(objAno.ano == "2026"){
+
+                  }else{
+                    // SIMULAÇÃO 1 (Nela usar valorBaseNovosTributosSimu1 como base, e na simu2 usar o valorDesonerado)
+                    if(imovel.tipoAluguel == "Aluguel recebido" && (!pfRegimeRegular && meuRegime == "Pessoa Fisica")){
+
+                        // Nesse caso não aplica IVA
+                        objAno.porcentagemCbs = 0
+                        objAno.porcentagemIbs = 0
+                        let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                        let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                        const valorIbsAnoVigente = valorDesonerado * aliquotaIbsAnoVigente
+                        const valorCbsAnoVigente = valorDesonerado * aliquotaCbsAnoVigente
+                        const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                        // CALCULAR VALOR ISS (base é o valorBaseNovosTributosSimu1 + valorIva)
+                        const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                        const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                        // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                        const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                        const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                        const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                        const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
+                        const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente // Mas nesse caso como eu fiz as porcentagens do IVA receberem 0, o valor que entra aqui é o valor sem IVA
+                        const objAnoVigente: objDepoisReforma = {
+                            ano: objAno.ano,
+                            valor: novoValorAnoVigente,
+                            valorImpostos: valorImpostosAnoVigente,
+                            porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                            custo: null
+                        }
+                        respImovelLocacaoAtual.depoisReforma.push(objAnoVigente)
+
+                    }else{
+
+                        // CONFERIR REDUÇÃO DE BASE
+                        let valorBaseNovosTributosSimu1 = valorDesonerado
+                        if(imovel.residencial){
+                          // quando adicionar a quantidade, caso sejam 3 imoveis na linha tem que diminuir 3x600
+                          console.log("Redutor social")
+                          console.log("Quanto reduziu: " + (600 * imovel.quantidade))
+
+                          valorBaseNovosTributosSimu1 = valorDesonerado - (600 * imovel.quantidade)
+                          console.log("Valor após a redução: " + valorBaseNovosTributosSimu1)
+                        }
+
+                        // CALCULAR VALOR IVA
+                        const reducaoAliquota = 0.7 // redução padrão de 70%
+                        let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                        let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                        aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoAliquota) // Aplicando redução padrão de alíquota
+                        aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoAliquota) // Aplicando redução padrão de alíquota
+                        const valorIbsAnoVigente = valorBaseNovosTributosSimu1 * aliquotaIbsAnoVigente
+                        const valorCbsAnoVigente = valorBaseNovosTributosSimu1 * aliquotaCbsAnoVigente
+                        const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                        // CALCULAR VALOR ISS (base é o valorBaseNovosTributosSimu1 + valorIva)
+                        const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                        const valorIssAnoVigente = (valorBaseNovosTributosSimu1 + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                        // CALCULAR VALOR ICMS (base é valorBaseNovosTributosSimu1 + ICMS (ou seja, por dentro) + IVA)
+                        const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                        const valorIcmsAnoVigente = ((valorBaseNovosTributosSimu1 + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                        // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                        const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                        const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorBaseNovosTributosSimu1
+                        const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                        let custoAnoVigente = novoValorAnoVigente
+                        let creditoAnoVigente = 0
+
+                        // Calcular custo
+                        // Só tem que conferir creditoIVA se for condominio embutido e quem paga não é simples nacional (esse é o único caso que eu tenho certeza se tem ou não crédito através da variavel temCreditoIva)
+                        if(imovel.condominioEmbutido && !((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional") || (imovel.tipoAluguel == "Aluguel pago" && meuRegime == "Simples Nacional"))){
+                            if(temCreditoIva){
+                              creditoAnoVigente = valorIvaAnoVigente
+                              custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                            }
+                        }
+
+                        const objAnoVigente: objDepoisReforma = {
+                            ano: objAno.ano,
+                            valor: novoValorAnoVigente,
+                            valorImpostos: valorImpostosAnoVigente,
+                            porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                            custo: custoAnoVigente
+                        }
+                        respImovelLocacaoAtual.depoisReforma.push(objAnoVigente)
+
+                    }
+
+                  }
+                })
+
+
                 let valorBaseNovosTributosSimu1 = valorDesonerado
                 if(imovel.residencial){
                   // quando adicionar a quantidade, caso sejam 3 imoveis na linha tem que diminuir 3x600
@@ -2159,7 +2703,7 @@ export class calcularSimplificadoUseCase{
                         console.log("O valor de IVA calculado será custo se o destinatário (locatário) for pessoa física não optante pelo Regime Regular de IBS/CBS. Sendo a Pessoa Física optante pelo Regime Regular, o valor do IVA ficará como crédito para abatimento das operações futuras de faturamento.")
                     }
 
-                        // pf regime regular 
+                        // pf regime regular e pj
                         const reducaoAliquota = 0.7
                         const aliquotaPadrao = 0.28
       
@@ -2177,7 +2721,7 @@ export class calcularSimplificadoUseCase{
       
       
                         console.log("Novos tributos simulação 2: ")
-                        // Somei "(600 * imovel.quantidade)" porque na simulação 2 não tem redução em nenhuma hipótese
+                        // Usando valorDesonerado e não valorBaseNovosTributosSimu1 porque na simulação 2 não tem redução de base por imovel em nenhuma hipótese
                         const novosTributosSimu2 = valorDesonerado * 0.0365
                         console.log(novosTributosSimu2)
       
@@ -2185,13 +2729,16 @@ export class calcularSimplificadoUseCase{
                         if(imovel.condominioEmbutido){
                           // Não destacado
 
+                          // Se quem tá pagando aluguel é do SIMPLES NACIONAL
                           if((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional") || (imovel.tipoAluguel == "Aluguel pago" && meuRegime == "Simples Nacional")){
 
                             // Como é simples nacional, eu não tenho certeza se tem crédito ou não então tenho que apresentar os dois casos
-                            const valorFinalSimu2SemCredito = valorDesonerado + novosTributosSimu2
-
                               // SIMULAÇÃO 1
                             valorFinalSimu1 = valorDesonerado + valorNovosTributos
+
+                            // SIMULAÇÃO 2
+                            const valorFinalSimu2SemCredito = valorDesonerado + novosTributosSimu2
+
                             if((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional")){
                               console.log("Como o outro é o locatário e simples nacional, caso ele opte por estar no regime regular, na simulação 1 ele terá crédito de " + valorNovosTributos + " e na simulaçao 2 ele terá um crédito de " + novosTributosSimu2 + ", caso ele opte por ficar fora do regime regular esses valores passarão a ser custo.")
                             }else{
@@ -2206,7 +2753,7 @@ export class calcularSimplificadoUseCase{
                           }else{
                               // SIMULAÇÃO 1
                               console.log("Valor final simulação 1:")
-                              // Somei "(600 * imovel.quantidade)" porque não tem que considerar a redução para o valor final, somente para chegar no valor dos novosTributos
+                              // To usando valorDesonerado e não valorBaseNovosTributos1 porque não tem que considerar a redução para o valor final, somente para chegar no valor dos novosTributos
                               valorFinalSimu1 = valorDesonerado + valorNovosTributos
                               if(temCreditoIva){
                                 console.log("Você tem direito ao crédito novo")
@@ -2234,6 +2781,8 @@ export class calcularSimplificadoUseCase{
                           
       
                         }else{
+
+                          // A diferença é que aqui não tem credito IVA em todos os casos
                           
                           console.log("Valor final simulação 1:")
                           // Somei "(600 * imovel.quantidade)" porque não tem que considerar a redução para o valor final, somente para chegar no valor dos novosTributos
@@ -2253,7 +2802,17 @@ export class calcularSimplificadoUseCase{
                 const custoDR = temCreditoIva ? valorFinalSimu1 - valorNovosTributos : valorFinalSimu1
 
 
-                   const respServicoPrestadoAtual: objItemFinal = {
+                  const objImovelLocacaoAtualAR = {
+                    valor: valorBase,
+                    valorImpostos: valorImpostosAtuais,
+                    valorDesonerado: valorDesonerado,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: imovel.tipoAluguel == "Aluguel pago" ? custoAtual : null
+                  }
+
+                  respImovelLocacaoAtual.antesReforma = objImovelLocacaoAtualAR
+
+                   /*const respImovelLocacaoAtual: objItemFinal = {
                       antesReforma: {
                         valor: valorBase,
                         valorImpostos: valorImpostosAtuais,
@@ -2270,9 +2829,9 @@ export class calcularSimplificadoUseCase{
                           custo: imovel.tipoAluguel == "Aluguel pago" ? custoDR : null,
                         }
                       ]
-                    }
+                    }*/
 
-                    respostaFinalCalculo.locacaoBensImoveis.push(respServicoPrestadoAtual)
+                    respostaFinalCalculo.locacaoBensImoveis.push(respImovelLocacaoAtual)
 
                     if(imovel.tipoAluguel == "Aluguel pago"){
                       respostaFinalCalculo.totalCompras.locacaoImoveis.valorAR += valorBase
@@ -2343,6 +2902,17 @@ export class calcularSimplificadoUseCase{
           if(totalImoveisCompraVenda.length > 0){
             totalImoveisCompraVenda.forEach(imovel => {
 
+              let respCompraVendaAtual: objItemFinal = {
+                antesReforma: {
+                  valor: 0,
+                  valorImpostos: 0,
+                  valorDesonerado: 0,
+                  porcentagemCargaTributaria: 0,
+                  custo: null
+                },
+                depoisReforma: []
+              }
+
               const valorDeVenda = imovel.valorVendaImovel
               const valorDeAquisicao = imovel.valorAquisicao
               // Repete o valor de aquisição inicialmente
@@ -2409,8 +2979,18 @@ export class calcularSimplificadoUseCase{
               console.log("valor final: " + valorFinal)
               const porcentagemCargaTributariaDR = novosImpostos / valorDesonerado
 
+              const objCompraVendaAtualAR = {
+                  valor: valorDeVenda,
+                  valorImpostos: valorImpostosAtuais,
+                  valorDesonerado: valorDesonerado,
+                  porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                  custo: null
+                }
 
-              const respServicoPrestadoAtual: objItemFinal = {
+                respCompraVendaAtual.antesReforma = objCompraVendaAtualAR
+
+
+              /*const respServicoPrestadoAtual: objItemFinal = {
                 antesReforma: {
                   valor: valorDeVenda,
                   valorImpostos: valorImpostosAtuais,
@@ -2427,9 +3007,9 @@ export class calcularSimplificadoUseCase{
                     custo: null,
                   }
                 ]
-              }
+              }*/
 
-              respostaFinalCalculo.compraVendaBensImoveis.push(respServicoPrestadoAtual)
+              respostaFinalCalculo.compraVendaBensImoveis.push(respCompraVendaAtual)
 
 
 
@@ -2443,16 +3023,14 @@ export class calcularSimplificadoUseCase{
 
           // BENS MÓVEIS - LOCAÇÃO
           if(totalMoveisLocacao.length > 0){
-            const pisCoLucroPresumidoLocacao = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
-            const pisCoLucroRealLocacao = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
-            const pisCoSimplesLocacao = this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo / 100 : 0
-
-            console.log("piscofins lucroPresumido era pra ser 3,65%")
-            console.log(pisCoLucroPresumidoLocacao)
-            console.log("piscofins lucroReal era pra ser 9,25%")
-            console.log(pisCoLucroRealLocacao)
-            console.log("piscofins Simples era pra ser 3,3%")
-            console.log(pisCoSimplesLocacao)
+            let pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+            let iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+            let icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+            let ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0
+            const ibsBruto = this.parametrosEntrada.aliquotaIbs / 100
+            const cbsBruto = this.parametrosEntrada.aliquotaCbs / 100
+            const ivaBruto = this.parametrosEntrada.aliquotaIva / 100
+          
 
             console.log("BENS MOVEIS")
             console.log("/////////////////////////////////////////////////////////////")
@@ -2480,6 +3058,18 @@ export class calcularSimplificadoUseCase{
               totalMoveisLocacao.forEach((movel, index) => {
                 console.log("MOVEL " + (index + 1))
 
+                let respMoveisLocacaoAtual: objItemFinal = {
+                  antesReforma: {
+                    valor: 0,
+                    valorImpostos: 0,
+                    valorDesonerado: 0,
+                    porcentagemCargaTributaria: 0,
+                    custo: null
+                  },
+                  depoisReforma: []
+                }
+  
+
                 //
 
                 let valorBase = movel.valorLocacao
@@ -2496,15 +3086,23 @@ export class calcularSimplificadoUseCase{
                 if(movel.tipoAluguel == 'Aluguel pago'){
                   // o locador é o OUTRO
                   if(movel.regimeOutro == "Lucro Presumido"){
-                      aliquotaDesonerar = pisCoLucroPresumidoLocacao
-                      valorImpostosAtuais = valorBase * aliquotaDesonerar
+                      pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+                      iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+                      icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+                      ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0   
                   }else if(movel.regimeOutro == "Lucro Real"){
-                      aliquotaDesonerar = pisCoLucroRealLocacao
-                      valorImpostosAtuais = valorBase * aliquotaDesonerar
+                      pisCo = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
+                      iss = this.parametrosEntrada.tabelaLucroReal.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.iss / 100 : 0
+                      icms = this.parametrosEntrada.tabelaLucroReal.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.icms / 100 : 0
+                      ipi = this.parametrosEntrada.tabelaLucroReal.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.ipi / 100 : 0
                   }else{
-                      aliquotaDesonerar = pisCoSimplesLocacao
-                      valorImpostosAtuais = valorBase * aliquotaDesonerar
+                      pisCo = this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.pisCo / 100 : 0
+                      iss = this.parametrosEntrada.tabelaSimplesNacional.locacao.iss !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.iss / 100 : 0
+                      icms = this.parametrosEntrada.tabelaSimplesNacional.locacao.icms !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.icms / 100 : 0
+                      ipi = this.parametrosEntrada.tabelaSimplesNacional.locacao.ipi !== null ? this.parametrosEntrada.tabelaSimplesNacional.locacao.ipi / 100 : 0
                   }
+                  aliquotaDesonerar = pisCo + iss + icms + ipi
+                  valorImpostosAtuais = valorBase * aliquotaDesonerar
 
                     // CRÉDITO: como eu sou o locatário:
                     if(meuRegime == 'Lucro Real' && movel.creditaPisCofins && (movel.regimeOutro == "Lucro Presumido" || movel.regimeOutro == "Lucro Real" || movel.regimeOutro == "Simples Nacional")){
@@ -2528,20 +3126,32 @@ export class calcularSimplificadoUseCase{
                     // Minha empresa é o locador
                     // Conferir se eu sou PF ou PJ, como ainda não coloquei a opção de eu ser PF, vai como se todos fossem PJ inicialmente
                     if(meuRegime == 'Lucro Presumido'){
-                      aliquotaDesonerar = pisCoLucroPresumidoLocacao
-                      if(movel.comOperador){
-                        valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * (parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0)
-                      }else{
-                        valorImpostosAtuais = (valorBase * aliquotaDesonerar)
-                      }
+                        pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
+                        iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
+                        icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
+                        ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0  
+                        aliquotaDesonerar = pisCo + iss + icms + ipi 
+                        if(movel.comOperador){
+                          valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * (parametrosEntrada.tabelaLucroPresumido.servicos.iss !== null ? parametrosEntrada.tabelaLucroPresumido.servicos.iss / 100 : 0)
+                        }else{
+                          valorImpostosAtuais = (valorBase * aliquotaDesonerar)
+                        }
                     }else if(meuRegime == 'Lucro Real'){
-                        aliquotaDesonerar = pisCoLucroRealLocacao
+                        pisCo = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
+                        iss = this.parametrosEntrada.tabelaLucroReal.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.iss / 100 : 0
+                        icms = this.parametrosEntrada.tabelaLucroReal.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.icms / 100 : 0
+                        ipi = this.parametrosEntrada.tabelaLucroReal.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.ipi / 100 : 0
+                        aliquotaDesonerar = pisCo + iss + icms + ipi
                         if(movel.comOperador){
                           valorImpostosAtuais = (valorBase * aliquotaDesonerar) + movel.valorMaoObra * (parametrosEntrada.tabelaLucroReal.servicos.iss !== null ? parametrosEntrada.tabelaLucroReal.servicos.iss / 100 : 0)
                         }else{
                           valorImpostosAtuais = (valorBase * aliquotaDesonerar)
                         }
                     }else if(meuRegime == "Simples Nacional"){
+                        pisCo = 0
+                        iss = 0
+                        icms = 0
+                        ipi = 0
 
                       // Buscar dados no anexo III
                       const dadosAnexo = anexos.find(elem => elem.anexo == "III")
@@ -2566,6 +3176,21 @@ export class calcularSimplificadoUseCase{
                             const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
                             tributosExcluir.forEach(tributoExcluir => {
                                 porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                                if(tributoExcluir == "pis"){
+                                  pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "cofins"){
+                                  pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "icms"){
+                                  icms += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "iss"){
+                                  iss += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "ipi"){
+                                  ipi += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
                             })
 
                             // Calculando impostos que irão permanecer após a reforma
@@ -2597,6 +3222,18 @@ export class calcularSimplificadoUseCase{
                             const tributosExcluir: (keyof linhaReparticao)[] = ["cofins", "pis", "icms", "ipi"]
                             tributosExcluir.forEach(tributoExcluir => {
                                 porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                                if(tributoExcluir == "pis"){
+                                  pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "cofins"){
+                                  pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "icms"){
+                                  icms += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
+                                if(tributoExcluir == "ipi"){
+                                  ipi += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                                }
                             })
 
                             // Calculando impostos que irão permanecer após a reforma
@@ -2661,95 +3298,139 @@ export class calcularSimplificadoUseCase{
 
                 // ONERAR NOVOS IMPOSTOS
 
+                anoAano.forEach(objAno => {
+                    // CALCULAR VALOR IVA
+                    let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                    let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                    const valorIbsAnoVigente = valorDesonerado * aliquotaIbsAnoVigente
+                    const valorCbsAnoVigente = valorDesonerado * aliquotaCbsAnoVigente
+                    const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                    // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                    const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                    const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                    // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                    const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                    const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                    // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                    const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                    const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
+                    const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                    const creditoAnoVigente = (temCreditoIva ? valorIvaAnoVigente : 0)
+                    const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                    const objAnoVigente: objDepoisReforma = {
+                        ano: objAno.ano,
+                        valor: novoValorAnoVigente,
+                        valorImpostos: valorImpostosAnoVigente,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                        custo: movel.tipoAluguel == "Aluguel pago" ? custoAnoVigente : null
+                    }
+                    respMoveisLocacaoAtual.depoisReforma.push(objAnoVigente)
+
+                })
+
                 let baseIva = valorDesonerado
                 const aliquotaIva = 0.28
                 const valorImpostosNovos = baseIva * aliquotaIva
                 const novoValorTotal = valorDesonerado + valorImpostosNovos
                 const porcentagemCargaTributariaDR = valorImpostosNovos / valorDesonerado
+
                 creditoDR = temCreditoIva ? valorImpostosNovos : 0
                 const custoDR = temCreditoIva ? valorDesonerado : novoValorTotal
 
 
-              const respServicoPrestadoAtual: objItemFinal = {
-                antesReforma: {
-                  valor: valorBase,
-                  valorImpostos: valorImpostosAtuais,
-                  valorDesonerado: valorDesonerado,
-                  porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                  custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
-                },
-                depoisReforma: [
-                  {
-                    ano: "2033",
-                    valor: novoValorTotal,
-                    valorImpostos: valorImpostosNovos,
-                    porcentagemCargaTributaria: porcentagemCargaTributariaDR,
-                    custo: movel.tipoAluguel == "Aluguel pago" ? custoDR : null,
-                  }
-                ]
-              }
-
-              respostaFinalCalculo.locacaoBensMoveis.push(respServicoPrestadoAtual)
-
-
-              if(movel.tipoAluguel == "Aluguel pago"){
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR += valorBase
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.creditoAR += creditoAtual
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR += custoAR
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR += novoValorTotal
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR += valorImpostosNovos
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado 
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.creditoDR += creditoDR
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR += custoDR
-                  respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
-
-                  //preenchendo total
-                  respostaFinalCalculo.totalCompras.total.valorAR += valorBase
-                  respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo.totalCompras.total.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado
-                  respostaFinalCalculo.totalCompras.total.creditoAR += creditoAtual
-                  respostaFinalCalculo.totalCompras.total.custoAR += custoAR
-                  respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR
-                  respostaFinalCalculo.totalCompras.total.valorDR += novoValorTotal
-                  respostaFinalCalculo.totalCompras.total.impostosDR += valorImpostosNovos
-                  respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado 
-                  respostaFinalCalculo.totalCompras.total.creditoDR += creditoDR
-                  respostaFinalCalculo.totalCompras.total.custoDR += custoDR
-                  respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
-
-                  if(movel.compoeCusto){
-                    console.log("Movel COM CUSTO")
-                    console.log(movel)
-                    dreCustoGeralAR += custoAR
-                    dreCustoGeralDR += custoDR
-                  }else{
-                    dreDespesasAR += custoAR
-                    dreDespesasDR += custoDR
+                const objMoveisLocacaoAtualAR = {
+                    valor: valorBase,
+                    valorImpostos: valorImpostosAtuais,
+                    valorDesonerado: valorDesonerado,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
                   }
 
-              }else if(movel.tipoAluguel == "Aluguel recebido"){
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.valorAR += valorBase
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.valorDR += novoValorTotal
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR += valorImpostosNovos
-                  respostaFinalCalculo.totalVendas.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+                respMoveisLocacaoAtual.antesReforma = objMoveisLocacaoAtualAR
 
-                  //preenchendo total
-                  respostaFinalCalculo.totalVendas.total.valorAR += valorBase
-                  respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo.totalVendas.total.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
-                  respostaFinalCalculo.totalVendas.total.valorDR += novoValorTotal
-                  respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
-                  respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
-              }
+                /*const respMoveisLocacaoAtual: objItemFinal = {
+                  antesReforma: {
+                    valor: valorBase,
+                    valorImpostos: valorImpostosAtuais,
+                    valorDesonerado: valorDesonerado,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
+                  },
+                  depoisReforma: [
+                    {
+                      ano: "2033",
+                      valor: novoValorTotal,
+                      valorImpostos: valorImpostosNovos,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaDR,
+                      custo: movel.tipoAluguel == "Aluguel pago" ? custoDR : null,
+                    }
+                  ]
+                }*/
+
+                respostaFinalCalculo.locacaoBensMoveis.push(respMoveisLocacaoAtual)
+
+
+                if(movel.tipoAluguel == "Aluguel pago"){
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR += valorBase
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado += valorDesonerado
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.creditoAR += creditoAtual
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR += custoAR
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR += novoValorTotal
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado 
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.creditoDR += creditoDR
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR += custoDR
+                    respostaFinalCalculo.totalCompras.locacaoMoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
+
+                    //preenchendo total
+                    respostaFinalCalculo.totalCompras.total.valorAR += valorBase
+                    respostaFinalCalculo.totalCompras.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalCompras.total.valorDesonerado += valorDesonerado
+                    respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado
+                    respostaFinalCalculo.totalCompras.total.creditoAR += creditoAtual
+                    respostaFinalCalculo.totalCompras.total.custoAR += custoAR
+                    respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorAR
+                    respostaFinalCalculo.totalCompras.total.valorDR += novoValorTotal
+                    respostaFinalCalculo.totalCompras.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDesonerado 
+                    respostaFinalCalculo.totalCompras.total.creditoDR += creditoDR
+                    respostaFinalCalculo.totalCompras.total.custoDR += custoDR
+                    respostaFinalCalculo.totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo.totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo.totalCompras.locacaoMoveis.valorDR
+
+                    if(movel.compoeCusto){
+                      console.log("Movel COM CUSTO")
+                      console.log(movel)
+                      dreCustoGeralAR += custoAR
+                      dreCustoGeralDR += custoDR
+                    }else{
+                      dreDespesasAR += custoAR
+                      dreDespesasDR += custoDR
+                    }
+
+                }else if(movel.tipoAluguel == "Aluguel recebido"){
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.valorAR += valorBase
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado += valorDesonerado
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.valorDR += novoValorTotal
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalVendas.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+
+                    //preenchendo total
+                    respostaFinalCalculo.totalVendas.total.valorAR += valorBase
+                    respostaFinalCalculo.totalVendas.total.impostosAR += valorImpostosAtuais
+                    respostaFinalCalculo.totalVendas.total.valorDesonerado += valorDesonerado
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+                    respostaFinalCalculo.totalVendas.total.valorDR += novoValorTotal
+                    respostaFinalCalculo.totalVendas.total.impostosDR += valorImpostosNovos
+                    respostaFinalCalculo.totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo.totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo.totalVendas.locacaoMoveis.valorDesonerado
+                }
 
               })
           }
@@ -2760,6 +3441,9 @@ export class calcularSimplificadoUseCase{
 
           // PRODUTOS VENDIDOS
           if(totalProdutosVendidos.length > 0){
+            const ibsBruto = this.parametrosEntrada.aliquotaIbs / 100
+            const cbsBruto = this.parametrosEntrada.aliquotaCbs / 100
+            const ivaBruto = this.parametrosEntrada.aliquotaIva / 100
 
             let faturamentoTotalMensal = 0
             totalProdutosVendidos.forEach(produto => {
@@ -2772,6 +3456,23 @@ export class calcularSimplificadoUseCase{
             console.log(totalProdutosVendidos)
 
             totalProdutosVendidos.forEach(produtoVendido => {
+
+
+              let pisCo = produtoVendido.pisCofins / 100
+              let icms = produtoVendido.icms / 100
+              let iss = 0
+              let ipi = produtoVendido.ipi / 100
+
+              let respProdutosVendidosAtual: objItemFinal = {
+                antesReforma: {
+                  valor: 0,
+                  valorImpostos: 0,
+                  valorDesonerado: 0,
+                  porcentagemCargaTributaria: 0,
+                  custo: null
+                },
+                depoisReforma: []
+              }
 
               let valorBase = produtoVendido.valorOperacao
               console.log("Valor Base: ")
@@ -2787,6 +3488,13 @@ export class calcularSimplificadoUseCase{
 
               // Produtos num geral, sempre olhados pelo regime do VENDEDOR, como nesse caso o cliente que está usando nosso sistema é o vendedor:
               if(meuRegime == "Simples Nacional"){
+
+                // zera os parametros de entrada
+                pisCo = 0
+                icms = 0
+                iss = 0
+                ipi = 0
+
                 if(produtoVendido.tipoOperacao == "Indústria" || produtoVendido.tipoOperacao == "Indústria - Consumidor final fora do Estado"){
                   // Buscar dados no anexo II
                   const dadosAnexo = anexos.find(elem => elem.anexo == "II")
@@ -2810,6 +3518,21 @@ export class calcularSimplificadoUseCase{
                         const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
                         tributosExcluir.forEach(tributoExcluir => {
                             porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                            if(tributoExcluir == "pis"){
+                              pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "cofins"){
+                              pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "icms"){
+                              icms += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "iss"){
+                              iss += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "ipi"){
+                              ipi += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
                         })
 
                         // Calculando impostos que irão permanecer
@@ -2858,6 +3581,21 @@ export class calcularSimplificadoUseCase{
                         const tributosExcluir: (keyof linhaReparticao)[] = ["iss", "cofins", "pis", "icms", "ipi"]
                         tributosExcluir.forEach(tributoExcluir => {
                             porcentagemTributosExcluir += reparticaoAtual[tributoExcluir]
+                            if(tributoExcluir == "pis"){
+                              pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "cofins"){
+                              pisCo += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "icms"){
+                              icms += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "iss"){
+                              iss += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
+                            if(tributoExcluir == "ipi"){
+                              ipi += aliquotaEfetiva * reparticaoAtual[tributoExcluir]
+                            }
                         })
 
                         
@@ -2913,7 +3651,48 @@ export class calcularSimplificadoUseCase{
 
               // IMPOSTOS NOVOS ******************************************************************************************************************************************
               let reducaoIva = 0
-              let aliquotaIva = 0.28
+              let aliquotaIva = ivaBruto + cbsBruto
+
+              anoAano.forEach(objAno => {
+                  // CALCULAR VALOR IVA
+                  let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                  let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                  if(produtoVendido.beneficio){
+                    // Se vier um numero maior que zero
+                    reducaoIva = produtoVendido.manterBeneficio ? produtoVendido.beneficio : 0
+                  }else{
+                    // se vier zero ou qualquer tipo de null, undefined...
+                    reducaoIva = 0
+                  }
+                  aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoIva)
+                  aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoIva)
+                  const valorIbsAnoVigente = valorDesonerado * aliquotaIbsAnoVigente
+                  const valorCbsAnoVigente = valorDesonerado * aliquotaCbsAnoVigente
+                  const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                  // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                  const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                  const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                  // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                  const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                  const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                  // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                  const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                  const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
+                  const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                  const objAnoVigente: objDepoisReforma = {
+                      ano: objAno.ano,
+                      valor: novoValorAnoVigente,
+                      valorImpostos: valorImpostosAnoVigente,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                      custo: null
+                  }
+                  respProdutosVendidosAtual.depoisReforma.push(objAnoVigente)
+
+              })
+
 
               if(produtoVendido.beneficio){
                 // Se vier um numero maior que zero
@@ -2935,8 +3714,17 @@ export class calcularSimplificadoUseCase{
               const novoValorProduto = valorDesonerado + novosImpostos
               console.log("Novo valor do produto: " + novoValorProduto)
 
+              const objProdutoVendidoAtualAR = {
+                valor: valorBase,
+                valorImpostos: valorImpostosAtuais,
+                valorDesonerado: valorDesonerado,
+                porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                custo: null
+              }
 
-              const respServicoPrestadoAtual: objItemFinal = {
+              respProdutosVendidosAtual.antesReforma = objProdutoVendidoAtualAR
+
+              /*const respServicoPrestadoAtual: objItemFinal = {
                 antesReforma: {
                   valor: valorBase,
                   valorImpostos: valorImpostosAtuais,
@@ -2953,9 +3741,9 @@ export class calcularSimplificadoUseCase{
                     custo: null
                   }
                 ]
-              }
+              }*/
 
-              respostaFinalCalculo.produtosVendidos.push(respServicoPrestadoAtual)              
+              respostaFinalCalculo.produtosVendidos.push(respProdutosVendidosAtual)              
 
               respostaFinalCalculo.totalVendas.vendasProdutos.valorAR += valorBase
               respostaFinalCalculo.totalVendas.vendasProdutos.impostosAR += valorImpostosAtuais
@@ -2990,12 +3778,24 @@ export class calcularSimplificadoUseCase{
               faturamentoTotalMensal += produto.valorOperacao
             })
 
+
             const rbt12 = dadosEmpresaAtual ? Number(dadosEmpresaAtual.faturamento_mensal_medio) * 12 : faturamentoTotalMensal * 12
 
             console.log("TEM PRODUTOS ADQURIDOS")
             console.log(totalProdutosAdquiridos)
 
             totalProdutosAdquiridos.forEach(produtoAdquirido => {
+
+              let respProdutoAdquiridoAtual: objItemFinal = {
+                antesReforma: {
+                  valor: 0,
+                  valorImpostos: 0,
+                  valorDesonerado: 0,
+                  porcentagemCargaTributaria: 0,
+                  custo: null
+                },
+                depoisReforma: []
+              }              
 
               let valorBase = produtoAdquirido.valorOperacao
               // variavel para valor com credito antes da reforma. O calculo em si do crédito deve ser feito para cada caso de forma única pois o icms para simples não 
@@ -3052,7 +3852,53 @@ export class calcularSimplificadoUseCase{
 
 
               // IMPOSTOS NOVOS ******************************************************************************************************************************************
+
+              const icms = produtoAdquirido.aliquotas.icms !== null ? (produtoAdquirido.aliquotas.icms / 100) : 0
+              const iss = 0
               let reducaoIva = 0
+              anoAano.forEach(objAno => {
+                  // CALCULAR VALOR IVA
+                  let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
+                  let aliquotaCbsAnoVigente = cbsBruto * objAno.porcentagemCbs
+                  if(produtoAdquirido.beneficio){
+                    // Se vier um numero maior que zero
+                    reducaoIva = produtoAdquirido.manterBeneficio ? produtoAdquirido.beneficio : 0
+                  }else{
+                    // se vier zero ou qualquer tipo de null, undefined...
+                    reducaoIva = 0
+                  }
+                  aliquotaIbsAnoVigente = aliquotaIbsAnoVigente - (aliquotaIbsAnoVigente * reducaoIva)
+                  aliquotaCbsAnoVigente = aliquotaCbsAnoVigente - (aliquotaCbsAnoVigente * reducaoIva)
+                  const valorIbsAnoVigente = valorDesonerado * aliquotaIbsAnoVigente
+                  const valorCbsAnoVigente = valorDesonerado * aliquotaCbsAnoVigente
+                  const valorIvaAnoVigente = valorIbsAnoVigente + valorCbsAnoVigente
+
+                  // CALCULAR VALOR ISS (base é o valorDesonerado + valorIva)
+                  const aliquotaIssAnoVigente = iss * objAno.porcentagemIcmsIss
+                  const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
+
+                  // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
+                  const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                  const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+
+                  // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
+                  const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
+                  const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
+                  const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                  const creditoAnoVigente = (produtoAdquirido.creditoIcms ? valorIcmsAnoVigente : 0)
+                  let custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                  const objAnoVigente: objDepoisReforma = {
+                      ano: objAno.ano,
+                      valor: novoValorAnoVigente,
+                      valorImpostos: valorImpostosAnoVigente,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                      custo: custoAnoVigente
+                  }
+                  respProdutoAdquiridoAtual.depoisReforma.push(objAnoVigente)
+
+              })
+
+
               let aliquotaIva = 0.28
               
               if(produtoAdquirido.beneficio){
@@ -3075,7 +3921,17 @@ export class calcularSimplificadoUseCase{
               const novoValorProduto = valorDesonerado + novosImpostos
               console.log("Novo valor do produto: " + novoValorProduto)
 
-              const respServicoPrestadoAtual: objItemFinal = {
+              const objProdutoAdquiridoAtualAR = {
+                valor: valorBase,
+                valorImpostos: valorImpostosAtuais,
+                valorDesonerado: valorDesonerado,
+                porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                custo: custoAR
+              }
+
+              respProdutoAdquiridoAtual.antesReforma = objProdutoAdquiridoAtualAR
+
+              /*const respServicoPrestadoAtual: objItemFinal = {
                 antesReforma: {
                   valor: valorBase,
                   valorImpostos: valorImpostosAtuais,
@@ -3092,9 +3948,9 @@ export class calcularSimplificadoUseCase{
                     custo: null
                   }
                 ]
-              }
+              }*/
 
-              respostaFinalCalculo.produtosAdquiridos.push(respServicoPrestadoAtual)              
+              respostaFinalCalculo.produtosAdquiridos.push(respProdutoAdquiridoAtual)              
 
               respostaFinalCalculo.totalCompras.comprasProdutos.valorAR += valorBase
               respostaFinalCalculo.totalCompras.comprasProdutos.impostosAR += valorImpostosAtuais

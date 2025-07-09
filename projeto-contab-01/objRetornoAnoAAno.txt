@@ -1,0 +1,1946 @@
+{
+    "servicosPrestados": [
+        {
+            "antesReforma": {
+                "valor": 1876,
+                "valorImpostos": 267.33000000000004,
+                "valorDesonerado": 1608.67,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 926.115392125,
+                    "valorImpostos": 68.61539212500001,
+                    "porcentagemCargaTributaria": 0.08001795000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 926.687216,
+                    "valorImpostos": 69.187216,
+                    "porcentagemCargaTributaria": 0.0806848,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 927.210934125,
+                    "valorImpostos": 69.71093412500001,
+                    "porcentagemCargaTributaria": 0.08129555000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 927.6865465,
+                    "valorImpostos": 70.1865465,
+                    "porcentagemCargaTributaria": 0.08185020000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 929.53,
+                    "valorImpostos": 72.03000000000002,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 2808.3740685000002,
+                    "valorImpostos": 235.87406850000002,
+                    "porcentagemCargaTributaria": 0.09169060000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 2814.948864,
+                    "valorImpostos": 242.44886400000001,
+                    "porcentagemCargaTributaria": 0.09424640000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 2821.3312365,
+                    "valorImpostos": 248.83123650000005,
+                    "porcentagemCargaTributaria": 0.09672740000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 2827.521186,
+                    "valorImpostos": 255.021186,
+                    "porcentagemCargaTributaria": 0.0991336,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2860.62,
+                    "valorImpostos": 288.12,
+                    "porcentagemCargaTributaria": 0.112,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1868.8345687550002,
+                    "valorImpostos": 260.16456875500006,
+                    "porcentagemCargaTributaria": 0.16172650000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1891.1781907200002,
+                    "valorImpostos": 282.50819072,
+                    "porcentagemCargaTributaria": 0.175616,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1913.220991395,
+                    "valorImpostos": 304.55099139500004,
+                    "porcentagemCargaTributaria": 0.18931850000000003,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1934.96297078,
+                    "valorImpostos": 326.29297078,
+                    "porcentagemCargaTributaria": 0.20283400000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2059.0976,
+                    "valorImpostos": 450.4276000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1876,
+                "valorImpostos": 267.33000000000004,
+                "valorDesonerado": 1608.67,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 926.115392125,
+                    "valorImpostos": 68.61539212500001,
+                    "porcentagemCargaTributaria": 0.08001795000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 926.687216,
+                    "valorImpostos": 69.187216,
+                    "porcentagemCargaTributaria": 0.0806848,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 927.210934125,
+                    "valorImpostos": 69.71093412500001,
+                    "porcentagemCargaTributaria": 0.08129555000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 927.6865465,
+                    "valorImpostos": 70.1865465,
+                    "porcentagemCargaTributaria": 0.08185020000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 929.53,
+                    "valorImpostos": 72.03000000000002,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 2808.3740685000002,
+                    "valorImpostos": 235.87406850000002,
+                    "porcentagemCargaTributaria": 0.09169060000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 2814.948864,
+                    "valorImpostos": 242.44886400000001,
+                    "porcentagemCargaTributaria": 0.09424640000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 2821.3312365,
+                    "valorImpostos": 248.83123650000005,
+                    "porcentagemCargaTributaria": 0.09672740000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 2827.521186,
+                    "valorImpostos": 255.021186,
+                    "porcentagemCargaTributaria": 0.0991336,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2860.62,
+                    "valorImpostos": 288.12,
+                    "porcentagemCargaTributaria": 0.112,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1868.8345687550002,
+                    "valorImpostos": 260.16456875500006,
+                    "porcentagemCargaTributaria": 0.16172650000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1891.1781907200002,
+                    "valorImpostos": 282.50819072,
+                    "porcentagemCargaTributaria": 0.175616,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1913.220991395,
+                    "valorImpostos": 304.55099139500004,
+                    "porcentagemCargaTributaria": 0.18931850000000003,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1934.96297078,
+                    "valorImpostos": 326.29297078,
+                    "porcentagemCargaTributaria": 0.20283400000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2059.0976,
+                    "valorImpostos": 450.4276000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1876,
+                "valorImpostos": 267.33000000000004,
+                "valorDesonerado": 1608.67,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 925.2746725425,
+                    "valorImpostos": 67.77467254250001,
+                    "porcentagemCargaTributaria": 0.07903751900000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 926.115392125,
+                    "valorImpostos": 68.61539212500001,
+                    "porcentagemCargaTributaria": 0.08001795000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 926.687216,
+                    "valorImpostos": 69.187216,
+                    "porcentagemCargaTributaria": 0.0806848,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 927.210934125,
+                    "valorImpostos": 69.71093412500001,
+                    "porcentagemCargaTributaria": 0.08129555000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 927.6865465,
+                    "valorImpostos": 70.1865465,
+                    "porcentagemCargaTributaria": 0.08185020000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 929.53,
+                    "valorImpostos": 72.03000000000002,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 2800.72369017,
+                    "valorImpostos": 228.22369017000003,
+                    "porcentagemCargaTributaria": 0.08871669200000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 2808.3740685000002,
+                    "valorImpostos": 235.87406850000002,
+                    "porcentagemCargaTributaria": 0.09169060000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 2814.948864,
+                    "valorImpostos": 242.44886400000001,
+                    "porcentagemCargaTributaria": 0.09424640000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 2821.3312365,
+                    "valorImpostos": 248.83123650000005,
+                    "porcentagemCargaTributaria": 0.09672740000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 2827.521186,
+                    "valorImpostos": 255.021186,
+                    "porcentagemCargaTributaria": 0.0991336,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2860.62,
+                    "valorImpostos": 288.12,
+                    "porcentagemCargaTributaria": 0.112,
+                    "custo": null
+                },
+                {
+                    "ano": "2027",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1844.8094522991,
+                    "valorImpostos": 236.13945229910001,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1868.8345687550002,
+                    "valorImpostos": 260.16456875500006,
+                    "porcentagemCargaTributaria": 0.16172650000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1891.1781907200002,
+                    "valorImpostos": 282.50819072,
+                    "porcentagemCargaTributaria": 0.175616,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1913.220991395,
+                    "valorImpostos": 304.55099139500004,
+                    "porcentagemCargaTributaria": 0.18931850000000003,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1934.96297078,
+                    "valorImpostos": 326.29297078,
+                    "porcentagemCargaTributaria": 0.20283400000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 2059.0976,
+                    "valorImpostos": 450.4276000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        }
+    ],
+    "servicosTomados": [
+        {
+            "antesReforma": {
+                "valor": 300,
+                "valorImpostos": 42.75000000000001,
+                "valorDesonerado": 257.25,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": 272.25
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 295.0121725425,
+                    "valorImpostos": 37.76217254250001,
+                    "porcentagemCargaTributaria": 0.14679173000000004,
+                    "custo": 271.2981986925
+                },
+                {
+                    "ano": "2028",
+                    "valor": 295.0121725425,
+                    "valorImpostos": 37.76217254250001,
+                    "porcentagemCargaTributaria": 0.14679173000000004,
+                    "custo": 271.2981986925
+                },
+                {
+                    "ano": "2029",
+                    "valor": 298.854142125,
+                    "valorImpostos": 41.60414212500001,
+                    "porcentagemCargaTributaria": 0.16172650000000005,
+                    "custo": 270.119317125
+                },
+                {
+                    "ano": "2030",
+                    "valor": 302.427216,
+                    "valorImpostos": 45.177216,
+                    "porcentagemCargaTributaria": 0.175616,
+                    "custo": 268.88181599999996
+                },
+                {
+                    "ano": "2031",
+                    "valor": 305.95218412500003,
+                    "valorImpostos": 48.702184125,
+                    "porcentagemCargaTributaria": 0.1893185,
+                    "custo": 267.59620912500003
+                },
+                {
+                    "ano": "2032",
+                    "valor": 309.4290465,
+                    "valorImpostos": 52.1790465,
+                    "porcentagemCargaTributaria": 0.202834,
+                    "custo": 266.2624965
+                },
+                {
+                    "ano": "2033",
+                    "valor": 329.28,
+                    "valorImpostos": 72.03,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 257.25
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 500,
+                "valorImpostos": 71.25000000000001,
+                "valorDesonerado": 428.75,
+                "porcentagemCargaTributaria": 0.16618075801749274,
+                "custo": 500
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 491.6869542375,
+                    "valorImpostos": 62.936954237500004,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": 452.1636644875
+                },
+                {
+                    "ano": "2028",
+                    "valor": 491.6869542375,
+                    "valorImpostos": 62.936954237500004,
+                    "porcentagemCargaTributaria": 0.14679173,
+                    "custo": 452.1636644875
+                },
+                {
+                    "ano": "2029",
+                    "valor": 498.090236875,
+                    "valorImpostos": 69.34023687500002,
+                    "porcentagemCargaTributaria": 0.16172650000000005,
+                    "custo": 450.19886187500003
+                },
+                {
+                    "ano": "2030",
+                    "valor": 504.04536,
+                    "valorImpostos": 75.29536000000002,
+                    "porcentagemCargaTributaria": 0.17561600000000005,
+                    "custo": 448.13636
+                },
+                {
+                    "ano": "2031",
+                    "valor": 509.920306875,
+                    "valorImpostos": 81.17030687500001,
+                    "porcentagemCargaTributaria": 0.18931850000000003,
+                    "custo": 445.993681875
+                },
+                {
+                    "ano": "2032",
+                    "valor": 515.7150775,
+                    "valorImpostos": 86.9650775,
+                    "porcentagemCargaTributaria": 0.20283400000000001,
+                    "custo": 443.7708275
+                },
+                {
+                    "ano": "2033",
+                    "valor": 548.8,
+                    "valorImpostos": 120.05000000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 428.74999999999994
+                }
+            ]
+        }
+    ],
+    "locacaoBensMoveis": [
+        {
+            "antesReforma": {
+                "valor": 200,
+                "valorImpostos": 6.6000000000000005,
+                "valorDesonerado": 193.4,
+                "porcentagemCargaTributaria": 0.03412616339193382,
+                "custo": 200
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 211.22811484000002,
+                    "valorImpostos": 17.82811484,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": 193.4
+                },
+                {
+                    "ano": "2028",
+                    "valor": 211.22811484000002,
+                    "valorImpostos": 17.82811484,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": 193.4
+                },
+                {
+                    "ano": "2029",
+                    "valor": 215.00278,
+                    "valorImpostos": 21.602780000000003,
+                    "porcentagemCargaTributaria": 0.11170000000000001,
+                    "custo": 193.4
+                },
+                {
+                    "ano": "2030",
+                    "valor": 218.61936,
+                    "valorImpostos": 25.219360000000005,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": 193.4
+                },
+                {
+                    "ano": "2031",
+                    "valor": 222.23594,
+                    "valorImpostos": 28.835940000000004,
+                    "porcentagemCargaTributaria": 0.1491,
+                    "custo": 193.4
+                },
+                {
+                    "ano": "2032",
+                    "valor": 225.85252000000003,
+                    "valorImpostos": 32.45252000000001,
+                    "porcentagemCargaTributaria": 0.16780000000000003,
+                    "custo": 193.40000000000003
+                },
+                {
+                    "ano": "2033",
+                    "valor": 247.55200000000002,
+                    "valorImpostos": 54.15200000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 193.4
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 300,
+                "valorImpostos": 27.75,
+                "valorDesonerado": 272.25,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 300
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 297.34671285,
+                    "valorImpostos": 25.096712850000003,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2028",
+                    "valor": 297.34671285,
+                    "valorImpostos": 25.096712850000003,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2029",
+                    "valor": 302.660325,
+                    "valorImpostos": 30.410325000000004,
+                    "porcentagemCargaTributaria": 0.11170000000000001,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2030",
+                    "valor": 307.7514,
+                    "valorImpostos": 35.501400000000004,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2031",
+                    "valor": 312.84247500000004,
+                    "valorImpostos": 40.59247500000001,
+                    "porcentagemCargaTributaria": 0.14910000000000004,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2032",
+                    "valor": 317.93355,
+                    "valorImpostos": 45.683550000000004,
+                    "porcentagemCargaTributaria": 0.1678,
+                    "custo": 272.25
+                },
+                {
+                    "ano": "2033",
+                    "valor": 348.48,
+                    "valorImpostos": 76.23,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 272.25
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 500,
+                "valorImpostos": 46.25,
+                "valorDesonerado": 453.75,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 495.57785475000003,
+                    "valorImpostos": 41.82785475000001,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 495.57785475000003,
+                    "valorImpostos": 41.82785475000001,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 504.433875,
+                    "valorImpostos": 50.683875,
+                    "porcentagemCargaTributaria": 0.11170000000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 512.919,
+                    "valorImpostos": 59.169000000000004,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 521.404125,
+                    "valorImpostos": 67.65412500000001,
+                    "porcentagemCargaTributaria": 0.1491,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 529.88925,
+                    "valorImpostos": 76.13925,
+                    "porcentagemCargaTributaria": 0.1678,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 580.8,
+                    "valorImpostos": 127.05,
+                    "porcentagemCargaTributaria": 0.27999999999999997,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 700,
+                "valorImpostos": 64.75,
+                "valorDesonerado": 635.25,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 693.80899665,
+                    "valorImpostos": 58.558996650000005,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 693.80899665,
+                    "valorImpostos": 58.558996650000005,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 706.2074250000001,
+                    "valorImpostos": 70.95742500000001,
+                    "porcentagemCargaTributaria": 0.11170000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 718.0866,
+                    "valorImpostos": 82.8366,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 729.965775,
+                    "valorImpostos": 94.71577500000001,
+                    "porcentagemCargaTributaria": 0.1491,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 741.84495,
+                    "valorImpostos": 106.59495000000001,
+                    "porcentagemCargaTributaria": 0.1678,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 813.12,
+                    "valorImpostos": 177.87,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        }
+    ],
+    "produtosVendidos": [
+        {
+            "antesReforma": {
+                "valor": 1111,
+                "valorImpostos": 44.44,
+                "valorDesonerado": 1066.56,
+                "porcentagemCargaTributaria": 0.041666666666666664,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 1164.8782738559999,
+                    "valorImpostos": 98.318273856,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1164.8782738559999,
+                    "valorImpostos": 98.318273856,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1185.6947519999999,
+                    "valorImpostos": 119.134752,
+                    "porcentagemCargaTributaria": 0.11170000000000001,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1205.639424,
+                    "valorImpostos": 139.07942400000002,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1225.584096,
+                    "valorImpostos": 159.024096,
+                    "porcentagemCargaTributaria": 0.14909999999999998,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1245.528768,
+                    "valorImpostos": 178.968768,
+                    "porcentagemCargaTributaria": 0.16780000000000003,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 1365.1968,
+                    "valorImpostos": 298.6368,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 222,
+                "valorImpostos": 22.200000000000003,
+                "valorDesonerado": 199.8,
+                "porcentagemCargaTributaria": 0.11111111111111112,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 207.63634356734696,
+                    "valorImpostos": 7.83634356734694,
+                    "porcentagemCargaTributaria": 0.03922093877551021,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 207.63634356734696,
+                    "valorImpostos": 7.83634356734694,
+                    "porcentagemCargaTributaria": 0.03922093877551021,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 208.00767006109982,
+                    "valorImpostos": 8.2076700610998,
+                    "porcentagemCargaTributaria": 0.04107942973523423,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 208.34429268292683,
+                    "valorImpostos": 8.54429268292683,
+                    "porcentagemCargaTributaria": 0.04276422764227643,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 208.67954969574038,
+                    "valorImpostos": 8.879549695740366,
+                    "porcentagemCargaTributaria": 0.0444421906693712,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 209.01344939271257,
+                    "valorImpostos": 9.213449392712551,
+                    "porcentagemCargaTributaria": 0.04611336032388664,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 210.98880000000003,
+                    "valorImpostos": 11.1888,
+                    "porcentagemCargaTributaria": 0.056,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 333,
+                "valorImpostos": 29.970000000000002,
+                "valorDesonerado": 303.03,
+                "porcentagemCargaTributaria": 0.09890109890109892,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 309.21428571428567,
+                    "valorImpostos": 6.184285714285714,
+                    "porcentagemCargaTributaria": 0.020408163265306124,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 309.21428571428567,
+                    "valorImpostos": 6.184285714285714,
+                    "porcentagemCargaTributaria": 0.020408163265306124,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 308.5845213849287,
+                    "valorImpostos": 5.554521384928717,
+                    "porcentagemCargaTributaria": 0.018329938900203666,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 307.9573170731707,
+                    "valorImpostos": 4.927317073170731,
+                    "porcentagemCargaTributaria": 0.016260162601626015,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 307.33265720081135,
+                    "valorImpostos": 4.302657200811359,
+                    "porcentagemCargaTributaria": 0.014198782961460446,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 306.7105263157894,
+                    "valorImpostos": 3.6805263157894736,
+                    "porcentagemCargaTributaria": 0.012145748987854251,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 303.03,
+                    "valorImpostos": 0,
+                    "porcentagemCargaTributaria": 0,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 350,
+                "valorImpostos": 28,
+                "valorDesonerado": 322,
+                "porcentagemCargaTributaria": 0.08695652173913043,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 340.686856,
+                    "valorImpostos": 18.686856,
+                    "porcentagemCargaTributaria": 0.05803371428571428,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 340.686856,
+                    "valorImpostos": 18.686856,
+                    "porcentagemCargaTributaria": 0.05803371428571428,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 342.55291242362523,
+                    "valorImpostos": 20.552912423625255,
+                    "porcentagemCargaTributaria": 0.06382892057026476,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 344.30439024390245,
+                    "valorImpostos": 22.30439024390244,
+                    "porcentagemCargaTributaria": 0.06926829268292684,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 346.0487626774848,
+                    "valorImpostos": 24.04876267748479,
+                    "porcentagemCargaTributaria": 0.07468559837728195,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 347.7860728744939,
+                    "valorImpostos": 25.786072874493925,
+                    "porcentagemCargaTributaria": 0.08008097165991902,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 358.064,
+                    "valorImpostos": 36.06400000000001,
+                    "porcentagemCargaTributaria": 0.11200000000000002,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 142,
+                "valorImpostos": 14.200000000000001,
+                "valorDesonerado": 127.8,
+                "porcentagemCargaTributaria": 0.11111111111111112,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 143.89787245360824,
+                    "valorImpostos": 16.09787245360825,
+                    "porcentagemCargaTributaria": 0.1259614432989691,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 143.89787245360824,
+                    "valorImpostos": 16.09787245360825,
+                    "porcentagemCargaTributaria": 0.1259614432989691,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 146.01773895169578,
+                    "valorImpostos": 18.217738951695786,
+                    "porcentagemCargaTributaria": 0.14254881808838643,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 148.01754098360655,
+                    "valorImpostos": 20.21754098360656,
+                    "porcentagemCargaTributaria": 0.15819672131147544,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 150.00508682328908,
+                    "valorImpostos": 22.205086823289072,
+                    "porcentagemCargaTributaria": 0.17374872318692544,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 151.98048879837066,
+                    "valorImpostos": 24.18048879837067,
+                    "porcentagemCargaTributaria": 0.18920570264765785,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 163.584,
+                    "valorImpostos": 35.784,
+                    "porcentagemCargaTributaria": 0.27999999999999997,
+                    "custo": null
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 554,
+                "valorImpostos": 49.86000000000001,
+                "valorDesonerado": 504.14,
+                "porcentagemCargaTributaria": 0.09890109890109891,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 561.8499346571429,
+                    "valorImpostos": 57.70993465714286,
+                    "porcentagemCargaTributaria": 0.11447204081632655,
+                    "custo": null
+                },
+                {
+                    "ano": "2028",
+                    "valor": 561.8499346571429,
+                    "valorImpostos": 57.70993465714286,
+                    "porcentagemCargaTributaria": 0.11447204081632655,
+                    "custo": null
+                },
+                {
+                    "ano": "2029",
+                    "valor": 570.7254969450101,
+                    "valorImpostos": 66.58549694501019,
+                    "porcentagemCargaTributaria": 0.13207739307535643,
+                    "custo": null
+                },
+                {
+                    "ano": "2030",
+                    "valor": 579.1461951219512,
+                    "valorImpostos": 75.00619512195122,
+                    "porcentagemCargaTributaria": 0.14878048780487807,
+                    "custo": null
+                },
+                {
+                    "ano": "2031",
+                    "valor": 587.5327322515213,
+                    "valorImpostos": 83.39273225152131,
+                    "porcentagemCargaTributaria": 0.16541582150101422,
+                    "custo": null
+                },
+                {
+                    "ano": "2032",
+                    "valor": 595.8853157894737,
+                    "valorImpostos": 91.7453157894737,
+                    "porcentagemCargaTributaria": 0.18198380566801622,
+                    "custo": null
+                },
+                {
+                    "ano": "2033",
+                    "valor": 645.2991999999999,
+                    "valorImpostos": 141.1592,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": null
+                }
+            ]
+        }
+    ],
+    "produtosAdquiridos": [
+        {
+            "antesReforma": {
+                "valor": 222,
+                "valorImpostos": 16.65,
+                "valorDesonerado": 205.35,
+                "porcentagemCargaTributaria": 0.08108108108108107,
+                "custo": 205.35
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 223.65743567647058,
+                    "valorImpostos": 18.30743567647059,
+                    "porcentagemCargaTributaria": 0.08915235294117647,
+                    "custo": 212.92187876399998
+                },
+                {
+                    "ano": "2028",
+                    "valor": 223.65743567647058,
+                    "valorImpostos": 18.30743567647059,
+                    "porcentagemCargaTributaria": 0.08915235294117647,
+                    "custo": 212.92187876399998
+                },
+                {
+                    "ano": "2029",
+                    "valor": 224.21095108695653,
+                    "valorImpostos": 18.860951086956522,
+                    "porcentagemCargaTributaria": 0.09184782608695652,
+                    "custo": 214.525038
+                },
+                {
+                    "ano": "2030",
+                    "valor": 224.68911813643928,
+                    "valorImpostos": 19.339118136439268,
+                    "porcentagemCargaTributaria": 0.09417637271214642,
+                    "custo": 216.061056
+                },
+                {
+                    "ano": "2031",
+                    "valor": 225.1625351821192,
+                    "valorImpostos": 19.812535182119206,
+                    "porcentagemCargaTributaria": 0.09648178807947021,
+                    "custo": 217.597074
+                },
+                {
+                    "ano": "2032",
+                    "valor": 225.6312726523888,
+                    "valorImpostos": 20.281272652388797,
+                    "porcentagemCargaTributaria": 0.09876441515650741,
+                    "custo": 219.13309199999998
+                },
+                {
+                    "ano": "2033",
+                    "valor": 228.3492,
+                    "valorImpostos": 22.999200000000002,
+                    "porcentagemCargaTributaria": 0.11200000000000002,
+                    "custo": 228.3492
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 111,
+                "valorImpostos": 4.0515,
+                "valorDesonerado": 106.9485,
+                "porcentagemCargaTributaria": 0.03788271925272444,
+                "custo": 106.9485
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 116.80729079609999,
+                    "valorImpostos": 9.858790796100001,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": 116.80729079609999
+                },
+                {
+                    "ano": "2028",
+                    "valor": 116.80729079609999,
+                    "valorImpostos": 9.858790796100001,
+                    "porcentagemCargaTributaria": 0.09218260000000002,
+                    "custo": 116.80729079609999
+                },
+                {
+                    "ano": "2029",
+                    "valor": 118.89464745,
+                    "valorImpostos": 11.946147450000002,
+                    "porcentagemCargaTributaria": 0.11170000000000002,
+                    "custo": 118.89464745
+                },
+                {
+                    "ano": "2030",
+                    "valor": 120.8945844,
+                    "valorImpostos": 13.946084400000002,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": 120.8945844
+                },
+                {
+                    "ano": "2031",
+                    "valor": 122.89452134999999,
+                    "valorImpostos": 15.94602135,
+                    "porcentagemCargaTributaria": 0.1491,
+                    "custo": 122.89452134999999
+                },
+                {
+                    "ano": "2032",
+                    "valor": 124.8944583,
+                    "valorImpostos": 17.9459583,
+                    "porcentagemCargaTributaria": 0.1678,
+                    "custo": 124.8944583
+                },
+                {
+                    "ano": "2033",
+                    "valor": 136.89408,
+                    "valorImpostos": 29.94558,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 136.89408
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 222,
+                "valorImpostos": 8.103,
+                "valorDesonerado": 213.897,
+                "porcentagemCargaTributaria": 0.03788271925272444,
+                "custo": 213.897
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 221.78403263688,
+                    "valorImpostos": 7.88703263688,
+                    "porcentagemCargaTributaria": 0.03687304,
+                    "custo": 221.78403263688
+                },
+                {
+                    "ano": "2028",
+                    "valor": 221.78403263688,
+                    "valorImpostos": 7.88703263688,
+                    "porcentagemCargaTributaria": 0.03687304,
+                    "custo": 221.78403263688
+                },
+                {
+                    "ano": "2029",
+                    "valor": 223.45391795999998,
+                    "valorImpostos": 9.556917960000002,
+                    "porcentagemCargaTributaria": 0.04468000000000001,
+                    "custo": 223.45391795999998
+                },
+                {
+                    "ano": "2030",
+                    "valor": 225.05386751999998,
+                    "valorImpostos": 11.15686752,
+                    "porcentagemCargaTributaria": 0.052160000000000005,
+                    "custo": 225.05386751999998
+                },
+                {
+                    "ano": "2031",
+                    "valor": 226.65381707999998,
+                    "valorImpostos": 12.756817080000001,
+                    "porcentagemCargaTributaria": 0.059640000000000006,
+                    "custo": 226.65381707999998
+                },
+                {
+                    "ano": "2032",
+                    "valor": 228.25376663999998,
+                    "valorImpostos": 14.35676664,
+                    "porcentagemCargaTributaria": 0.06712,
+                    "custo": 228.25376663999998
+                },
+                {
+                    "ano": "2033",
+                    "valor": 237.853464,
+                    "valorImpostos": 23.956464000000004,
+                    "porcentagemCargaTributaria": 0.11200000000000002,
+                    "custo": 237.853464
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 200,
+                "valorImpostos": 18.5,
+                "valorDesonerado": 181.5,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 200
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 198.2311419,
+                    "valorImpostos": 16.7311419,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": 198.2311419
+                },
+                {
+                    "ano": "2028",
+                    "valor": 198.2311419,
+                    "valorImpostos": 16.7311419,
+                    "porcentagemCargaTributaria": 0.0921826,
+                    "custo": 198.2311419
+                },
+                {
+                    "ano": "2029",
+                    "valor": 201.77355,
+                    "valorImpostos": 20.273550000000004,
+                    "porcentagemCargaTributaria": 0.11170000000000002,
+                    "custo": 201.77355
+                },
+                {
+                    "ano": "2030",
+                    "valor": 205.1676,
+                    "valorImpostos": 23.667600000000004,
+                    "porcentagemCargaTributaria": 0.13040000000000002,
+                    "custo": 205.1676
+                },
+                {
+                    "ano": "2031",
+                    "valor": 208.56165000000001,
+                    "valorImpostos": 27.061650000000004,
+                    "porcentagemCargaTributaria": 0.1491,
+                    "custo": 208.56165000000001
+                },
+                {
+                    "ano": "2032",
+                    "valor": 211.9557,
+                    "valorImpostos": 30.455700000000007,
+                    "porcentagemCargaTributaria": 0.16780000000000003,
+                    "custo": 211.9557
+                },
+                {
+                    "ano": "2033",
+                    "valor": 232.32,
+                    "valorImpostos": 50.82000000000001,
+                    "porcentagemCargaTributaria": 0.28,
+                    "custo": 232.32
+                }
+            ]
+        }
+    ],
+    "locacaoBensImoveis": [
+        {
+            "antesReforma": {
+                "valor": 800,
+                "valorImpostos": 29.2,
+                "valorDesonerado": 770.8,
+                "porcentagemCargaTributaria": 0.03788271925272444,
+                "custo": 800
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 775.523436424,
+                    "valorImpostos": 4.723436423999999,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2028",
+                    "valor": 775.523436424,
+                    "valorImpostos": 4.723436423999999,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2029",
+                    "valor": 776.523508,
+                    "valorImpostos": 5.723508,
+                    "porcentagemCargaTributaria": 0.033510000000000005,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2030",
+                    "valor": 777.4816959999999,
+                    "valorImpostos": 6.681696,
+                    "porcentagemCargaTributaria": 0.03912000000000001,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2031",
+                    "valor": 778.439884,
+                    "valorImpostos": 7.639884,
+                    "porcentagemCargaTributaria": 0.04473000000000001,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2032",
+                    "valor": 779.398072,
+                    "valorImpostos": 8.598071999999998,
+                    "porcentagemCargaTributaria": 0.05034,
+                    "custo": 770.8
+                },
+                {
+                    "ano": "2033",
+                    "valor": 785.1472,
+                    "valorImpostos": 14.3472,
+                    "porcentagemCargaTributaria": 0.08400000000000003,
+                    "custo": 770.8
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 500,
+                "valorImpostos": 46.25,
+                "valorDesonerado": 453.75,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": 453.75
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 466.298356425,
+                    "valorImpostos": 12.548356425,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 466.298356425
+                },
+                {
+                    "ano": "2028",
+                    "valor": 466.298356425,
+                    "valorImpostos": 12.548356425,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 466.298356425
+                },
+                {
+                    "ano": "2029",
+                    "valor": 468.95516250000003,
+                    "valorImpostos": 15.205162500000004,
+                    "porcentagemCargaTributaria": 0.033510000000000005,
+                    "custo": 468.95516250000003
+                },
+                {
+                    "ano": "2030",
+                    "valor": 471.5007,
+                    "valorImpostos": 17.750700000000002,
+                    "porcentagemCargaTributaria": 0.03912,
+                    "custo": 471.5007
+                },
+                {
+                    "ano": "2031",
+                    "valor": 474.0462375,
+                    "valorImpostos": 20.296237500000004,
+                    "porcentagemCargaTributaria": 0.044730000000000006,
+                    "custo": 474.0462375
+                },
+                {
+                    "ano": "2032",
+                    "valor": 476.591775,
+                    "valorImpostos": 22.841775000000005,
+                    "porcentagemCargaTributaria": 0.05034000000000001,
+                    "custo": 476.591775
+                },
+                {
+                    "ano": "2033",
+                    "valor": 491.865,
+                    "valorImpostos": 38.11500000000001,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": 491.865
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1300,
+                "valorImpostos": 120.25,
+                "valorDesonerado": 1179.75,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 1212.375726705,
+                    "valorImpostos": 32.625726705000005,
+                    "porcentagemCargaTributaria": 0.027654780000000004,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1212.375726705,
+                    "valorImpostos": 32.625726705000005,
+                    "porcentagemCargaTributaria": 0.027654780000000004,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1219.2834225,
+                    "valorImpostos": 39.53342250000001,
+                    "porcentagemCargaTributaria": 0.033510000000000005,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1225.90182,
+                    "valorImpostos": 46.15182000000001,
+                    "porcentagemCargaTributaria": 0.03912000000000001,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1232.5202175,
+                    "valorImpostos": 52.770217500000015,
+                    "porcentagemCargaTributaria": 0.04473000000000001,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1239.138615,
+                    "valorImpostos": 59.38861500000001,
+                    "porcentagemCargaTributaria": 0.05034000000000001,
+                    "custo": 1179.75
+                },
+                {
+                    "ano": "2033",
+                    "valor": 1278.849,
+                    "valorImpostos": 99.09900000000002,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": 1179.75
+                }
+            ]
+        },
+        {
+            "antesReforma": {
+                "valor": 1600,
+                "valorImpostos": 148,
+                "valorDesonerado": 1452,
+                "porcentagemCargaTributaria": 0.10192837465564739,
+                "custo": null
+            },
+            "depoisReforma": [
+                {
+                    "ano": "2027",
+                    "valor": 1475.56187256,
+                    "valorImpostos": 23.56187256,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 1475.56187256
+                },
+                {
+                    "ano": "2028",
+                    "valor": 1475.56187256,
+                    "valorImpostos": 23.56187256,
+                    "porcentagemCargaTributaria": 0.02765478,
+                    "custo": 1475.56187256
+                },
+                {
+                    "ano": "2029",
+                    "valor": 1480.55052,
+                    "valorImpostos": 28.55052000000001,
+                    "porcentagemCargaTributaria": 0.03351000000000001,
+                    "custo": 1480.55052
+                },
+                {
+                    "ano": "2030",
+                    "valor": 1485.33024,
+                    "valorImpostos": 33.33024000000001,
+                    "porcentagemCargaTributaria": 0.03912000000000001,
+                    "custo": 1485.33024
+                },
+                {
+                    "ano": "2031",
+                    "valor": 1490.10996,
+                    "valorImpostos": 38.109960000000015,
+                    "porcentagemCargaTributaria": 0.04473000000000002,
+                    "custo": 1490.10996
+                },
+                {
+                    "ano": "2032",
+                    "valor": 1494.88968,
+                    "valorImpostos": 42.88968000000001,
+                    "porcentagemCargaTributaria": 0.05034000000000002,
+                    "custo": 1494.88968
+                },
+                {
+                    "ano": "2033",
+                    "valor": 1523.568,
+                    "valorImpostos": 71.56800000000001,
+                    "porcentagemCargaTributaria": 0.08400000000000002,
+                    "custo": 1523.568
+                }
+            ]
+        }
+    ],
+    "compraVendaBensImoveis": [
+        {
+            "antesReforma": {
+                "valor": 20000,
+                "valorImpostos": 92500,
+                "valorDesonerado": -72500,
+                "porcentagemCargaTributaria": -1.2758620689655173,
+                "custo": null
+            },
+            "depoisReforma": []
+        },
+        {
+            "antesReforma": {
+                "valor": 25000,
+                "valorImpostos": 120250,
+                "valorDesonerado": -95250,
+                "porcentagemCargaTributaria": -1.26246719160105,
+                "custo": null
+            },
+            "depoisReforma": []
+        }
+    ],
+    "totalCompras": {
+        "comprasProdutos": {
+            "valorAR": 755,
+            "impostosAR": 47.3045,
+            "valorDesonerado": 707.6955,
+            "creditoAR": 28.804500000000004,
+            "custoAR": 726.1955,
+            "porcentagemCustoEfetivoAR": 0.961848344370861,
+            "porcentagemCargaTributariaAR": 0.06684301369727516,
+            "valorDR": 835.4167440000001,
+            "impostosDR": 127.72124400000003,
+            "creditoDR": 0,
+            "custoDR": 0,
+            "porcentagemCustoEfetivoDR": 0,
+            "porcentagemCargaTributariaDR": 0.18047485677102654
+        },
+        "servicosTomados": {
+            "valorAR": 800,
+            "impostosAR": 114.00000000000003,
+            "valorDesonerado": 686,
+            "creditoAR": 27.75,
+            "custoAR": 772.25,
+            "porcentagemCargaTributariaAR": 0.16618075801749274,
+            "porcentagemCustoEfetivoAR": 0.9653125,
+            "valorDR": 878.0799999999999,
+            "impostosDR": 192.08,
+            "creditoDR": 192.08,
+            "custoDR": 686,
+            "porcentagemCustoEfetivoDR": 0.7812500000000001,
+            "porcentagemCargaTributariaDR": 0.28
+        },
+        "locacaoMoveis": {
+            "valorAR": 500,
+            "impostosAR": 34.35,
+            "valorDesonerado": 465.65,
+            "creditoAR": 0,
+            "custoAR": 500,
+            "porcentagemCargaTributariaAR": 0.07376785139052937,
+            "porcentagemCustoEfetivoAR": 1,
+            "valorDR": 596.032,
+            "impostosDR": 130.382,
+            "creditoDR": 130.382,
+            "custoDR": 465.65,
+            "porcentagemCustoEfetivoDR": 0.7812499999999999,
+            "porcentagemCargaTributariaDR": 0.28
+        },
+        "locacaoImoveis": {
+            "valorAR": 1300,
+            "impostosAR": 75.45,
+            "valorDesonerado": 1224.55,
+            "creditoAR": 46.25,
+            "custoAR": 1253.75,
+            "porcentagemCargaTributariaAR": 0.061614470621861095,
+            "porcentagemCustoEfetivoAR": 0.9644230769230769,
+            "valorDR": 1277.0122000000001,
+            "impostosDR": 52.46220000000001,
+            "creditoDR": 52.46220000000001,
+            "custoDR": 1224.55,
+            "porcentagemCustoEfetivoDR": 0.6035964260952243,
+            "porcentagemCargaTributariaDR": 0.04284202360050632
+        },
+        "total": {
+            "valorAR": 3355,
+            "impostosAR": 271.10450000000003,
+            "valorDesonerado": 3083.8954999999996,
+            "creditoAR": 102.8045,
+            "custoAR": 3252.1955,
+            "porcentagemCargaTributariaAR": 0.06684301369727516,
+            "porcentagemCustoEfetivoAR": 0.961848344370861,
+            "valorDR": 3586.5409440000003,
+            "impostosDR": 502.645444,
+            "creditoDR": 374.92420000000004,
+            "custoDR": 2376.2,
+            "porcentagemCustoEfetivoDR": 0,
+            "porcentagemCargaTributariaDR": 0.18047485677102654
+        }
+    },
+    "totalVendas": {
+        "vendasProdutos": {
+            "valorAR": 2712,
+            "impostosAR": 188.67000000000002,
+            "valorDesonerado": 2523.33,
+            "porcentagemCargaTributariaAR": 0.07477024408222468,
+            "valorDR": 3219.81798,
+            "impostosDR": 696.48798,
+            "porcentagemCargaTributariaDR": 0.2760193791537373
+        },
+        "servicosPrestados": {
+            "valorAR": 5876,
+            "impostosAR": 837.3300000000002,
+            "valorDesonerado": 5038.67,
+            "porcentagemCargaTributariaAR": 0.16618075801749274,
+            "valorDR": 5849.2476,
+            "impostosDR": 810.5776000000001,
+            "porcentagemCargaTributariaDR": 0.1608713410483322
+        },
+        "locacaoMoveis": {
+            "valorAR": 1200,
+            "impostosAR": 111,
+            "valorDesonerado": 1089,
+            "porcentagemCargaTributariaAR": 0.10192837465564739,
+            "valorDR": 1393.92,
+            "impostosDR": 304.92,
+            "porcentagemCargaTributariaDR": 0.28
+        },
+        "locacaoImoveis": {
+            "valorAR": 2900,
+            "impostosAR": 268.25,
+            "valorDesonerado": 2631.75,
+            "porcentagemCargaTributariaAR": 0.10192837465564739,
+            "valorDR": 2802.417,
+            "impostosDR": 170.66700000000003,
+            "porcentagemCargaTributariaDR": 0.06484924479908807
+        },
+        "total": {
+            "valorAR": 12688,
+            "impostosAR": 1405.2500000000002,
+            "valorDesonerado": 11282.749999999998,
+            "porcentagemCargaTributariaAR": 0.07477024408222468,
+            "valorDR": 13265.40258,
+            "impostosDR": 1982.6525800000002,
+            "porcentagemCargaTributariaDR": 0.2760193791537373
+        }
+    },
+    "dre": {
+        "receitaBruta": {
+            "AR": 25376,
+            "DR": 22565.5,
+            "diferencaReais": -2810.5,
+            "diferencaPercentual": -0.11075425598991173
+        },
+        "deducoesTributos": {
+            "AR": 2604.8910000000005,
+            "DR": 0,
+            "diferencaReais": -2604.8910000000005,
+            "diferencaPercentual": -1
+        },
+        "custoGeral": {
+            "AR": 620.8454999999999,
+            "DR": 272.25,
+            "diferencaReais": -348.5954999999999,
+            "diferencaPercentual": -0.5614851037818587
+        },
+        "lucroBruto": {
+            "AR": 22150.2635,
+            "DR": 22293.25,
+            "diferencaReais": 142.98649999999907,
+            "diferencaPercentual": 0.006455295667250146
+        },
+        "despesas": {
+            "AR": 2631.35,
+            "DR": 2103.95,
+            "diferencaReais": -527.4000000000001,
+            "diferencaPercentual": -0.20042943736105046
+        },
+        "lucrosAntesIrCs": {
+            "AR": 19518.913500000002,
+            "DR": 20189.3,
+            "diferencaReais": 670.3864999999969,
+            "diferencaPercentual": 0.034345482395830934
+        },
+        "irCs": {
+            "AR": 4684.53924,
+            "DR": 4864.362,
+            "diferencaReais": 179.82276000000002,
+            "diferencaPercentual": 0.03838643477773494
+        },
+        "lucroLiquido": {
+            "AR": 14834.374260000002,
+            "DR": 15324.937999999998,
+            "diferencaReais": 490.56373999999596,
+            "diferencaPercentual": 0.033069392169966454
+        }
+    },
+    "caixa": {
+        "fornecedores": {
+            "AR": 6710,
+            "DR": 7173.081888000001,
+            "diferencaReais": 463.0818880000006,
+            "diferencaPercentual": 0.06901369418777953
+        },
+        "tributosCredito": {
+            "AR": 205.609,
+            "DR": 749.8484000000001,
+            "diferencaReais": 544.2394,
+            "diferencaPercentual": 2.646962924774694
+        },
+        "clientes": {
+            "AR": 25376,
+            "DR": 26530.805159999996,
+            "diferencaReais": 1154.8051599999962,
+            "diferencaPercentual": 0.045507769546027595
+        },
+        "tributosDebito": {
+            "AR": 2810.5000000000005,
+            "DR": 3965.30516,
+            "diferencaReais": 1154.8051599999994,
+            "diferencaPercentual": 0.41088957836683837
+        },
+        "tributosRecolhidos": {
+            "AR": 2604.8910000000005,
+            "DR": 3215.45676,
+            "diferencaReais": 610.5657599999995,
+            "diferencaPercentual": 0.23439205709567093
+        },
+        "saldoCredor": {
+            "AR": 0,
+            "DR": 0,
+            "diferencaReais": 0,
+            "diferencaPercentual": 0
+        },
+        "resultado": {
+            "AR": 16061.109,
+            "DR": 16142.266511999995,
+            "diferencaReais": 81.15751199999431,
+            "diferencaPercentual": 0.005053045340766588
+        },
+        "irCs": {
+            "AR": 4684.53924,
+            "DR": 4864.362,
+            "diferencaReais": 179.82276000000002,
+            "diferencaPercentual": 0.03838643477773494
+        },
+        "resultadoPosIrCs": {
+            "AR": 11376.56976,
+            "DR": 11277.904511999994,
+            "diferencaReais": -98.66524800000661,
+            "diferencaPercentual": -0.008672671119805677
+        },
+        "resultadoSobreClientes": {
+            "AR": 0.6329251655107188,
+            "DR": 0.6084348520389947,
+            "diferencaReais": -0.024490313471724034,
+            "diferencaPercentual": -0.03869385324876814
+        }
+    }
+}

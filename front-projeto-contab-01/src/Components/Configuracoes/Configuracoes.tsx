@@ -79,7 +79,12 @@ export function Configuracoes(){
 
     return (
         <div className="fixed top-0 left-0 h-screen w-screen bg-black/90 flex justify-center items-center [font-family:'Manrope',sans-serif]">
-            <div className=" flex flex-col w-1/2 h-[90vh] rounded-md bg-[#101222] border-2 border-solid border-[#3a4475] relative p-4">
+            <div className=" flex flex-col w-1/2 h-[90vh]  rounded-2xl
+                border border-[#ffffff22]
+                ring-1 ring-[#FFDD00]/30
+                shadow-[0_0_40px_#FFDD0055]
+                bg-[radial-gradient(ellipse_90%_55%_at_50%_-15%,_#695c0095,_rgb(18,18,18)_80%)]
+                backdrop-blur-2xl relative p-4">
                 <div className="flex justify-end h-6 ">
                     <div onClick={fecharConfig} className="w-6 h-6 cursor-pointer">
                         <img className="w-full h-full object-cover" src={xisConfig} alt="fechar"/>
@@ -89,7 +94,7 @@ export function Configuracoes(){
                 <div className="flex w-full flex-1">
                     <div className="w-1/5 h-[90vh]">
                         {
-                            opcoesConfig.map(item => <div onClick={(e) => {escolheuOpcao(e)}} className={`p-2 text-sm text-white rounded-md cursor-pointer ${item.ativo ? "bg-[#0B2580]" : "hover:bg-[#181C2F]"}`}>{item.nome}</div>)
+                            opcoesConfig.map(item => <div onClick={(e) => {escolheuOpcao(e)}} className={`p-2 text-sm text-white rounded-md cursor-pointer ${item.ativo ? "bg-[#46410a]" : "hover:bg-[#2f2d18]"}`}>{item.nome}</div>)
                         }
                     </div>
                     <div className="w-full h-[90vh] pt-4 pl-4">

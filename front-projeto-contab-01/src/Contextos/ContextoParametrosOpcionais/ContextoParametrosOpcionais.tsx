@@ -40,14 +40,14 @@ const objInicialSimplesNacional: objAreas = {
 const objInicialLucroReal: objAreas = {
         industrial: {icms: null, ipi: null, iss: "0", pisCo: "9,25"},
         servicos: {icms: null, ipi: null, iss: "5", pisCo: "9,25"},
-        comercial: {icms: null, ipi: null, iss: "0", pisCo: "9,25"},
+        comercial: {icms: "19,5", ipi: null, iss: null, pisCo: "9,25"},
         locacao: {icms: null, ipi: null, iss: null, pisCo: "9,25"},
     }
 
 const objInicialLucroPresumido: objAreas = {
         industrial: {icms: null, ipi: null, iss: "0", pisCo: "3,65"},
         servicos: {icms: null, ipi: null, iss: "5", pisCo: "3,65"},
-        comercial: {icms: null, ipi: null, iss: "0", pisCo: "3,65"},
+        comercial: {icms: "19,5", ipi: null, iss: null, pisCo: "3,65"},
         locacao: {icms: null, ipi: null, iss: null, pisCo: "3,65"},
     }
 

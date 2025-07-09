@@ -33,16 +33,16 @@ export function PaginaInicial(){
 
 
     useGSAP(() => {
-        let textAnimation1 = gsap.timeline();
+        let textAnimation1 = gsap.timeline()
         textAnimation1.from('.text1', {
          y: 100,
-        });
+        })
 
-        let textAnimation2 = gsap.timeline();
+        let textAnimation2 = gsap.timeline()
         textAnimation2.from('.text2', {
             delay: 0.3,
          y: 100,
-        });
+        })
 
     }) 
 

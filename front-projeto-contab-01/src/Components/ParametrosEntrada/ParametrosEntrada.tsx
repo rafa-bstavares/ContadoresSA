@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext } from "react"
+import { ChangeEvent, useContext, useEffect } from "react"
 import { ContextoParametrosOpcionais, objAliquotas, objAreas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 
 
@@ -200,6 +200,13 @@ export function ParametrosEntrada(){
         }
 
     }
+
+    useEffect(() => {
+        console.log("Lucro Presumido")
+        console.log(tabelaLucroPresumido)
+        console.log("Lucro Real")
+        console.log(tabelaLucroReal)
+    }, [tabelaLucroPresumido, tabelaLucroReal])
 
     return (
         <div className="flex flex-col gap-6 overflow-y-scroll h-[80vh]">

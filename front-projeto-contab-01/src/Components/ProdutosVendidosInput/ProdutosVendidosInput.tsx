@@ -334,7 +334,7 @@ export function ProdutosVendidosInput(){
                 icmsDifal: Number(icmsDifal.replace(",", ".")),
                 ipi: ipi ? Number(ipi.replace(",", ".")) : 0,
                 ncm: ncmGenerico ? "" : ncmAdd,
-                pisCofins: icms ? Number(icms.replace(",", ".")) : 0,
+                pisCofins: pisCofins ? Number(pisCofins.replace(",", ".")) : 0,
                 valorOperacao: Number(valorOperacaoAdd),
                 beneficio: 0,
                 manterBeneficio: true,
