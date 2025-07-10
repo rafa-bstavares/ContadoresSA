@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { ContextoResultadoSimulador, tabelaCaixaType, tabelaDreType, totalComprasType, totalVendasType } from "../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador"
+import { ContextoResultadoSimulador, objRegimeType, objRespostaFinalType, regimesChavesObjType, regimesType, tabelaCaixaType, tabelaDreType, totalComprasType, totalVendasType, valorInicialobjRegime } from "../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import xisLogo from "../../assets/images/priceTaxIsotipo.png"
 import setaFina from "../../assets/images/setaFina.png"
@@ -7,6 +7,12 @@ import { IndicadorColorido } from "../IndicadorColorido/IndicadorColorido"
 
 
 export function ResultadoSimulador(){
+
+    const [objRegimeAtual, setObjRegimeAtual] = useState<objRegimeType>(valorInicialobjRegime)
+    const [regimeAtual, setRegimeAtual] = useState<regimesType>("Simples Nacional")
+    const [regimeAtualAberto, setRegimeAtualAberto] = useState<boolean>(false)
+
+    const arrRegimes: ("Simples Nacional" | "Lucro Real" | "Lucro Presumido")[] = ["Simples Nacional", "Lucro Real", "Lucro Presumido"]
 
     const controleDropTabelasInicial = {
         caixa: true,
@@ -75,10 +81,20 @@ export function ResultadoSimulador(){
 
     }
 
+    function trocarDropRegimeAtual(){
+        setRegimeAtualAberto(!regimeAtualAberto)
+    }
 
-    // const {objResultado} = useContext(ContextoResultadoSimulador)
+    function escolherRegimeAtual(item: regimesType){
+        setRegimeAtual(item)
+        trocarDropRegimeAtual()
+    }
 
-    const objResultado = {
+
+    const {objResultado} = useContext(ContextoResultadoSimulador)
+
+    /*
+    const objRegimeExemplo = {
     "servicosPrestados": [
         {
             "antesReforma": {
@@ -781,6 +797,47 @@ export function ResultadoSimulador(){
     }
 }
 
+    const objResultado: objRespostaFinalType = {
+        simplesNacional: objRegimeExemplo,
+        lucroPresumido: objRegimeExemplo,
+        lucroReal: objRegimeExemplo,
+        cnpj: "04200700000180",
+        meuRegime: "Simples Nacional"
+    }
+
+    */
+
+
+    useEffect(() => {
+
+        let meuRegimeChave: regimesChavesObjType = "simplesNacional"
+
+        switch(regimeAtual){
+            case "Simples Nacional":
+                meuRegimeChave = "simplesNacional"
+                break
+
+            case "Lucro Presumido":
+                meuRegimeChave = "lucroPresumido"
+                break
+
+            case "Lucro Real":
+                meuRegimeChave = "lucroReal"
+                break
+
+            default:
+                meuRegimeChave = "simplesNacional"
+        }
+
+        setObjRegimeAtual(objResultado[meuRegimeChave])
+
+    }, [regimeAtual])
+
+
+    useEffect(() => {
+        setRegimeAtual(objResultado.meuRegime)
+    }, [objResultado])
+
 /*
     const valorVendaAR = Object.values(objResultado.totalVendas).reduce((soma, area) => {
         return soma + area.valorAR;
@@ -884,10 +941,10 @@ export function ResultadoSimulador(){
     }
     */
 
-    const arrPropriedadesCaixa = Object.entries(objResultado.caixa)
-    const diferencaCustoCompras = objResultado.totalCompras.total.custoDR - objResultado.totalCompras.total.custoAR
-    const diferencaVendas = objResultado.totalVendas.total.valorDR - objResultado.totalVendas.total.valorAR
-    const representacaoPaupavel = objResultado.caixa.resultadoSobreClientes.diferencaPercentual * objResultado.caixa.clientes.AR
+    const arrPropriedadesCaixa = Object.entries(objRegimeAtual.caixa)
+    const diferencaCustoCompras = objRegimeAtual.totalCompras.total.custoDR - objRegimeAtual.totalCompras.total.custoAR
+    const diferencaVendas = objRegimeAtual.totalVendas.total.valorDR - objRegimeAtual.totalVendas.total.valorAR
+    const representacaoPaupavel = objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual * objRegimeAtual.caixa.clientes.AR
 
     
     
@@ -904,7 +961,7 @@ export function ResultadoSimulador(){
 
     useEffect(() => {
         console.log("Resultado de dentro da tela de resultadooo")
-        console.log(objResultado)
+        console.log(objRegimeAtual)
     }, [])
 
     return (
@@ -928,6 +985,52 @@ export function ResultadoSimulador(){
                     <span className="text-8xl text-center flex items-end gap-4">O <img className="w-30 h-auto align-bottom inline" src={xisLogo} alt="Xis LogoTipo Pricetx" /> da Questão</span>
                 </div>
 
+                {/* DROP REGIMES */}
+                <div className="flex flex-col max-w-[400px]">
+                    <label className="text-gray-400 w-[10vw]">Mude o regime:</label>
+                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                        <div
+                        onClick={trocarDropRegimeAtual}
+                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
+                        >
+                            <div className=" opacity-50">
+                                {regimeAtual}
+                            </div>
+                            <div
+                                className={`
+                                ${regimeAtualAberto ? "rotate-180" : "rotate-0"}
+                                transition-all ease-linear duration-500
+                                `}
+                            >
+                                <img
+                                src={setaSeletor}
+                                alt="seta-seletor"
+                                className="w-4 h-4"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                        className={`
+                            ${regimeAtualAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                            [transition:grid-template-rows_500ms]
+                        `}
+                        >
+                        <div className="overflow-hidden">
+                            {arrRegimes.map(item => (
+                            <div
+                                key={item}
+                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                onClick={() => escolherRegimeAtual(item)}
+                            >
+                                {item}
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 {/* DRE */}    
                 <div className="flex flex-col gap-8 items-center">
@@ -935,13 +1038,13 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">DRE - Demonstração de Resultado do Exercício</span>
                         <div className="flex items-start gap-2 ">
                             <div className="flex items-center mt-[20px] ">
-                                <IndicadorColorido cor={`${objResultado.dre.lucroLiquido.diferencaReais > 0 ? "verde" : "vermelho"}`}/>
+                                <IndicadorColorido cor={`${objRegimeAtual.dre.lucroLiquido.diferencaReais > 0 ? "verde" : "vermelho"}`}/>
                             </div>
                             {
-                                objResultado.dre.lucroLiquido.diferencaReais > 0 ?
-                                <span className="">Seu Lucro Líquido aumentou em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, isso significa que você pode trabalhar o preço de venda em <span className="text-4xl textoGradiente">{Math.abs(objResultado.dre.lucroLiquido.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> para buscar mais competitividade e manter um preço equilibrado até o fim da cadeia (consumidor final)</span>
+                                objRegimeAtual.dre.lucroLiquido.diferencaReais > 0 ?
+                                <span className="">Seu Lucro Líquido aumentou em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, isso significa que você pode trabalhar o preço de venda em <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> para buscar mais competitividade e manter um preço equilibrado até o fim da cadeia (consumidor final)</span>
                                 :
-                                <span>A queda de <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> no Lucro Líquido exige ação: renegocie com fornecedores ou ajuste seus preços para manter a lucratividade</span>
+                                <span>A queda de <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> no Lucro Líquido exige ação: renegocie com fornecedores ou ajuste seus preços para manter a lucratividade</span>
                             }
                         </div>
                     </div>
@@ -958,7 +1061,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.dre ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objResultado.dre).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(objRegimeAtual.dre).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {
@@ -994,15 +1097,15 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">Impactos no Fluxo de Caixa</span>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em] ">
-                                <IndicadorColorido cor={`${objResultado.caixa.resultado.diferencaReais > 0? "verde" : "vermelho"}`}/>
+                                <IndicadorColorido cor={`${objRegimeAtual.caixa.resultado.diferencaReais > 0? "verde" : "vermelho"}`}/>
                             </div>
-                            <span>Seu caixa {objResultado.caixa.resultado.diferencaReais > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objResultado.caixa.resultado.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.resultado.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {objResultado.caixa.resultado.diferencaReais > 0? "positivo" : "negativo"} no resultado.</span>
+                            <span>Seu caixa {objRegimeAtual.caixa.resultado.diferencaReais > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.caixa.resultado.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.resultado.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {objRegimeAtual.caixa.resultado.diferencaReais > 0? "positivo" : "negativo"} no resultado.</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
-                                <IndicadorColorido cor={`${objResultado.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
+                                <IndicadorColorido cor={`${objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
                             </div>
-                            <span>Sua capacidade de gerar caixa {objResultado.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.resultadoSobreClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
+                            <span>Sua capacidade de gerar caixa {objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -1065,15 +1168,15 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">Impacto nas Compras</span>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
-                                <IndicadorColorido cor={`${objResultado.caixa.fornecedores.diferencaReais > 0 ? "vermelho" : "verde"}`}/>
+                                <IndicadorColorido cor={`${objRegimeAtual.caixa.fornecedores.diferencaReais > 0 ? "vermelho" : "verde"}`}/>
                             </div>
-                            <span>O preço de compra sofreu {objResultado.caixa.fornecedores.diferencaReais > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(objResultado.caixa.fornecedores.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(objResultado.caixa.fornecedores.diferencaReais / (objResultado.caixa.fornecedores.AR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <span>O preço de compra sofreu {objRegimeAtual.caixa.fornecedores.diferencaReais > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(objRegimeAtual.caixa.fornecedores.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.fornecedores.diferencaReais / (objRegimeAtual.caixa.fornecedores.AR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
                                 <IndicadorColorido cor={`${diferencaCustoCompras > 0 ? "vermelho" : "verde"}`}/>
                             </div>
-                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / objResultado.totalCompras.total.custoAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
+                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / objRegimeAtual.totalCompras.total.custoAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -1089,7 +1192,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.compras ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objResultado.totalCompras).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(objRegimeAtual.totalCompras).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {
@@ -1144,7 +1247,7 @@ export function ResultadoSimulador(){
                             <div className="flex items-center mt-[0.3em]">
                                 <IndicadorColorido cor={`${diferencaVendas > 0 ? "vermelho" : "verde"}`} />
                             </div>
-                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (objResultado.caixa.clientes.AR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (objRegimeAtual.caixa.clientes.AR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <span>
                             {
@@ -1168,7 +1271,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.vendas ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objResultado.totalVendas).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(objRegimeAtual.totalVendas).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {

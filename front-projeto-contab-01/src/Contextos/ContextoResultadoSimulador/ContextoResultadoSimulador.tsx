@@ -95,7 +95,7 @@ antesReforma: objAntesReforma,
 depoisReforma: objDepoisReforma[]
 }      
 
-export type objRespostaFinalType = {
+export type objRegimeType = {
     servicosPrestados: objItemFinal[],
     servicosTomados: objItemFinal[],
     locacaoBensMoveis: objItemFinal[],
@@ -109,12 +109,24 @@ export type objRespostaFinalType = {
     caixa: tabelaCaixaType
 }
 
+export type regimesType = "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "Pessoa Física" | ""
+
+export type regimesChavesObjType = "simplesNacional" | "lucroReal" | "lucroPresumido"
+
+export type objRespostaFinalType = {
+  simplesNacional: objRegimeType,
+  lucroReal: objRegimeType,
+  lucroPresumido: objRegimeType,
+  meuRegime: regimesType,
+  cnpj: string
+}
+
 type TiposContextoResultadoSimulador = {       
     objResultado: objRespostaFinalType
     setObjResultado: Dispatch<SetStateAction<objRespostaFinalType>>
 }
 
-const valorInicialResultadoSimulador = {
+export const valorInicialobjRegime = {
               servicosPrestados: [],
               servicosTomados: [],
               locacaoBensMoveis: [],
@@ -269,6 +281,14 @@ const valorInicialResultadoSimulador = {
                 resultadoSobreClientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
               }
           }  
+
+  const valorInicialResultadoSimulador: objRespostaFinalType = {
+    simplesNacional: valorInicialobjRegime,
+    lucroReal: valorInicialobjRegime,
+    lucroPresumido: valorInicialobjRegime,
+    cnpj: "",
+    meuRegime: "Simples Nacional"
+  }
 
 export const ContextoResultadoSimulador = createContext<TiposContextoResultadoSimulador>({
     objResultado: valorInicialResultadoSimulador,
