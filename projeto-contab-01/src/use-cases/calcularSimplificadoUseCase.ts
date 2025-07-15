@@ -742,30 +742,48 @@ export class calcularSimplificadoUseCase{
                 ]
 
 
+          type anosType = "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033"
+
+          const arrAnos: anosType[] = ["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]
+
+          type objAreaComprasTransicaoType = {
+                ano: anosType
+                valor: number,
+                impostos: number,
+                credito: number,
+                custo: number,
+                porcentagemCustoEfetivo: number,
+                porcentagemCargaTributaria: number
+          }
+
           type objAreaComprasType = {
-              valorAR: number,
-              impostosAR: number,
-              valorDesonerado: number,
-              creditoAR: number, 
-              custoAR: number,
-              porcentagemCustoEfetivoAR: number,
-              porcentagemCargaTributariaAR: number,
-              valorDR: number,
-              impostosDR: number,
-              creditoDR: number,
-              custoDR: number,
-              porcentagemCustoEfetivoDR: number,
-              porcentagemCargaTributariaDR: number,
+              antesReforma: {
+                valorAR: number,
+                impostosAR: number,
+                valorDesonerado: number,
+                creditoAR: number, 
+                custoAR: number,
+                porcentagemCustoEfetivoAR: number,
+                porcentagemCargaTributariaAR: number
+              },
+              depoisReforma: objAreaComprasTransicaoType[]
+          }
+
+          type objAreaVendasTransicaoType = {
+                ano: anosType
+                valor: number,
+                impostos: number,
+                porcentagemCargaTributaria: number
           }
 
           type objAreaVendasType = {
-              valorAR: number,
-              impostosAR: number,
-              valorDesonerado: number,
-              porcentagemCargaTributariaAR: number,
-              valorDR: number,
-              impostosDR: number,
-              porcentagemCargaTributariaDR: number,
+              antesReforma: {
+                valorAR: number,
+                impostosAR: number,
+                valorDesonerado: number,
+                porcentagemCargaTributariaAR: number
+              },
+              depoisReforma: objAreaVendasTransicaoType[]
           }
 
           type totalComprasType = {
@@ -799,7 +817,7 @@ export class calcularSimplificadoUseCase{
           } 
           
           type objDepoisReforma = {
-             ano: string,
+             ano: anosType,
              valor: number,
              valorImpostos: number,
              porcentagemCargaTributaria: number,
@@ -810,8 +828,18 @@ export class calcularSimplificadoUseCase{
             antesReforma: objAntesReforma,
             depoisReforma: objDepoisReforma[]
           }    
+
+          type objDepoisReformaDreCaixa = {
+            ano: anosType,
+            valor: number
+          }
           
-          type linhaArDrDiferencas = {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number}
+          type linhaArDrDiferencas = {
+            antesReforma: {
+              valor: number
+            },
+            depoisReforma: objDepoisReformaDreCaixa[]
+          } 
 
           type tabelaDreType = {
             receitaBruta: linhaArDrDiferencas,
@@ -861,149 +889,224 @@ export class calcularSimplificadoUseCase{
               compraVendaBensImoveis: [],
               totalCompras: {
                   comprasProdutos: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    creditoDR: 0,
-                    custoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   servicosTomados: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    creditoDR: 0,
-                    custoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoMoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    creditoDR: 0,
-                    custoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoImoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    creditoDR: 0,
-                    custoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   total: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    creditoDR: 0,
-                    custoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
               },
               totalVendas: {
                   vendasProdutos: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   servicosPrestados: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoMoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoImoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   total: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
               },
               dre: {
-                receitaBruta: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                deducoesTributos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                custoGeral: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucroBruto: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                despesas: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucrosAntesIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucroLiquido: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                receitaBruta: {antesReforma: {valor: 0}, depoisReforma: []},
+                deducoesTributos: {antesReforma: {valor: 0}, depoisReforma: []},
+                custoGeral: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucroBruto: {antesReforma: {valor: 0}, depoisReforma: []},
+                despesas: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucrosAntesIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucroLiquido: {antesReforma: {valor: 0}, depoisReforma: []}
               },
               caixa: {
-                fornecedores: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosCredito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                clientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosDebito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosRecolhidos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                saldoCredor: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultado: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultadoPosIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultadoSobreClientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                fornecedores: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosCredito: {antesReforma: {valor: 0}, depoisReforma: []},
+                clientes: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosDebito: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosRecolhidos: {antesReforma: {valor: 0}, depoisReforma: []},
+                saldoCredor: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultado: {antesReforma: {valor: 0}, depoisReforma: []},
+                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultadoPosIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultadoSobreClientes: {antesReforma: {valor: 0}, depoisReforma: []}
               }
           }    
           
@@ -1065,9 +1168,27 @@ export class calcularSimplificadoUseCase{
               }
 
               let dreCustoGeralAR = 0
-              let dreCustoGeralDR = 0
+              let dreCustoGeralTransicao = [
+                {ano: "2026", custoGeralAnoVigente: 0},
+                {ano: "2027", custoGeralAnoVigente: 0},
+                {ano: "2028", custoGeralAnoVigente: 0},
+                {ano: "2029", custoGeralAnoVigente: 0},
+                {ano: "2030", custoGeralAnoVigente: 0},
+                {ano: "2031", custoGeralAnoVigente: 0},
+                {ano: "2032", custoGeralAnoVigente: 0},
+                {ano: "2033", custoGeralAnoVigente: 0},
+              ]
               let dreDespesasAR = 0
-              let dreDespesasDR = 0
+              let dreDespesasTransicao = [
+                {ano: "2026", despesaAnoVigente: 0},
+                {ano: "2027", despesaAnoVigente: 0},
+                {ano: "2028", despesaAnoVigente: 0},
+                {ano: "2029", despesaAnoVigente: 0},
+                {ano: "2030", despesaAnoVigente: 0},
+                {ano: "2031", despesaAnoVigente: 0},
+                {ano: "2032", despesaAnoVigente: 0},
+                {ano: "2033", despesaAnoVigente: 0},
+              ]
               let valorImpostosPermanecerTotal = 0
 
 
@@ -1272,6 +1393,19 @@ export class calcularSimplificadoUseCase{
                                       }
                                       respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
 
+                                      const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                                      const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                                      if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                                        objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                                        objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                                        objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoMensalDesonerado
+
+                                        objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                                        objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                                        objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoMensalDesonerado
+                                      }
+
                                     }
                                   })
             
@@ -1396,22 +1530,16 @@ export class calcularSimplificadoUseCase{
                         respostaFinalCalculo[chaveRegimeObjFinal].servicosPrestados.push(respServicoPrestadoAtual)
 
                         // Somar para tabela vendas
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorAR += faturamentoMensalServico
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado += faturamentoMensalDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDR += valorMensalServicoAposReforma
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado   
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR += faturamentoMensalServico
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado += faturamentoMensalDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
                         
                         // Completando linha total
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += faturamentoMensalServico
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += faturamentoMensalDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += valorMensalServicoAposReforma
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado        
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += faturamentoMensalServico
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += faturamentoMensalDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
 
                     })
                   }else if(regimeAtual == 'Lucro Presumido'){
@@ -1504,6 +1632,19 @@ export class calcularSimplificadoUseCase{
                           }
                           respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
 
+                          const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                          const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                          if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                            objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
+
+                            objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
+                          }
+
                         }
                       })
 
@@ -1561,22 +1702,16 @@ export class calcularSimplificadoUseCase{
             
                         respostaFinalCalculo[chaveRegimeObjFinal].servicosPrestados.push(respServicoPrestadoAtual)
 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorAR += faturamentoMensalAtividade
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado += faturamentoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDR += novoValorServiço
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado      
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR += faturamentoMensalAtividade
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado += faturamentoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado   
 
 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += faturamentoMensalAtividade
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += faturamentoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += novoValorServiço
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado 
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += faturamentoMensalAtividade
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += faturamentoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
                     })
                     
 
@@ -1674,6 +1809,19 @@ export class calcularSimplificadoUseCase{
                           }
                           respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
 
+                          const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                          const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                          if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                            objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
+
+                            objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
+                          }
+
                         }
                       })
 
@@ -1727,21 +1875,15 @@ export class calcularSimplificadoUseCase{
 
                         respostaFinalCalculo[chaveRegimeObjFinal].servicosPrestados.push(respServicoPrestadoAtual)
 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorAR += faturamentoMensalAtividade
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado += faturamentoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDR += novoValorServiço
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado     
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR += faturamentoMensalAtividade
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado += faturamentoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
                         
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += faturamentoMensalAtividade
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += faturamentoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += novoValorServiço
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado  
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += faturamentoMensalAtividade
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += faturamentoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
 
 
                     })
@@ -1876,6 +2018,7 @@ export class calcularSimplificadoUseCase{
                         // ANÁLISE DR
 
                         anoAano.forEach(objAno => {
+                            let custoAnoVigente = 0
                             if(objAno.ano == "2026"){
 
                             }else{
@@ -1926,7 +2069,7 @@ export class calcularSimplificadoUseCase{
                               const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                               const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
                               const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
-                              const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                              custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
 
                               const objAnoVigente: objDepoisReforma = {
                                   ano: objAno.ano,
@@ -1936,7 +2079,39 @@ export class calcularSimplificadoUseCase{
                                   custo: custoAnoVigente
                               }
                               respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                                const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                                const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                                if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                                  objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteCompras[0].credito += creditoAnoVigente
+                                  objAnoVigenteCompras[0].custo += custoAnoVigente
+                                  objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+
+                                  objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                                  objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                                  objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+                                }
+
                             }
+
+                              if(atividade.compoeCusto){
+                                const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objCustoGeralAtual){
+                                  objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                                }
+                              }else{
+                                const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objDespesaAtual){
+                                  objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                                }
+                              }
 
                         })
 
@@ -2094,6 +2269,7 @@ export class calcularSimplificadoUseCase{
                             // ANÁLISE DR
 
                             anoAano.forEach(objAno => {
+                              let custoAnoVigente = 0
                               if(objAno.ano == "2026"){
 
                               }else{
@@ -2144,7 +2320,7 @@ export class calcularSimplificadoUseCase{
                                 const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                                 const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
-                                const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                                custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
 
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
@@ -2154,8 +2330,41 @@ export class calcularSimplificadoUseCase{
                                     custo: custoAnoVigente
                                 }
                                 respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                                const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                                const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                                if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                                  objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteCompras[0].credito += creditoAnoVigente
+                                  objAnoVigenteCompras[0].custo += custoAnoVigente
+                                  objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+
+                                  objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                                  objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                                  objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+                                }
+
+
+
                               }
 
+                              if(atividade.compoeCusto){
+                                const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objCustoGeralAtual){
+                                  objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                                }
+                              }else{
+                                const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objDespesaAtual){
+                                  objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                                }
+                              }
 
                             })
 
@@ -2272,6 +2481,8 @@ export class calcularSimplificadoUseCase{
                             // ANÁLISE DR
 
                             anoAano.forEach(objAno => {
+                              let custoAnoVigente = 0
+
                               if(objAno.ano == '2026'){
 
                               }else{
@@ -2322,7 +2533,7 @@ export class calcularSimplificadoUseCase{
                                 const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                                 const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
-                                const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+                                custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
                                     valor: novoValorAnoVigente,
@@ -2331,7 +2542,41 @@ export class calcularSimplificadoUseCase{
                                     custo: custoAnoVigente
                                 }
                                 respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                                const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                                const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                                if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                                  objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteCompras[0].credito += creditoAnoVigente
+                                  objAnoVigenteCompras[0].custo += custoAnoVigente
+                                  objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+
+                                  objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                                  objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                                  objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
+                                }
+                        
                               }
+
+                              if(atividade.compoeCusto){
+                                const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objCustoGeralAtual){
+                                  objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                                }
+                              }else{
+                                const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                if(objDespesaAtual){
+                                  objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                                }
+                              }
+
+
                             })
 
                           
@@ -2407,34 +2652,23 @@ export class calcularSimplificadoUseCase{
 
                         respostaFinalCalculo[chaveRegimeObjFinal].servicosTomados.push(respServicoTomadoAtual)
 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorAR += valorServicoAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDesonerado += valorServicoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.creditoAR += creditoAR 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoAR += custoAR 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosAR /  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDR += valorMensalServicoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.creditoDR += creditoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoDR += custoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorAR += valorServicoAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorDesonerado += valorServicoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.creditoAR += creditoAR 
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.custoAR += custoAR 
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.impostosAR /  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorDesonerado
+
 
                         // preenchendo total
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorAR += valorServicoAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDesonerado += valorServicoDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoAR += creditoAR 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoAR += custoAR 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosAR /  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDR += valorMensalServicoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoDR += creditoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoDR += custoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR += valorServicoAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorDesonerado += valorServicoDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR += creditoAR 
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR += custoAR 
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.impostosAR /  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorDesonerado
 
 
                         if(atividade.compoeCusto){
@@ -2446,10 +2680,8 @@ export class calcularSimplificadoUseCase{
                           console.log("ATIVIDADE COM CUSTO")
                           console.log(atividade)
                           dreCustoGeralAR += custoAR
-                          dreCustoGeralDR += custoDR
                         }else{
                           dreDespesasAR += custoAR
-                          dreDespesasDR += custoDR
                         }
 
                   })
@@ -2718,6 +2950,53 @@ export class calcularSimplificadoUseCase{
                             }
                             respImovelLocacaoAtual.depoisReforma.push(objAnoVigente)
 
+                            if(imovel.tipoAluguel == "Aluguel pago"){
+                                const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                                const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                                if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                                  objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteCompras[0].credito += creditoAnoVigente
+                                  objAnoVigenteCompras[0].custo += custoAnoVigente
+                                  objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+
+                                  objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                                  objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                                  objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                                  objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                                  objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+                                }
+
+                                if(imovel.compoeCusto){
+                                  const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                  if(objCustoGeralAtual){
+                                    objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                                  }
+                                }else{
+                                  const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                                  if(objDespesaAtual){
+                                    objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                                  }
+                                }
+                            }else if(imovel.tipoAluguel == "Aluguel recebido"){
+                              const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                              const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                              if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                                objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                                objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                                objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+
+                                objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                                objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                                objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+                              }
+                            }
+                    
+
                         }
 
                       }
@@ -2883,64 +3162,44 @@ export class calcularSimplificadoUseCase{
                         respostaFinalCalculo[chaveRegimeObjFinal].locacaoBensImoveis.push(respImovelLocacaoAtual)
 
                         if(imovel.tipoAluguel == "Aluguel pago"){
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorAR += valorBase
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosAR += valorImpostosAtuais
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDesonerado += valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.creditoAR += creditoAtual
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoAR += custoAtual
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorAR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDR += valorFinalSimu1
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosDR += valorNovosTributos
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.creditoDR += creditoDR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoDR += custoDR
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorAR += valorBase
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.impostosAR += valorImpostosAtuais
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorDesonerado += valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.creditoAR += creditoAtual
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.custoAR += custoAtual
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorAR
 
                           // preenchendo total
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorAR += valorBase
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosAR += valorImpostosAtuais
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDesonerado += valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoAR += creditoAtual
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoAR += custoAtual
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorAR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDR += valorFinalSimu1
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosDR += valorNovosTributos
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoDR += creditoDR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.valorDR
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoDR += custoDR
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR += valorBase
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.impostosAR += valorImpostosAtuais
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorDesonerado += valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR += creditoAtual
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR += custoAtual
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorAR
+
 
                           if(imovel.compoeCusto){
                             console.log("imovel COM CUSTO")
                             console.log(imovel)
                             dreCustoGeralAR += custoAtual
-                            dreCustoGeralDR += custoDR
                           }else{
                             dreDespesasAR += custoAtual
-                            dreDespesasDR += custoDR
                           }
 
                         }else if(imovel.tipoAluguel == "Aluguel recebido"){
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorAR += valorBase
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosAR += valorImpostosAtuais
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado += valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado 
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDR += valorFinalSimu1
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosDR += valorNovosTributos
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorAR += valorBase
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.impostosAR += valorImpostosAtuais
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado += valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado 
 
                           // preenchendo total
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += valorBase
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += valorDesonerado
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado 
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += valorFinalSimu1
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += valorNovosTributos
-                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += valorBase
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += valorDesonerado
+                          respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado 
                         }
-
 
                   })
               }
@@ -3381,6 +3640,54 @@ export class calcularSimplificadoUseCase{
                         }
                         respMoveisLocacaoAtual.depoisReforma.push(objAnoVigente)
 
+                        if(movel.tipoAluguel == "Aluguel pago"){
+                          const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                          const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                          if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                            objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                            objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteCompras[0].credito += creditoAnoVigente
+                            objAnoVigenteCompras[0].custo += custoAnoVigente
+                            objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                            objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+
+                            objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                            objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                            objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                            objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+                          }
+
+                            if(movel.compoeCusto){
+                              const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                              if(objCustoGeralAtual){
+                                objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                              }
+                            }else{
+                              const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                              if(objDespesaAtual){
+                                objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                              }
+                            }
+                  
+                        }else if(movel.tipoAluguel == "Aluguel recebido"){
+                          const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                          const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                          if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                            objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+
+                            objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+                          }
+                        }
+                
+
                     })
 
                     let baseIva = valorDesonerado
@@ -3426,62 +3733,42 @@ export class calcularSimplificadoUseCase{
 
 
                     if(movel.tipoAluguel == "Aluguel pago"){
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorAR += valorBase
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDesonerado += valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.creditoAR += creditoAtual
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoAR += custoAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDR += novoValorTotal
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDesonerado 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.creditoDR += creditoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoDR += custoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorAR += valorBase
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorDesonerado += valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.creditoAR += creditoAtual
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.custoAR += custoAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorAR
 
                         //preenchendo total
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorAR += valorBase
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDesonerado += valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoAR += creditoAtual
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoAR += custoAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorAR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDR += novoValorTotal
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDesonerado 
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoDR += creditoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoDR += custoDR
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.valorDR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR += valorBase
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorDesonerado += valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR += creditoAtual
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR += custoAR
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorAR
 
                         if(movel.compoeCusto){
                           console.log("Movel COM CUSTO")
                           console.log(movel)
                           dreCustoGeralAR += custoAR
-                          dreCustoGeralDR += custoDR
                         }else{
                           dreDespesasAR += custoAR
-                          dreDespesasDR += custoDR
                         }
 
                     }else if(movel.tipoAluguel == "Aluguel recebido"){
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorAR += valorBase
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado += valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDR += novoValorTotal
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorAR += valorBase
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado += valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado
 
                         //preenchendo total
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += valorBase
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += novoValorTotal
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += valorImpostosNovos
-                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += valorBase
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += valorDesonerado
+                        respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado
                     }
 
                   })
@@ -3625,6 +3912,8 @@ export class calcularSimplificadoUseCase{
                       }   
                     }else if(produtoVendido.tipoOperacao == "Revenda" || produtoVendido.tipoOperacao == "Revenda - Consumidor final fora do Estado"){
                       // Buscar dados no anexo I
+
+                      console.log("rbt12: " + rbt12)
                       const dadosAnexo = anexos.find(elem => elem.anexo == "I")
                       const faixaIndex = dadosAnexo?.tabela1.findIndex(elem => {
                           return rbt12 > elem.rbt12[0] && rbt12 < elem.rbt12[1]
@@ -3677,6 +3966,10 @@ export class calcularSimplificadoUseCase{
 
                             const aliquotaEfetivaDesonerada = aliquotaEfetiva * porcentagemTributosExcluir
 
+                            console.log("Regime Atual: " + regimeAtual)
+                            console.log("aliquotaEfetiva: " + aliquotaEfetiva)
+                            console.log("porcentagemTributosExcluir: " + porcentagemTributosExcluir)
+
                             valorImpostosAtuais = (valorBase * aliquotaEfetivaDesonerada)
 
                             console.log("aliquota a desonerar: " + aliquotaEfetivaDesonerada)
@@ -3694,13 +3987,37 @@ export class calcularSimplificadoUseCase{
 
 
 
-                  }else{
-                    // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
-                    const aliquotaDesonerar = (produtoVendido.icms / 100) + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100) + (produtoVendido.ipi / 100)
-                    console.log("aliquota a desonerar: " + aliquotaDesonerar)
-
+                  }else if(regimeAtual == "Lucro Real"){
+                    let aliquotaDesonerar = 0
+                    if(meuRegime == "Lucro Real"){
+                      // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
+                      icms = (produtoVendido.icms / 100)
+                      ipi = (produtoVendido.ipi / 100)
+                      aliquotaDesonerar = icms + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100) 
+                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                    }else{
+                      const tabelaLucroReal = parametrosEntrada.tabelaLucroReal
+                      icms = (tabelaLucroReal.comercial.icms ? (tabelaLucroReal.comercial.icms / 100) : 0)
+                      ipi = (tabelaLucroReal.comercial.ipi ? (tabelaLucroReal.comercial.ipi / 100) : 0)
+                      aliquotaDesonerar = icms + ipi + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100)
+                    }
                     valorImpostosAtuais = valorBase * aliquotaDesonerar
 
+                  }else if(regimeAtual == "Lucro Presumido"){
+                    let aliquotaDesonerar = 0
+                    if(meuRegime == "Lucro Presumido"){
+                      // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
+                      icms = (produtoVendido.icms / 100)
+                      ipi = (produtoVendido.ipi / 100)
+                      aliquotaDesonerar = icms + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100) 
+                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                    }else{
+                      const tabelaLucroPresumido = parametrosEntrada.tabelaLucroPresumido
+                      icms = (tabelaLucroPresumido.comercial.icms ? (tabelaLucroPresumido.comercial.icms / 100) : 0)
+                      ipi = (tabelaLucroPresumido.comercial.ipi ? (tabelaLucroPresumido.comercial.ipi / 100) : 0)
+                      aliquotaDesonerar = icms + ipi + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100)
+                    }
+                    valorImpostosAtuais = valorBase * aliquotaDesonerar
                   }
 
                   console.log("valor dos impostos atuais (antes da reforma): " + valorImpostosAtuais)
@@ -3755,6 +4072,19 @@ export class calcularSimplificadoUseCase{
                           custo: null
                       }
                       respProdutosVendidosAtual.depoisReforma.push(objAnoVigente)
+
+                      const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                      const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                      if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
+                        objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                        objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                        objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+
+                        objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                        objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
+                        objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
+                      }
 
                   })
 
@@ -3816,22 +4146,16 @@ export class calcularSimplificadoUseCase{
                   console.log("arr do Simples Nacional SEMPRE")
                   console.log(respostaFinalCalculo.simplesNacional.produtosVendidos)
 
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorAR += valorBase
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDR += novoValorProduto
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosDR += novosImpostos
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado    
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorAR += valorBase
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
                   
                   // preenchendo total
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorAR += valorBase
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.valorDR += novoValorProduto
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.impostosDR += novosImpostos
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado 
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += valorBase
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
 
                 })
 
@@ -3970,6 +4294,37 @@ export class calcularSimplificadoUseCase{
                       }
                       respProdutoAdquiridoAtual.depoisReforma.push(objAnoVigente)
 
+                      const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+                      const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
+
+                      if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
+                        objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                        objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
+                        objAnoVigenteCompras[0].credito += creditoAnoVigente
+                        objAnoVigenteCompras[0].custo += custoAnoVigente
+                        objAnoVigenteCompras[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                        objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+
+                        objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                        objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
+                        objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
+                        objAnoVigenteComprasTotal[0].custo += custoAnoVigente
+                        objAnoVigenteComprasTotal[0].porcentagemCustoEfetivo = objAnoVigenteCompras[0].custo / objAnoVigenteCompras[0].valor
+                        objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
+                      }
+
+                      if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
+                        const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                        if(objCustoGeralAtual){
+                          objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                        }
+                      }else{
+                        const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                        if(objDespesaAtual){
+                          objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                        }
+                      }
+
                   })
 
 
@@ -4026,37 +4381,27 @@ export class calcularSimplificadoUseCase{
 
                   respostaFinalCalculo[chaveRegimeObjFinal].produtosAdquiridos.push(respProdutoAdquiridoAtual)              
 
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorAR += valorBase
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.creditoAR += creditoAtual
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.custoAR += custoAR
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorAR
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDR += novoValorProduto
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosDR += novosImpostos
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDR
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorAR += valorBase
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.creditoAR += creditoAtual
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.custoAR += custoAR
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorAR
 
                   // preencher total
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorAR += valorBase
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosAR += valorImpostosAtuais
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDesonerado += valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.creditoAR += creditoAtual
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.custoAR += custoAR
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorAR
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.valorDR += novoValorProduto
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.impostosDR += novosImpostos
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCargaTributariaDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.impostosDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDesonerado
-                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.porcentagemCustoEfetivoDR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.custoDR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.valorDR
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR += valorBase
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.impostosAR += valorImpostosAtuais
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorDesonerado += valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorDesonerado
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR += creditoAtual
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR += custoAR
+                  respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorAR
 
                   if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
                     dreCustoGeralAR += custoAR
-                    dreCustoGeralDR += 0
                   }else{
                     dreDespesasAR += custoAR
-                    dreDespesasDR += 0
                   }
           
 
@@ -4067,93 +4412,54 @@ export class calcularSimplificadoUseCase{
 
               // No final de tudo realizo a soma de colunas para fazer a tabela da DRE
               
-              // TABELA CAIXA
+              // TABELAS ANTES DA REFORMA (AR)
                 
+                // ***** TABELA CAIXA AR *****
+                  const tabelaCaixa = respostaFinalCalculo[chaveRegimeObjFinal].caixa
                   // Fornecedores
-                  // o SLICE é pra não pegar a linha de TOTAIS
-              const valorCompraAR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalCompras).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.valorAR;
-              }, 0)
+                //preenchendo fornecedoresAR
+              tabelaCaixa.fornecedores.antesReforma.valor = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR  
               
-              const valorCompraDR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalCompras).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.valorDR;
-              }, 0)
-
-              const diferencaCompras = valorCompraDR - valorCompraAR
-
                   // Tributos Crédito
-              const tributosCreditoAR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalCompras).slice(0, -1).reduce((soma, area) => {
-                return soma + area.creditoAR
-              }, 0) 
-
-              const tributosCreditoDR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalCompras).slice(0, -1).reduce((soma, area) => {
-                return soma + area.creditoDR
-              }, 0) 
-
-              const diferencaTributosCredito = tributosCreditoDR - tributosCreditoAR
+              const tributosCreditoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR
+              tabelaCaixa.tributosCredito.antesReforma.valor = tributosCreditoAR
 
                   // Clientes
-              const valorVendaAR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalVendas).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.valorAR;
-              }, 0)
-            
-              const valorVendaDR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalVendas).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.valorDR;
-              }, 0)
-
-              const diferencaVendas = valorVendaDR - valorVendaAR
+              const valorVendaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR
+              tabelaCaixa.clientes.antesReforma.valor = valorVendaAR
 
                   // Tributos Débito
-              const tributosDebitoAR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalVendas).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.impostosAR
-              }, 0) 
+              const tributosDebitoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR
+              tabelaCaixa.tributosDebito.antesReforma.valor = tributosDebitoAR
 
-              let tributosDebitoDR = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalVendas).slice(0, -1).reduce((soma, area) => {
-                return soma + area.impostosDR
-              }, 0)
+                
 
-
-              // TABELA DRE
+                // ***** TABELA DRE AR *****
 
                   // Receita Bruta
-              const valorVendaDesonerado = Object.values(respostaFinalCalculo[chaveRegimeObjFinal].totalVendas).slice(0, -1).reduce((soma, area) => {
-                  return soma + area.valorDesonerado;
-              }, 0)
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.receitaBruta.antesReforma.valor = valorVendaAR
 
-              const diferencaReceitaBruta = valorVendaDesonerado - valorVendaAR
-
-                // Deduções Tributos
+                  // Deduções Tributos
               let deducoesTributosAR = 0
-              let deducoesTributosDR = 0
-
               if(regimeAtual == "Simples Nacional"){
                   deducoesTributosAR = valorImpostosPermanecerTotal + tributosDebitoAR // tributosDébitoAR é a soma de todos os impostos excluídos das operções de VENDA
-                  deducoesTributosDR = valorImpostosPermanecerTotal
               }else if(regimeAtual == "Lucro Presumido" || regimeAtual == "Lucro Real"){
                   deducoesTributosAR = tributosDebitoAR - tributosCreditoAR
-                  deducoesTributosDR = 0
               }
 
-              const diferencaDeducoesTributos = deducoesTributosDR - deducoesTributosAR
-
-              
                   // Custo Geral
-              const diferencaReaisCustoDre = dreCustoGeralDR - dreCustoGeralAR
-              const diferencaReaisDespesasDre = dreDespesasDR - dreDespesasAR
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.custoGeral.antesReforma.valor = dreCustoGeralAR
 
                   // Lucro Bruto
               const lucroBrutoAR = valorVendaAR - deducoesTributosAR - dreCustoGeralAR
-              const lucroBrutoDR = valorVendaDesonerado - deducoesTributosDR - dreCustoGeralDR
-              const diferencaLucroBruto = lucroBrutoDR - lucroBrutoAR
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.lucroBruto.antesReforma.valor = lucroBrutoAR
 
-                  // Lucro Antes IR/CS (Lucro Antes IR/CS = Receita Bruta - Deduções Tributos - Custo Mercadoria - Despesas)
+                // Lucro Antes IRCS
               const lucroAntesIrCsAR = valorVendaAR - deducoesTributosAR - dreCustoGeralAR - dreDespesasAR
-              const lucroAntesIrCsDR = valorVendaDesonerado - deducoesTributosDR - dreCustoGeralDR - dreDespesasDR
-              const diferencaLucroAntesIrCs = lucroAntesIrCsDR - lucroAntesIrCsAR
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.lucrosAntesIrCs.antesReforma.valor = lucroAntesIrCsAR
 
-                  // IR/CS
+                // IR/CS
               let irCsAR = 0
-              let irCsDR = 0
                   
               if(regimeAtual == "Lucro Real"){
                   // AR
@@ -4167,31 +4473,20 @@ export class calcularSimplificadoUseCase{
                     irCsAR = 0
                   }
 
-                  // DR
-                  if(lucroAntesIrCsDR > 0){
-                    const valor1 = lucroAntesIrCsDR * 0.24
-                    const adicional = lucroAntesIrCsDR > 20000 ? (lucroAntesIrCsDR - 20000) * 0.1 : 0
-
-                    irCsDR = valor1 + adicional
-
-                  }else{
-                    irCsDR = 0
-                  }
-
               }else if(regimeAtual == "Lucro Presumido"){
-                  const valorTotalServicosPrestadosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorAR
-                  const valorDesoneradoServicosPrestados = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.valorDesonerado
+                  const valorTotalServicosPrestadosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR
+                  const valorDesoneradoServicosPrestados = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
 
-                  const valorTotalLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorAR
-                  const valorTotalLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorAR
+                  const valorTotalLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorAR
+                  const valorTotalLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorAR
                   const valorTotalLocacaoAR = valorTotalLocacaoImoveisAR + valorTotalLocacaoMoveisAR
 
-                  const valorDesoneradoLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.valorDesonerado
-                  const valorDesoneradoLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.valorDesonerado
+                  const valorDesoneradoLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado
+                  const valorDesoneradoLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado
                   const valorDesoneradoLocacaoAR = valorDesoneradoLocacaoImoveisAR + valorDesoneradoLocacaoMoveisAR
 
-                  const valorTotalProdutosVendidosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorAR
-                  const valorDesoneradoProdutosVendidos = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.valorDesonerado
+                  const valorTotalProdutosVendidosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorAR
+                  const valorDesoneradoProdutosVendidos = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
 
                   const arrCalculoIrCs: {valorAR: number, valorDesonerado: number, aliquota: number, aliquotaIrpjCsll: number}[] = [
                     {valorAR: valorTotalServicosPrestadosAR, valorDesonerado: valorDesoneradoServicosPrestados, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
@@ -4206,116 +4501,227 @@ export class calcularSimplificadoUseCase{
                       const irCsARAtual = irpjCsll + adicional
                       irCsAR += irCsARAtual
 
-                      const valor1Desonerado = item.valorDesonerado * item.aliquota
-                      const adicionalDR = valor1Desonerado > 20000 ? ((valor1Desonerado - 20000) * 0.1) : 0
-                      const irpjCsllDR = item.valorDesonerado * item.aliquotaIrpjCsll
-                      const irCsDRAtual = irpjCsllDR + adicionalDR
-                      irCsDR += irCsDRAtual
-
                   })
-
-
 
               }else{
                   irCsAR = 0
-                  irCsDR = 0
               }
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.irCs.antesReforma.valor = irCsAR
 
-              const diferencaIrCs = irCsDR - irCsAR
+                // Lucro Líquido
+              const lucroLiquidoAR = lucroAntesIrCsAR - irCsAR
+              respostaFinalCalculo[chaveRegimeObjFinal].dre.lucroLiquido.antesReforma.valor = lucroLiquidoAR
+                
 
+              // ***** CONTINUANDO A TABELA CAIXA AR... *****
+
+                // tributos recolhidos
+              const tributosRecolhidosAR = ((tributosDebitoAR - tributosCreditoAR) > 0 ? (tributosDebitoAR - tributosCreditoAR) : 0)
+              tabelaCaixa.tributosRecolhidos.antesReforma.valor = tributosRecolhidosAR
+
+                // Saldo Credor
+              const saldoCredorAR = ((tributosCreditoAR - tributosDebitoAR) > 0 ? (tributosCreditoAR - tributosDebitoAR) : 0)
+              tabelaCaixa.saldoCredor.antesReforma.valor = saldoCredorAR
+
+                // Resultado
+              const resultadoCaixaAR = tabelaCaixa.clientes.antesReforma.valor - tabelaCaixa.fornecedores.antesReforma.valor + tabelaCaixa.tributosCredito.antesReforma.valor - tabelaCaixa.tributosDebito.antesReforma.valor
+              tabelaCaixa.resultado.antesReforma.valor = resultadoCaixaAR
+
+                // Resultado Sobre Clientes
+              const resultadoSobreClientesAR = tabelaCaixa.clientes.antesReforma.valor ? (resultadoCaixaAR / tabelaCaixa.clientes.antesReforma.valor) : 0
+              tabelaCaixa.resultadoSobreClientes.antesReforma.valor = resultadoSobreClientesAR
+
+                // Resultado Pos Ir/Cs
+              const resultadoPosIrCsAR = resultadoCaixaAR - irCsAR
+              tabelaCaixa.resultadoPosIrCs.antesReforma.valor = resultadoPosIrCsAR
+
+              // TABELAS TRANSIÇÃO (DR)
+              arrAnos.forEach(anoAtual => {
+                  
+                // ***** TABELA CAIXA TRANSIÇÃO *****
+                const tabelaComprasTotalAnoAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(item => item.ano == anoAtual)
+                const tabelaVendasTotalAnoAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(item => item.ano == anoAtual)
+
+                // fornecedores
+                const objLinhaFornecedoresAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: tabelaComprasTotalAnoAtual[0].valor}
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.fornecedores.depoisReforma.push(objLinhaFornecedoresAnoAtual)
+
+                // tributos crédito
+                const objLinhaTributosCreditoAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: tabelaComprasTotalAnoAtual[0].credito}
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.tributosCredito.depoisReforma.push(objLinhaTributosCreditoAnoAtual)
+                // antigo tributosCreditoDR
+                const tributosCreditoAtual = objLinhaTributosCreditoAnoAtual.valor
+
+                // Clientes
+                const objLinhaClientesAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: tabelaVendasTotalAnoAtual[0].valor}
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.clientes.depoisReforma.push(objLinhaClientesAnoAtual)
+                //antigo valorVendaDR
+                const valorVendaAtual = objLinhaClientesAnoAtual.valor
+
+                // tributos Debito
+                const objLinhaTributosDebitoAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: tabelaVendasTotalAnoAtual[0].impostos}
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.tributosDebito.depoisReforma.push(objLinhaTributosDebitoAnoAtual)
+                // antigo tributosDebitoDR
+                let tributosDebitoAtual = objLinhaTributosDebitoAnoAtual.valor
+                    
+                
+
+                // ***** TABELA DRE TRANSIÇÃO *****
+
+                  // Receita Bruta (Estou colocando todos como valorDesonerado total. Seria para fazer apenas sem IVA?)
+                const valorVendaDesonerado = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado
+                const objLinhaReceitaBrutaAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaDesonerado}
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.receitaBruta.depoisReforma.push(objLinhaReceitaBrutaAnoAtual)
+
+                  //Deduções Tributos
+                const objLinhaDeducoesTributosAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: 0}
+                if(regimeAtual == "Simples Nacional"){
+                    objLinhaDeducoesTributosAnoAtual.valor = valorImpostosPermanecerTotal
+                }else if(regimeAtual == "Lucro Presumido" || regimeAtual == "Lucro Real"){
+                    objLinhaDeducoesTributosAnoAtual.valor = 0
+                }
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.deducoesTributos.depoisReforma.push(objLinhaDeducoesTributosAnoAtual)
+                // antigo deducoesTributosDR
+                const deducoesTributosAtual = objLinhaDeducoesTributosAnoAtual.valor
+
+                  //Custo Geral
+                const objCustoGeralAtual = dreCustoGeralTransicao.find(item => item.ano == anoAtual)
+                let dreCustoGeralAtual = 0
+                if(objCustoGeralAtual){
+                  const objLinhaCustoGeralAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: objCustoGeralAtual.custoGeralAnoVigente}
+                  respostaFinalCalculo[chaveRegimeObjFinal].dre.custoGeral.depoisReforma.push(objLinhaCustoGeralAnoAtual)
+                  //  antigo dreCustoGeralDR
+                  dreCustoGeralAtual = objLinhaCustoGeralAnoAtual.valor
+                }
+                
+
+                  // Despesas
+                const objDespesasAtual = dreDespesasTransicao.find(item => item.ano == anoAtual)
+                let dreDespesasAtual = 0
+                if(objDespesasAtual){
+                  const objLinhaDespesasAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: objDespesasAtual.despesaAnoVigente}
+                  respostaFinalCalculo[chaveRegimeObjFinal].dre.despesas.depoisReforma.push(objLinhaDespesasAnoAtual)
+                  //  antigo dreDespesasDR
+                  dreDespesasAtual = objLinhaDespesasAnoAtual.valor
+                }
+
+
+                  //  Lucro Bruto
+                const objLinhaLucroBrutoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaDesonerado - deducoesTributosAtual - dreCustoGeralAtual}
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.lucroBruto.depoisReforma.push(objLinhaLucroBrutoAtual)
+
+                  // Lucro Antes IR/CS (Lucro Antes IR/CS = Receita Bruta - Deduções Tributos - Custo Mercadoria - Despesas)
+                  // antigo lucroAntesIrCsDR
+                const lucroAntesIrCsAtual = valorVendaDesonerado - deducoesTributosAtual - dreCustoGeralAtual - dreDespesasAtual
+                const objLinhaLucroAntesIrCsAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: lucroAntesIrCsAtual}
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.lucrosAntesIrCs.depoisReforma.push(objLinhaLucroAntesIrCsAnoAtual)
+
+
+                  // IR/CS
+                  //antigo irCsDR
+                let irCsAtual = 0
+                    
+                if(regimeAtual == "Lucro Real"){
+                    // DR
+                    if(lucroAntesIrCsAtual > 0){
+                      const valor1 = lucroAntesIrCsAtual * 0.24
+                      const adicional = lucroAntesIrCsAtual > 20000 ? (lucroAntesIrCsAtual - 20000) * 0.1 : 0
+
+                      irCsAtual = valor1 + adicional
+
+                    }else{
+                      irCsAtual = 0
+                    }
+
+                }else if(regimeAtual == "Lucro Presumido"){
+                    const valorTotalServicosPrestadosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR
+                    const valorDesoneradoServicosPrestados = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
+
+                    const valorTotalLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorAR
+                    const valorTotalLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorAR
+                    const valorTotalLocacaoAR = valorTotalLocacaoImoveisAR + valorTotalLocacaoMoveisAR
+
+                    const valorDesoneradoLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado
+                    const valorDesoneradoLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado
+                    const valorDesoneradoLocacaoAR = valorDesoneradoLocacaoImoveisAR + valorDesoneradoLocacaoMoveisAR
+
+                    const valorTotalProdutosVendidosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorAR
+                    const valorDesoneradoProdutosVendidos = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
+
+                    const arrCalculoIrCs: {valorAR: number, valorDesonerado: number, aliquota: number, aliquotaIrpjCsll: number}[] = [
+                      {valorAR: valorTotalServicosPrestadosAR, valorDesonerado: valorDesoneradoServicosPrestados, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                      {valorAR: valorTotalLocacaoAR, valorDesonerado: valorDesoneradoLocacaoAR, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                      {valorAR: valorTotalProdutosVendidosAR, valorDesonerado: valorDesoneradoProdutosVendidos, aliquota: 0.08, aliquotaIrpjCsll: 0.0228 },
+                    ]
+
+                    arrCalculoIrCs.forEach(item => {
+                        const valor1Desonerado = item.valorDesonerado * item.aliquota
+                        const adicionalDR = valor1Desonerado > 20000 ? ((valor1Desonerado - 20000) * 0.1) : 0
+                        const irpjCsllDR = item.valorDesonerado * item.aliquotaIrpjCsll
+                        const irCsAtualPorArea = irpjCsllDR + adicionalDR
+                        irCsAtual += irCsAtualPorArea
+                    })
+
+                }else{
+                    irCsAtual = 0
+                }
+                const objLinhaIrCsAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: irCsAtual}
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.irCs.depoisReforma.push(objLinhaIrCsAnoAtual)
+            
 
                   // Lucro Líquido
-              const lucroLiquidoAR = lucroAntesIrCsAR - irCsAR
-              const lucroLiquidoDR = lucroAntesIrCsDR - irCsDR
-              const diferencaLucroLiquido = lucroLiquidoDR - lucroLiquidoAR
-              const diferencaPercentualLucroLiquido = lucroLiquidoAR ? (diferencaLucroLiquido / lucroLiquidoAR) : 0
-      
-
-              const tabelaDre: tabelaDreType = {
-                  receitaBruta: {AR: valorVendaAR, DR: valorVendaDesonerado, diferencaReais: diferencaReceitaBruta, diferencaPercentual: valorVendaAR ? (diferencaReceitaBruta / valorVendaAR) : 0},
-                  deducoesTributos: {AR: deducoesTributosAR, DR: deducoesTributosDR, diferencaReais: diferencaDeducoesTributos, diferencaPercentual: deducoesTributosAR ? diferencaDeducoesTributos / deducoesTributosAR : 0},
-                  custoGeral: {AR: dreCustoGeralAR, DR: dreCustoGeralDR, diferencaReais: diferencaReaisCustoDre, diferencaPercentual: dreCustoGeralAR ? (diferencaReaisCustoDre / dreCustoGeralAR) : 0},
-                  lucroBruto: {AR: lucroBrutoAR, DR: lucroBrutoDR, diferencaReais: diferencaLucroBruto, diferencaPercentual: lucroBrutoAR ? (diferencaLucroBruto / lucroBrutoAR) : 0},
-                  despesas: {AR: dreDespesasAR, DR: dreDespesasDR, diferencaReais: diferencaReaisDespesasDre, diferencaPercentual: dreDespesasAR ? diferencaReaisDespesasDre / dreDespesasAR : 0},
-                  lucrosAntesIrCs: {AR: lucroAntesIrCsAR, DR: lucroAntesIrCsDR, diferencaReais: diferencaLucroAntesIrCs, diferencaPercentual: lucroAntesIrCsAR ? (diferencaLucroAntesIrCs / lucroAntesIrCsAR) : 0},
-                  irCs: {AR: irCsAR, DR: irCsDR, diferencaReais: diferencaIrCs, diferencaPercentual: irCsAR ? (diferencaIrCs / irCsAR) : 0},
-                  lucroLiquido: {AR: lucroLiquidoAR, DR: lucroLiquidoDR, diferencaReais: diferencaLucroLiquido, diferencaPercentual: diferencaPercentualLucroLiquido}
-              }
-
-              respostaFinalCalculo[chaveRegimeObjFinal].dre = tabelaDre
+                  // antigo lucroLiquidoDR
+                const lucroLiquidoAtual = lucroAntesIrCsAtual - irCsAtual
+                const objLinhaLucroLiquidoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: lucroLiquidoAtual}
+                respostaFinalCalculo[chaveRegimeObjFinal].dre.lucroLiquido.depoisReforma.push(objLinhaLucroLiquidoAtual)
 
 
-              // CONTINUANDO TABELA CAIXA...
+                // ***** CONTINUANDO TABELA CAIXA DR... *****
 
-              //Todas as contas com tributosDebitoDR preciso fazer depois de terminar a DRE, pois em caso de simples nacional, preciso somar o valor do deducoesTributosDR ao tributoDebitoDr
-          
-              if(regimeAtual == "Simples Nacional"){ 
-                  tributosDebitoDR += deducoesTributosDR
-              }
+                //Todas as contas com tributosDebitoDR preciso fazer depois de terminar a DRE, pois em caso de simples nacional, preciso somar o valor do deducoesTributosDR ao tributoDebitoDr
+            
+                if(regimeAtual == "Simples Nacional"){ 
+                    tributosDebitoAtual += deducoesTributosAtual
+                    const objFinalAnoAtualTributosDebito = respostaFinalCalculo[chaveRegimeObjFinal].caixa.tributosDebito.depoisReforma.find(item => item.ano == anoAtual)
+                    if(objFinalAnoAtualTributosDebito){
+                      objFinalAnoAtualTributosDebito.valor = tributosDebitoAtual
+                    }
+                }
 
-              const diferencaTributosDebito = tributosDebitoDR - tributosDebitoAR
 
                   // Tributos Recolhidos
-              const tributosRecolhidosAR = ((tributosDebitoAR - tributosCreditoAR) > 0 ? (tributosDebitoAR - tributosCreditoAR) : 0)
-              const tributosRecolhidosDR = ((tributosDebitoDR - tributosCreditoDR) > 0 ? (tributosDebitoDR - tributosCreditoDR) : 0)
+                const tributosRecolhidosAtual = ((tributosDebitoAtual - tributosCreditoAtual) > 0 ? (tributosDebitoAtual - tributosCreditoAtual) : 0)
+                const objLinhaTributosRecolhidosAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: tributosRecolhidosAtual} 
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.tributosRecolhidos.depoisReforma.push(objLinhaTributosRecolhidosAtual)
+
+                  //Saldo Credor
+                const saldoCredorAtual = ((tributosCreditoAtual - tributosDebitoAtual) > 0 ? (tributosCreditoAtual - tributosDebitoAtual) : 0)
+                const objLinhaSaldoCredorAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: saldoCredorAtual}
+                respostaFinalCalculo[chaveRegimeObjFinal].caixa.saldoCredor.depoisReforma.push(objLinhaSaldoCredorAtual)
+
+
+                  // Resultado 
+                const clientesAnoAtual = tabelaCaixa.clientes.depoisReforma.find(item => item.ano == anoAtual) 
+                const fornecedoresAnoAtual = tabelaCaixa.fornecedores.depoisReforma.find(item => item.ano == anoAtual) 
+                const tributosCreditoAnoAtual = tabelaCaixa.tributosCredito.depoisReforma.find(item => item.ano == anoAtual) 
+                const tributosDebitoAnoAtual = tabelaCaixa.tributosDebito.depoisReforma.find(item => item.ano == anoAtual) 
+
+                const resultadoCaixaAtual = (clientesAnoAtual ? clientesAnoAtual.valor : 0) - (fornecedoresAnoAtual ? fornecedoresAnoAtual.valor : 0) + (tributosCreditoAnoAtual ? tributosCreditoAnoAtual.valor : 0) - (tributosDebitoAnoAtual ? tributosDebitoAnoAtual.valor : 0)
+                const objLinhaResultadoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: resultadoCaixaAtual}
+                tabelaCaixa.resultado.depoisReforma.push(objLinhaResultadoAtual)
+
+                  // Resultado Sobre Clientes
+                const resultadoSobreClientesAtual = (clientesAnoAtual ? (clientesAnoAtual.valor ? (resultadoCaixaAtual / clientesAnoAtual.valor) : 0) : 0)
+                const objLinhaResultadoSobreClientesAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: resultadoSobreClientesAtual}
+                tabelaCaixa.resultadoSobreClientes.depoisReforma.push(objLinhaResultadoSobreClientesAtual)
+
+                  //Resultado Pos Ircs
+                const resultadoPosIrCsAtual = resultadoCaixaAtual - irCsAtual
+                const objLinhaResultadoPosIrCs: objDepoisReformaDreCaixa = {ano: anoAtual, valor: resultadoPosIrCsAtual}
+                tabelaCaixa.resultadoPosIrCs.depoisReforma.push(objLinhaResultadoPosIrCs)
+
+              })
               
-                  // Saldo Credor
-              const saldoCredorAR = ((tributosCreditoAR - tributosDebitoAR) > 0 ? (tributosCreditoAR - tributosDebitoAR) : 0)
-              const saldoCredorDR = ((tributosCreditoDR - tributosDebitoDR) > 0 ? (tributosCreditoDR - tributosDebitoDR) : 0)
-      
-                  // Contrução da tabela Caixa Sem Resultados
-              const caixa = {
-                  fornecedores: {AR: valorCompraAR, DR: valorCompraDR, diferencaReais: diferencaCompras, diferencaPercentual: valorCompraAR ? diferencaCompras / valorCompraAR : 0},
-                  tributosCredito: {AR: tributosCreditoAR, DR: tributosCreditoDR, diferencaReais: diferencaTributosCredito, diferencaPercentual: tributosCreditoAR ? diferencaTributosCredito / tributosCreditoAR : 0},
-                  clientes: {AR: valorVendaAR, DR: valorVendaDR, diferencaReais: diferencaVendas, diferencaPercentual: valorVendaAR ? diferencaVendas / valorVendaAR : 0},
-                  tributosDebito: {AR: tributosDebitoAR, DR: tributosDebitoDR, diferencaReais: diferencaTributosDebito, diferencaPercentual: tributosDebitoAR ? diferencaTributosDebito / tributosDebitoAR : 0},
-                  tributosRecolhidos: {AR: tributosRecolhidosAR, DR: tributosRecolhidosDR, diferencaReais: tributosRecolhidosDR - tributosRecolhidosAR, diferencaPercentual: tributosRecolhidosAR ? (tributosRecolhidosDR - tributosRecolhidosAR) / tributosRecolhidosAR : 0},
-                  saldoCredor: {AR: saldoCredorAR, DR: saldoCredorDR, diferencaReais: saldoCredorDR - saldoCredorAR, diferencaPercentual: saldoCredorAR ? (saldoCredorDR - saldoCredorAR) / saldoCredorAR : 0},
-              }
-
-                // Construindo tabela Caixa Com Resultados
-              const resultadoCaixaAR = caixa.clientes.AR - caixa.fornecedores.AR + caixa.tributosCredito.AR - caixa.tributosDebito.AR
-              const resultadoCaixaDR = caixa.clientes.DR - caixa.fornecedores.DR + caixa.tributosCredito.DR - caixa.tributosDebito.DR
-              const resultadoCaixaDiferenca = resultadoCaixaDR - resultadoCaixaAR
-              const resultadoCaixaDiferencaPercentual = resultadoCaixaAR ? (resultadoCaixaDiferenca / resultadoCaixaAR) : 0 
-              const resultadoSobreClientesAR = caixa.clientes.AR ? (resultadoCaixaAR / caixa.clientes.AR) : 0
-              const resultadoSobreClientesDR = caixa.clientes.DR ? (resultadoCaixaDR / caixa.clientes.DR) : 0
-
-              const resultadoPosIrCsAR = resultadoCaixaAR - irCsAR
-              const resultadoPosIrCsDR = resultadoCaixaDR - irCsDR
-              const diferencaResultadoPosIrCs = resultadoPosIrCsDR - resultadoPosIrCsAR
-              const diferencaPercentualResultadoPosIrCs = resultadoPosIrCsAR ? (diferencaResultadoPosIrCs / resultadoPosIrCsAR) : 0
-
-              const caixaComResultado: tabelaCaixaType = {
-                  ...caixa,
-                  resultado: {
-                      AR: resultadoCaixaAR,
-                      DR: resultadoCaixaDR,
-                      diferencaReais: resultadoCaixaDiferenca,
-                      diferencaPercentual: resultadoCaixaDiferencaPercentual
-                  },
-                  irCs: {
-                    AR: irCsAR,
-                    DR: irCsDR,
-                    diferencaReais: diferencaIrCs,
-                    diferencaPercentual: irCsAR ? (diferencaIrCs / irCsAR) : 0
-                  },
-                  resultadoPosIrCs: {
-                    AR: resultadoPosIrCsAR,
-                    DR: resultadoPosIrCsDR,
-                    diferencaReais: diferencaResultadoPosIrCs,
-                    diferencaPercentual: diferencaPercentualResultadoPosIrCs
-                  },
-                  resultadoSobreClientes: {
-                      AR: resultadoSobreClientesAR,
-                      DR: resultadoSobreClientesDR,
-                      diferencaReais: resultadoSobreClientesDR - resultadoSobreClientesAR,
-                      diferencaPercentual: (resultadoSobreClientesDR - resultadoSobreClientesAR) / resultadoSobreClientesAR
-                  }
-              }
-
-              respostaFinalCalculo[chaveRegimeObjFinal].caixa = caixaComResultado
-
 
           })
 

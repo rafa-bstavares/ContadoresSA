@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { ContextoResultadoSimulador, objRegimeType, objRespostaFinalType, regimesChavesObjType, regimesType, tabelaCaixaType, tabelaDreType, totalComprasType, totalVendasType, valorInicialobjRegime } from "../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador"
+import { anosType, ContextoResultadoSimulador, linhaArDrDiferencas, objRegimeType, objRespostaFinalType, regimesChavesObjType, regimesType, tabelaCaixaType, tabelaDreType, totalComprasType, totalVendasType, valorInicialobjRegime } from "../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import xisLogo from "../../assets/images/priceTaxIsotipo.png"
 import setaFina from "../../assets/images/setaFina.png"
@@ -8,9 +8,108 @@ import { IndicadorColorido } from "../IndicadorColorido/IndicadorColorido"
 
 export function ResultadoSimulador(){
 
-    const [objRegimeAtual, setObjRegimeAtual] = useState<objRegimeType>(valorInicialobjRegime)
+    {/* TIPAGEM A INICIALIZAÇÃO DE VALORES DAS TABELAS QUE VÃO PRA TELA */}
+
+    type linhaFinalARDRDiferencasEAnoAAno = {valorAR: number, valorAnoBase: number, diferencaReais: number, diferencaPercentual: number,  valor2026: number, valor2027: number, valor2028: number, valor2029: number, valor2030: number, valor2031: number, valor2032: number, valor2033: number}
+
+    type linhaFinalCompras = {valorAR: number, impostosAR: number, valorDesonerado: number, custoAR: number, porcentagemCustoEfetivoAR: number, creditoAR: number, porcentagemCargaTributariaAR: number, valorAnoBase: number, impostosAnoBase: number, custoAnoBase: number, porcentagemCustoEfetivoAnoBase: number, creditoAnoBase: number, porcentagemCargaTributariaAnoBase: number}
+
+    type linhaFinalVendas = {valorAR: number, impostosAR: number, valorDesonerado: number, porcentagemCargaTributariaAR: number, valorAnoBase: number, impostosAnoBase: number, porcentagemCargaTributariaAnoBase: number}
+
+    type tabelaDreTelaType = {
+        receitaBruta: linhaFinalARDRDiferencasEAnoAAno,
+        deducoesTributos: linhaFinalARDRDiferencasEAnoAAno,
+        custoGeral: linhaFinalARDRDiferencasEAnoAAno,
+        lucroBruto: linhaFinalARDRDiferencasEAnoAAno,
+        despesas: linhaFinalARDRDiferencasEAnoAAno,
+        lucrosAntesIrCs: linhaFinalARDRDiferencasEAnoAAno,
+        irCs: linhaFinalARDRDiferencasEAnoAAno,
+        lucroLiquido: linhaFinalARDRDiferencasEAnoAAno,
+    }
+
+    const tabelaDreTelaValorInicial = {
+        receitaBruta: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        deducoesTributos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        custoGeral: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        lucroBruto: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        despesas: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        lucrosAntesIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0, valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        lucroLiquido: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+    }
+
+    type tabelaCaixaTelaType = {
+        fornecedores: linhaFinalARDRDiferencasEAnoAAno,
+        tributosCredito: linhaFinalARDRDiferencasEAnoAAno,
+        clientes: linhaFinalARDRDiferencasEAnoAAno,
+        tributosDebito: linhaFinalARDRDiferencasEAnoAAno,
+        tributosRecolhidos: linhaFinalARDRDiferencasEAnoAAno,
+        saldoCredor: linhaFinalARDRDiferencasEAnoAAno,
+        resultado: linhaFinalARDRDiferencasEAnoAAno,
+        irCs: linhaFinalARDRDiferencasEAnoAAno,
+        resultadoPosIrCs: linhaFinalARDRDiferencasEAnoAAno,
+        resultadoSobreClientes: linhaFinalARDRDiferencasEAnoAAno,
+    }
+
+    const tabelaCaixaTelaValorInicial = {
+        fornecedores: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        tributosCredito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        clientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        tributosDebito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        tributosRecolhidos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        saldoCredor: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        resultado: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        resultadoPosIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        resultadoSobreClientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+    }
+
+    type tabelaComprasTelaType = {
+        comprasProdutos: linhaFinalCompras,
+        servicosTomados: linhaFinalCompras,
+        locacaoMoveis: linhaFinalCompras,
+        locacaoImoveis: linhaFinalCompras,
+        total: linhaFinalCompras
+    }
+
+    const tabelaComprasTelaValorInicial = {
+        comprasProdutos: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        servicosTomados: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        locacaoMoveis: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        locacaoImoveis: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        total: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0}
+    }
+
+    type tabelaVendasTelaType = {
+        vendasProdutos: linhaFinalVendas,
+        servicosPrestados: linhaFinalVendas,
+        locacaoMoveis: linhaFinalVendas,
+        locacaoImoveis: linhaFinalVendas,
+        total: linhaFinalVendas
+    }
+
+    const tabelaVendasTelaValorInicial = {
+        vendasProdutos: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        servicosPrestados: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        locacaoMoveis: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        locacaoImoveis: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0},
+        total: {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0}
+    }
+
+    {/* FIM TIPAGEM A INICIALIZAÇÃO DE VALORES DAS TABELAS QUE VÃO PRA TELA */}
+
+
+    const [objRegimeAtual, setObjRegimeAtual] = useState<objRegimeType>(JSON.parse(JSON.stringify(valorInicialobjRegime)))
     const [regimeAtual, setRegimeAtual] = useState<regimesType>("Simples Nacional")
     const [regimeAtualAberto, setRegimeAtualAberto] = useState<boolean>(false)
+    const [anoBaseAberto, setAnoBaseAberto] = useState<boolean>(false)
+    const [anoBase, setAnoBase] = useState<anosType>("2033")
+
+    const [tabelaDreTela, setTabelaDreTela] = useState<tabelaDreTelaType>(tabelaDreTelaValorInicial)
+    const [tabelaCaixaTela, setTabelaCaixaTela] = useState<tabelaCaixaTelaType>(tabelaCaixaTelaValorInicial)
+    const [tabelaComprasTela, setTabelaComprasTela] = useState<tabelaComprasTelaType>(tabelaComprasTelaValorInicial)
+    const [tabelaVendasTela, setTabelaVendasTela] = useState<tabelaVendasTelaType>(tabelaVendasTelaValorInicial)
+
 
     const arrRegimes: ("Simples Nacional" | "Lucro Real" | "Lucro Presumido")[] = ["Simples Nacional", "Lucro Real", "Lucro Presumido"]
 
@@ -85,13 +184,154 @@ export function ResultadoSimulador(){
         setRegimeAtualAberto(!regimeAtualAberto)
     }
 
+    function trocarDropAnoBase(){
+        setAnoBaseAberto(!anoBaseAberto)
+    }
+
     function escolherRegimeAtual(item: regimesType){
         setRegimeAtual(item)
         trocarDropRegimeAtual()
     }
 
+    function escolherAnoBase(item: anosType){
+        setAnoBase(item)
+        trocarDropAnoBase()
+    }
+
+    
 
     const {objResultado} = useContext(ContextoResultadoSimulador)
+
+    function tabelaARDRDiferencasEAnoAAnoTratada<T extends Record<string, linhaArDrDiferencas>>(objTabelaCrua: T, anoBase: anosType): Record<keyof T, linhaFinalARDRDiferencasEAnoAAno>{
+
+        const novaTabela: Record<keyof T, linhaFinalARDRDiferencasEAnoAAno> = {} as any
+        
+        Object.entries(objTabelaCrua).forEach(([chave, dados]) => {
+            const valorAR = dados.antesReforma.valor
+
+            const objLinhaAtual: linhaFinalARDRDiferencasEAnoAAno = {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0, valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0}
+
+            const objAnosTransicao = dados.depoisReforma
+            const objAnoBase = objAnosTransicao.find(item => item.ano == anoBase)
+            let valorAnoBase = 0
+            if(objAnoBase){
+                valorAnoBase = objAnoBase.valor
+            }
+
+            const diferencaReais = valorAnoBase - valorAR
+            const diferencaPercentual = valorAR ? (diferencaReais / valorAR) : 0
+
+            objAnosTransicao.forEach(({ano, valor}) => {
+                objLinhaAtual[`valor${ano}`] = valor
+            })
+
+            objLinhaAtual.valorAR = valorAR
+            objLinhaAtual.valorAnoBase = valorAnoBase
+            objLinhaAtual.diferencaReais = diferencaReais
+            objLinhaAtual.diferencaPercentual = diferencaPercentual
+
+            novaTabela[chave as keyof T] = objLinhaAtual
+
+
+        })
+
+        return novaTabela
+
+    }
+
+
+    function tabelaVendasTratada(objTabelaCrua: totalVendasType, anoBase: anosType): Record<keyof totalVendasType, linhaFinalVendas>{
+        const novaTabela: Record<keyof totalVendasType, linhaFinalVendas> = {} as any
+
+        Object.entries(objTabelaCrua).forEach(([chave, dados]) => {
+            const valorAR = dados.antesReforma.valorAR
+            const impostosAR = dados.antesReforma.impostosAR
+            const valorDesonerado = dados.antesReforma.valorDesonerado
+            const porcentagemCargaTributariaAR = dados.antesReforma.porcentagemCargaTributariaAR
+
+            const objLinhaAtual: linhaFinalVendas = {valorAR: 0, impostosAR: 0, valorDesonerado: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, porcentagemCargaTributariaAnoBase: 0}             
+
+            const objAnosTransicao = dados.depoisReforma
+            const objAnoBase = objAnosTransicao.find(item => item.ano == anoBase)
+            let valorAnoBase = 0
+            let impostosAnoBase = 0
+            let porcentagemCargaTributariaAnoBase = 0
+            if(objAnoBase){
+                valorAnoBase = objAnoBase.valor
+                impostosAnoBase = objAnoBase.impostos
+                porcentagemCargaTributariaAnoBase = objAnoBase.porcentagemCargaTributaria
+            }
+
+            objLinhaAtual.valorAR = valorAR
+            objLinhaAtual.impostosAR = impostosAR
+            objLinhaAtual.valorDesonerado = valorDesonerado
+            objLinhaAtual.porcentagemCargaTributariaAR = porcentagemCargaTributariaAR
+            objLinhaAtual.valorAnoBase = valorAnoBase
+            objLinhaAtual.impostosAnoBase = impostosAnoBase
+            objLinhaAtual.porcentagemCargaTributariaAnoBase = porcentagemCargaTributariaAnoBase
+
+            novaTabela[chave as keyof totalVendasType] = objLinhaAtual
+
+
+        })
+
+        return novaTabela
+
+    }
+
+    function tabelaComprasTratada(objTabelaCrua: totalComprasType, anoBase: anosType): Record<keyof totalComprasType, linhaFinalCompras>{
+        const novaTabela: Record<keyof totalComprasType, linhaFinalCompras> = {} as any
+
+        Object.entries(objTabelaCrua).forEach(([chave, dados]) => {
+            const valorAR = dados.antesReforma.valorAR
+            const impostosAR = dados.antesReforma.impostosAR
+            const valorDesonerado = dados.antesReforma.valorDesonerado
+            const custoAR = dados.antesReforma.custoAR
+            const porcentagemCustoEfetivoAR = dados.antesReforma.porcentagemCustoEfetivoAR
+            const creditoAR = dados.antesReforma.creditoAR
+            const porcentagemCargaTributariaAR = dados.antesReforma.porcentagemCargaTributariaAR
+
+            const objLinhaAtual: linhaFinalCompras = {valorAR: 0, impostosAR: 0, valorDesonerado: 0, custoAR: 0, porcentagemCustoEfetivoAR: 0, creditoAR: 0, porcentagemCargaTributariaAR: 0, valorAnoBase: 0, impostosAnoBase: 0, custoAnoBase: 0, porcentagemCustoEfetivoAnoBase: 0, creditoAnoBase: 0, porcentagemCargaTributariaAnoBase: 0}
+
+            const objAnosTransicao = dados.depoisReforma
+            const objAnoBase = objAnosTransicao.find(item => item.ano == anoBase)
+            let valorAnoBase = 0
+            let impostosAnoBase = 0
+            let porcentagemCustoEfetivoAnoBase = 0
+            let custoAnoBase = 0
+            let creditoAnoBase = 0
+            let porcentagemCargaTributariaAnoBase = 0
+            if(objAnoBase){
+                valorAnoBase = objAnoBase.valor
+                impostosAnoBase = objAnoBase.impostos
+                custoAnoBase = objAnoBase.custo
+                creditoAnoBase = objAnoBase.credito
+                porcentagemCustoEfetivoAnoBase = objAnoBase.porcentagemCustoEfetivo
+                porcentagemCargaTributariaAnoBase = objAnoBase.porcentagemCargaTributaria
+            }
+
+            objLinhaAtual.valorAR = valorAR
+            objLinhaAtual.impostosAR = impostosAR
+            objLinhaAtual.valorDesonerado = valorDesonerado
+            objLinhaAtual.custoAR = custoAR
+            objLinhaAtual.porcentagemCustoEfetivoAR = porcentagemCustoEfetivoAR
+            objLinhaAtual.creditoAR = creditoAR
+            objLinhaAtual.porcentagemCargaTributariaAR = porcentagemCargaTributariaAR
+            objLinhaAtual.valorAnoBase = valorAnoBase
+            objLinhaAtual.impostosAnoBase = impostosAnoBase
+            objLinhaAtual.porcentagemCustoEfetivoAnoBase = porcentagemCustoEfetivoAnoBase
+            objLinhaAtual.custoAnoBase = custoAnoBase
+            objLinhaAtual.creditoAnoBase = creditoAnoBase
+            objLinhaAtual.porcentagemCargaTributariaAnoBase = porcentagemCargaTributariaAnoBase
+
+            novaTabela[chave as keyof totalComprasType] = objLinhaAtual
+
+
+        })
+
+        return novaTabela
+    }
+
 
     /*
     const objRegimeExemplo = {
@@ -941,10 +1181,10 @@ export function ResultadoSimulador(){
     }
     */
 
-    const arrPropriedadesCaixa = Object.entries(objRegimeAtual.caixa)
-    const diferencaCustoCompras = objRegimeAtual.totalCompras.total.custoDR - objRegimeAtual.totalCompras.total.custoAR
-    const diferencaVendas = objRegimeAtual.totalVendas.total.valorDR - objRegimeAtual.totalVendas.total.valorAR
-    const representacaoPaupavel = objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual * objRegimeAtual.caixa.clientes.AR
+    const arrPropriedadesCaixa = Object.entries(tabelaCaixaTela)
+    const diferencaCustoCompras = tabelaComprasTela.total.custoAnoBase - tabelaComprasTela.total.custoAR
+    const diferencaVendas = tabelaVendasTela.total.valorAnoBase - tabelaVendasTela.total.valorAR
+    const representacaoPaupavel = tabelaCaixaTela.resultadoSobreClientes.diferencaPercentual * tabelaCaixaTela.clientes.valorAR
 
     
     
@@ -963,6 +1203,16 @@ export function ResultadoSimulador(){
         console.log("Resultado de dentro da tela de resultadooo")
         console.log(objRegimeAtual)
     }, [])
+
+
+    useEffect(() => {
+
+        setTabelaDreTela(tabelaARDRDiferencasEAnoAAnoTratada(objRegimeAtual.dre, anoBase))
+        setTabelaCaixaTela(tabelaARDRDiferencasEAnoAAnoTratada(objRegimeAtual.caixa, anoBase))
+        setTabelaComprasTela(tabelaComprasTratada(objRegimeAtual.totalCompras, anoBase))
+        setTabelaVendasTela(tabelaVendasTratada(objRegimeAtual.totalVendas, anoBase))
+
+    }, [anoBase, objRegimeAtual])
 
     return (
         <div className="w-full min-h-screen p-12">
@@ -985,48 +1235,93 @@ export function ResultadoSimulador(){
                     <span className="text-8xl text-center flex items-end gap-4">O <img className="w-30 h-auto align-bottom inline" src={xisLogo} alt="Xis LogoTipo Pricetx" /> da Questão</span>
                 </div>
 
-                {/* DROP REGIMES */}
-                <div className="flex flex-col max-w-[400px]">
-                    <label className="text-gray-400 w-[10vw]">Mude o regime:</label>
-                    <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
-                        <div
-                        onClick={trocarDropRegimeAtual}
-                        className="flex gap-2 items-center justify-between p-2 cursor-pointer"
-                        >
-                            <div className=" opacity-50">
-                                {regimeAtual}
+                <div className="flex gap-4">
+                    {/* DROP REGIMES */}
+                    <div className="flex flex-col max-w-[400px]">
+                        <label className="text-gray-400 w-[10vw]">Mude o regime:</label>
+                        <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                            <div
+                            onClick={trocarDropRegimeAtual}
+                            className="flex gap-2 items-center justify-between p-2 cursor-pointer"
+                            >
+                                <div className=" opacity-50">
+                                    {regimeAtual}
+                                </div>
+                                <div
+                                    className={`
+                                    ${regimeAtualAberto ? "rotate-180" : "rotate-0"}
+                                    transition-all ease-linear duration-500
+                                    `}
+                                >
+                                    <img
+                                    src={setaSeletor}
+                                    alt="seta-seletor"
+                                    className="w-4 h-4"
+                                    />
+                                </div>
                             </div>
                             <div
-                                className={`
-                                ${regimeAtualAberto ? "rotate-180" : "rotate-0"}
-                                transition-all ease-linear duration-500
-                                `}
+                            className={`
+                                ${regimeAtualAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                [transition:grid-template-rows_500ms]
+                            `}
                             >
-                                <img
-                                src={setaSeletor}
-                                alt="seta-seletor"
-                                className="w-4 h-4"
-                                />
+                            <div className="overflow-hidden">
+                                {arrRegimes.map(item => (
+                                <div
+                                    key={item}
+                                    className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                    onClick={() => escolherRegimeAtual(item)}
+                                >
+                                    {item}
+                                </div>
+                                ))}
+                            </div>
                             </div>
                         </div>
-
-                        <div
-                        className={`
-                            ${regimeAtualAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
-                            [transition:grid-template-rows_500ms]
-                        `}
-                        >
-                        <div className="overflow-hidden">
-                            {arrRegimes.map(item => (
+                    </div>
+                    {/* DROP ANO BASE */}
+                    <div className="flex flex-col max-w-[400px]">
+                        <label className="text-gray-400 w-[10vw]">Ano Base:</label>
+                        <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
                             <div
-                                key={item}
-                                className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
-                                onClick={() => escolherRegimeAtual(item)}
+                            onClick={trocarDropAnoBase}
+                            className="flex gap-2 items-center justify-between p-2 cursor-pointer"
                             >
-                                {item}
+                                <div className=" opacity-50">
+                                    {anoBase}
+                                </div>
+                                <div
+                                    className={`
+                                    ${anoBaseAberto ? "rotate-180" : "rotate-0"}
+                                    transition-all ease-linear duration-500
+                                    `}
+                                >
+                                    <img
+                                    src={setaSeletor}
+                                    alt="seta-seletor"
+                                    className="w-4 h-4"
+                                    />
+                                </div>
                             </div>
-                            ))}
-                        </div>
+                            <div
+                            className={`
+                                ${anoBaseAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                [transition:grid-template-rows_500ms]
+                            `}
+                            >
+                            <div className="overflow-hidden">
+                                {["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"].map(item => (
+                                <div
+                                    key={item}
+                                    className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                    onClick={() => escolherAnoBase(item as anosType)}
+                                >
+                                    {item}
+                                </div>
+                                ))}
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1038,13 +1333,14 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">DRE - Demonstração de Resultado do Exercício</span>
                         <div className="flex items-start gap-2 ">
                             <div className="flex items-center mt-[20px] ">
-                                <IndicadorColorido cor={`${objRegimeAtual.dre.lucroLiquido.diferencaReais > 0 ? "verde" : "vermelho"}`}/>
+                                
+                                <IndicadorColorido cor={`${tabelaDreTela.lucroLiquido.diferencaReais > 0 ? "verde" : "vermelho"}`}/>
                             </div>
                             {
-                                objRegimeAtual.dre.lucroLiquido.diferencaReais > 0 ?
-                                <span className="">Seu Lucro Líquido aumentou em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, isso significa que você pode trabalhar o preço de venda em <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> para buscar mais competitividade e manter um preço equilibrado até o fim da cadeia (consumidor final)</span>
+                                tabelaDreTela.lucroLiquido.diferencaReais > 0 ?
+                                <span className="">Seu Lucro Líquido aumentou em <span className="text-4xl textoGradiente">{"R$" + Math.abs(tabelaDreTela.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, isso significa que você pode trabalhar o preço de venda em <span className="text-4xl textoGradiente">{Math.abs(tabelaDreTela.lucroLiquido.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> para buscar mais competitividade e manter um preço equilibrado até o fim da cadeia (consumidor final)</span>
                                 :
-                                <span>A queda de <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.dre.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> no Lucro Líquido exige ação: renegocie com fornecedores ou ajuste seus preços para manter a lucratividade</span>
+                                <span>A queda de <span className="text-4xl textoGradiente">{"R$" + Math.abs(tabelaDreTela.lucroLiquido.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> no Lucro Líquido exige ação: renegocie com fornecedores ou ajuste seus preços para manter a lucratividade</span>
                             }
                         </div>
                     </div>
@@ -1061,26 +1357,43 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.dre ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objRegimeAtual.dre).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(tabelaDreTela).map(([nomeCategoria, dados], index) => {
+
                                     return (
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(5,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[repeat(13,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>Categoria</div>
                                                         <div>AR</div>
-                                                        <div>DR</div>
+                                                        <div>Ano Base</div>
                                                         <div>Diferença R$</div>
                                                         <div>Diferença %</div>
+                                                        <div>2026</div>
+                                                        <div>2027</div>
+                                                        <div>2028</div>
+                                                        <div>2029</div>
+                                                        <div>2030</div>
+                                                        <div>2031</div>
+                                                        <div>2032</div>
+                                                        <div>2033</div>
                                                     </div>
                                                 }
 
-                                                <div className={`grid grid-cols-[repeat(5,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                <div className={`grid grid-cols-[repeat(13,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div className="font-bold">{nomeLinhasTabelaDre[nomeCategoria as keyof tabelaDreType]}</div>
-                                                    <div>{retornarValorDinheiro(dados.AR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.DR)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorAR)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorAnoBase)}</div>
                                                     <div>{retornarValorDinheiro(dados.diferencaReais)}</div>
                                                     <div>{retornarValorPorcentagem(dados.diferencaPercentual)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2026)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2027)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2028)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2029)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2030)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2031)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2032)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valor2033)}</div>
                                                 </div>
                                             </>
                                     )
@@ -1097,15 +1410,15 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">Impactos no Fluxo de Caixa</span>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em] ">
-                                <IndicadorColorido cor={`${objRegimeAtual.caixa.resultado.diferencaReais > 0? "verde" : "vermelho"}`}/>
+                                <IndicadorColorido cor={`${tabelaCaixaTela.resultado.diferencaReais > 0? "verde" : "vermelho"}`}/>
                             </div>
-                            <span>Seu caixa {objRegimeAtual.caixa.resultado.diferencaReais > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(objRegimeAtual.caixa.resultado.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.resultado.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {objRegimeAtual.caixa.resultado.diferencaReais > 0? "positivo" : "negativo"} no resultado.</span>
+                            <span>Seu caixa {tabelaCaixaTela.resultado.diferencaReais > 0? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + Math.abs(tabelaCaixaTela.resultado.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, com impacto de <span className="text-4xl textoGradiente">{Math.abs(tabelaCaixaTela.resultado.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span> {tabelaCaixaTela.resultado.diferencaReais > 0? "positivo" : "negativo"} no resultado.</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
-                                <IndicadorColorido cor={`${objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
+                                <IndicadorColorido cor={`${tabelaCaixaTela.resultadoSobreClientes.diferencaPercentual > 0 ? "verde" : "vermelho"}`}/>
                             </div>
-                            <span>Sua capacidade de gerar caixa {objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.resultadoSobreClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
+                            <span>Sua capacidade de gerar caixa {tabelaCaixaTela.resultadoSobreClientes.diferencaPercentual > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{Math.abs(tabelaCaixaTela.resultadoSobreClientes.diferencaPercentual * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " %"} </span>, que representa <span className="text-4xl textoGradiente">{"R$ " + Math.abs(representacaoPaupavel).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -1122,22 +1435,39 @@ export function ResultadoSimulador(){
                         <div className={`${controleDropTabelas.caixa ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
                                 {arrPropriedadesCaixa.map(([nomeCategoria, dados], index) => {
+
                                     return (
                                             <>
                                                 {
                                                     index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(5,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[repeat(13,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
                                                         <div>Categoria</div>
                                                         <div>AR</div>
                                                         <div>DR</div>
                                                         <div>Diferença R$</div>
                                                         <div>Diferença %</div>
+                                                        <div>2026</div>
+                                                        <div>2027</div>
+                                                        <div>2028</div>
+                                                        <div>2029</div>
+                                                        <div>2030</div>
+                                                        <div>2031</div>
+                                                        <div>2032</div>
+                                                        <div>2033</div>
                                                     </div>
                                                 }
 
                                                 {
                                                     (index == arrPropriedadesCaixa.length - 1) &&
-                                                    <div className="grid grid-cols-[repeat(5,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                    <div className="grid grid-cols-[repeat(13,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
                                                         <div></div>
                                                         <div></div>
                                                         <div></div>
@@ -1146,12 +1476,20 @@ export function ResultadoSimulador(){
                                                     </div>
                                                 }
 
-                                                <div className={`grid grid-cols-[repeat(5,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                <div className={`grid grid-cols-[repeat(13,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div className="font-bold">{nomeLinhasTabelaCaixa[nomeCategoria as keyof tabelaCaixaType]}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.AR) : retornarValorDinheiro(dados.AR)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.DR) : retornarValorDinheiro(dados.DR)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorAR) : retornarValorDinheiro(dados.valorAR)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorAnoBase) : retornarValorDinheiro(dados.valorAnoBase)}</div>
                                                     <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.diferencaReais) : retornarValorDinheiro(dados.diferencaReais)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.diferencaPercentual)}</div>
+                                                    <div>{retornarValorPorcentagem(dados.diferencaPercentual)}</div>    
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2026) : retornarValorDinheiro(dados.valor2026)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2027) : retornarValorDinheiro(dados.valor2027)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2028) : retornarValorDinheiro(dados.valor2028)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2029) : retornarValorDinheiro(dados.valor2029)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2030) : retornarValorDinheiro(dados.valor2030)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2031) : retornarValorDinheiro(dados.valor2031)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2032) : retornarValorDinheiro(dados.valor2032)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2033) : retornarValorDinheiro(dados.valor2033)}</div>
                                                 </div>
                                             </>
                                     )
@@ -1168,15 +1506,15 @@ export function ResultadoSimulador(){
                         <span className="mb-4 text-4xl font-bold">Impacto nas Compras</span>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
-                                <IndicadorColorido cor={`${objRegimeAtual.caixa.fornecedores.diferencaReais > 0 ? "vermelho" : "verde"}`}/>
+                                <IndicadorColorido cor={`${tabelaCaixaTela.fornecedores.diferencaReais > 0 ? "vermelho" : "verde"}`}/>
                             </div>
-                            <span>O preço de compra sofreu {objRegimeAtual.caixa.fornecedores.diferencaReais > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(objRegimeAtual.caixa.fornecedores.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(objRegimeAtual.caixa.fornecedores.diferencaReais / (objRegimeAtual.caixa.fornecedores.AR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <span>O preço de compra sofreu {tabelaCaixaTela.fornecedores.diferencaReais > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + (Math.abs(tabelaCaixaTela.fornecedores.diferencaReais).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span>, representando uma variação de <span className="text-4xl textoGradiente">{Math.abs(tabelaCaixaTela.fornecedores.diferencaReais / (tabelaCaixaTela.fornecedores.valorAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center mt-[0.3em]">
                                 <IndicadorColorido cor={`${diferencaCustoCompras > 0 ? "vermelho" : "verde"}`}/>
                             </div>
-                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / objRegimeAtual.totalCompras.total.custoAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
+                            <span>O seu custo {diferencaCustoCompras > 0 ? "aumentou" : "reduziu"} em <span className="text-4xl textoGradiente">{"R$" + (Math.abs(diferencaCustoCompras).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span> representando uma variação de <span className="text-4xl textoGradiente">{"R$" + (Math.abs((diferencaCustoCompras / tabelaComprasTela.total.custoAR) * 100).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}))}</span></span>
                         </div>
                     </div>
                     <div className="flex flex-col border-solid border-white border-2 rounded-2xl w-full">
@@ -1192,7 +1530,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.compras ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objRegimeAtual.totalCompras).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(tabelaComprasTela).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {
@@ -1214,6 +1552,8 @@ export function ResultadoSimulador(){
                                                         <div>% Carga Tributária DR</div>
                                                     </div>
                                                 }
+
+
                                                 <div className={`grid grid-cols-[repeat(14,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div className="font-bold">{nomeLinhasTabelaCompras[nomeCategoria as keyof totalComprasType]}</div>
                                                     <div>{retornarValorDinheiro(dados.valorAR)}</div>
@@ -1223,12 +1563,12 @@ export function ResultadoSimulador(){
                                                     <div>{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAR)}</div>
                                                     <div>{retornarValorDinheiro(dados.creditoAR)}</div>
                                                     <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valorDR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.impostosDR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.custoDR)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCustoEfetivoDR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.creditoDR)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaDR)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorAnoBase)}</div>
+                                                    <div>{retornarValorDinheiro(dados.impostosAnoBase)}</div>
+                                                    <div>{retornarValorDinheiro(dados.custoAnoBase)}</div>
+                                                    <div>{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAnoBase)}</div>
+                                                    <div>{retornarValorDinheiro(dados.creditoAnoBase)}</div>
+                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAnoBase)}</div>
                                                 </div>
                                             </>
                                     )
@@ -1247,7 +1587,7 @@ export function ResultadoSimulador(){
                             <div className="flex items-center mt-[0.3em]">
                                 <IndicadorColorido cor={`${diferencaVendas > 0 ? "vermelho" : "verde"}`} />
                             </div>
-                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (objRegimeAtual.caixa.clientes.AR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
+                            <span>O preço de venda sofreu {diferencaVendas > 0 ? "um aumento" : "uma redução"} de <span className="text-4xl textoGradiente">{"R$" + Math.abs(diferencaVendas).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>, o que representa uma variação de <span className="text-4xl textoGradiente">{(Math.abs(diferencaVendas / (tabelaCaixaTela.clientes.valorAR) * 100)).toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "%"}</span></span>
                         </div>
                         <span>
                             {
@@ -1271,7 +1611,7 @@ export function ResultadoSimulador(){
                         </div>
                         <div className={`${controleDropTabelas.vendas ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
                             <div className="overflow-hidden">
-                                {Object.entries(objRegimeAtual.totalVendas).map(([nomeCategoria, dados], index) => {
+                                {Object.entries(tabelaVendasTela).map(([nomeCategoria, dados], index) => {
                                     return (
                                             <>
                                                 {
@@ -1293,9 +1633,9 @@ export function ResultadoSimulador(){
                                                     <div>{retornarValorDinheiro(dados.impostosAR)}</div>
                                                     <div>{retornarValorDinheiro(dados.valorDesonerado)}</div>
                                                     <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valorDR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.impostosDR)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaDR)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorAnoBase)}</div>
+                                                    <div>{retornarValorDinheiro(dados.impostosAnoBase)}</div>
+                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAnoBase)}</div>
                                                 </div>
                                             </>
                                     )

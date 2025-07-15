@@ -1,29 +1,43 @@
 import { createContext, useState, Dispatch, SetStateAction } from "react";
 
+type objAreaComprasTransicaoType = {
+      ano: anosType
+      valor: number,
+      impostos: number,
+      credito: number,
+      custo: number,
+      porcentagemCustoEfetivo: number,
+      porcentagemCargaTributaria: number
+}
+
 type objAreaComprasType = {
-    valorAR: number,
-    impostosAR: number,
-    valorDesonerado: number,
-    creditoAR: number, 
-    custoAR: number,
-    porcentagemCustoEfetivoAR: number,
-    porcentagemCargaTributariaAR: number,
-    valorDR: number,
-    impostosDR: number,
-    creditoDR: number,
-    custoDR: number,
-    porcentagemCustoEfetivoDR: number,
-    porcentagemCargaTributariaDR: number,
+    antesReforma: {
+      valorAR: number,
+      impostosAR: number,
+      valorDesonerado: number,
+      creditoAR: number, 
+      custoAR: number,
+      porcentagemCustoEfetivoAR: number,
+      porcentagemCargaTributariaAR: number
+    },
+    depoisReforma: objAreaComprasTransicaoType[]
+}
+
+type objAreaVendasTransicaoType = {
+      ano: anosType
+      valor: number,
+      impostos: number,
+      porcentagemCargaTributaria: number
 }
 
 type objAreaVendasType = {
-    valorAR: number,
-    impostosAR: number,
-    valorDesonerado: number,
-    porcentagemCargaTributariaAR: number,
-    valorDR: number,
-    impostosDR: number,
-    porcentagemCargaTributariaDR: number,
+    antesReforma: {
+      valorAR: number,
+      impostosAR: number,
+      valorDesonerado: number,
+      porcentagemCargaTributariaAR: number
+    },
+    depoisReforma: objAreaVendasTransicaoType[]
 }
 
 export type totalComprasType = {
@@ -47,7 +61,21 @@ export type linhasDreType = {
   despesas: {AR: number, DR: number},
 }
 
-export type linhaArDrDiferencas = {AR: number, DR: number, diferencaReais: number, diferencaPercentual: number}
+export type anosType = "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033"
+export const arrAnos: anosType[] = ["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]
+
+
+type objDepoisReformaDreCaixa = {
+  ano: anosType,
+  valor: number
+}
+
+export type linhaArDrDiferencas = {
+  antesReforma: {
+    valor: number
+  },
+  depoisReforma: objDepoisReformaDreCaixa[]
+} 
 
 export type tabelaDreType = {
   receitaBruta: linhaArDrDiferencas,
@@ -136,156 +164,231 @@ export const valorInicialobjRegime = {
               compraVendaBensImoveis: [],
               totalCompras: {
                   comprasProdutos: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    custoAR: 0, 
-                    creditoAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    custoDR: 0,
-                    creditoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   servicosTomados: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    custoAR: 0, 
-                    creditoAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    custoDR: 0,
-                    creditoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoMoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    custoAR: 0, 
-                    creditoAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    custoDR: 0,
-                    creditoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoImoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    custoAR: 0, 
-                    creditoAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    custoDR: 0,
-                    creditoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   total: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    custoAR: 0, 
-                    creditoAR: 0,
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    custoDR: 0,
-                    creditoDR: 0,
-                    porcentagemCustoEfetivoDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      creditoAR: 0,
+                      custoAR: 0, 
+                      porcentagemCustoEfetivoAR: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
               },
               totalVendas: {
                   vendasProdutos: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   servicosPrestados: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoMoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   locacaoImoveis: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
                   total: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0, 
-                    porcentagemCargaTributariaAR: 0,
-                    valorDR: 0,
-                    impostosDR: 0,
-                    porcentagemCargaTributariaDR: 0,   
+                    antesReforma: {
+                      valorAR: 0,
+                      impostosAR: 0,
+                      valorDesonerado: 0,
+                      porcentagemCargaTributariaAR: 0,
+                    },
+                    depoisReforma: [
+                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                    ]
                   },
               },
               dre: {
-                receitaBruta: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                deducoesTributos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                custoGeral: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucroBruto: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                despesas: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucrosAntesIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                lucroLiquido: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                receitaBruta: {antesReforma: {valor: 0}, depoisReforma: []},
+                deducoesTributos: {antesReforma: {valor: 0}, depoisReforma: []},
+                custoGeral: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucroBruto: {antesReforma: {valor: 0}, depoisReforma: []},
+                despesas: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucrosAntesIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                lucroLiquido: {antesReforma: {valor: 0}, depoisReforma: []}
               },
               caixa: {
-                fornecedores: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosCredito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                clientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosDebito: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                tributosRecolhidos: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                saldoCredor: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultado: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                irCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultadoPosIrCs: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
-                resultadoSobreClientes: {AR: 0, DR: 0, diferencaReais: 0, diferencaPercentual: 0},
+                fornecedores: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosCredito: {antesReforma: {valor: 0}, depoisReforma: []},
+                clientes: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosDebito: {antesReforma: {valor: 0}, depoisReforma: []},
+                tributosRecolhidos: {antesReforma: {valor: 0}, depoisReforma: []},
+                saldoCredor: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultado: {antesReforma: {valor: 0}, depoisReforma: []},
+                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultadoPosIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+                resultadoSobreClientes: {antesReforma: {valor: 0}, depoisReforma: []}
               }
           }  
 
   const valorInicialResultadoSimulador: objRespostaFinalType = {
-    simplesNacional: valorInicialobjRegime,
-    lucroReal: valorInicialobjRegime,
-    lucroPresumido: valorInicialobjRegime,
+    simplesNacional: JSON.parse(JSON.stringify(valorInicialobjRegime)),
+    lucroReal: JSON.parse(JSON.stringify(valorInicialobjRegime)),
+    lucroPresumido: JSON.parse(JSON.stringify(valorInicialobjRegime)),
     cnpj: "",
     meuRegime: "Simples Nacional"
   }
