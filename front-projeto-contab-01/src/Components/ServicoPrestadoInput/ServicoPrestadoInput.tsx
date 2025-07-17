@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { objAtividadeFinal } from "../SegundoPasso/SegundoPasso"
@@ -22,7 +22,11 @@ type Props = {
 
 
 export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPrestadas, setTotalAtividadesPrestadas}: Props){
+    const fileRef = useRef<HTMLInputElement>(null)
 
+    function clicarInput(){
+        fileRef.current?.click()
+    }
 
     const [atividadeSelecionada, setAtividadeSelecionada] = useState<ObjInfosType>()
     const [faturamentoSelecionado, setFaturamentoSelecionado] = useState<number>(0)
@@ -166,8 +170,10 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                 Serviços Prestados
             </div>
             <div className="text-sm">Selecione uma atividade e adicione o faturamento mensal</div>
-            <div>
+            <div className=" flex gap-4">
                 <BotaoGeral onClickFn={abrirModalServicosPrestadosFn} principalBranco={true} text="Adicionar Serviço Prestado"/>
+                <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
+                <input type="file" ref={fileRef} className="opacity-0" />
             </div>
 
 

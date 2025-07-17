@@ -20,8 +20,8 @@ export type ProdutoVendidoObj = {
 }
 
 
-export type TipoOperacaoAdquiridoType ="Consumo"| "Insumo" | "Alimentação" | "Imobilizado" | "Revenda"
-export const tipoOperacaoAdquiridoArr: TipoOperacaoAdquiridoType[] = ["Consumo", "Insumo", "Alimentação", "Imobilizado", "Revenda"]
+export type TipoOperacaoAdquiridoType ="Consumo"| "Insumo" | "Alimentação" | "Imobilizado" | "Revenda" | "Depreciação"
+export const tipoOperacaoAdquiridoArr: TipoOperacaoAdquiridoType[] = ["Consumo", "Insumo", "Alimentação", "Imobilizado", "Revenda", "Depreciação"]
 
 export type MetodoAdquiridoType = "Por Operação"| "Por CNPJ" 
 export const metodoAdquiridoArr: MetodoAdquiridoType[] = ["Por CNPJ", "Por Operação"]

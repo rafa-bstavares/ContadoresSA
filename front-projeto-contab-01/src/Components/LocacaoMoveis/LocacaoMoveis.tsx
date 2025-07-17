@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import interrogacaoImg from "../../assets/images/interrogaçãoImg.svg"
 import InfoTooltip from "../InfoToolTip/InfoToolTip"
@@ -17,6 +17,11 @@ type Props = {
 }
 
 export default function LocacaoMoveis({modoBranco}: Props){
+    const fileRef = useRef<HTMLInputElement>(null)
+
+    function clicarInput(){
+        fileRef.current?.click()
+    }
 
     type TiposAluguelType = "Aluguel pago" | "Aluguel recebido"
     type TiposOutroType = "Pessoa física" | "Pessoa jurídica"
@@ -905,8 +910,10 @@ export default function LocacaoMoveis({modoBranco}: Props){
                         <div className="font-semibold text-3xl mb-2">
                             Locação
                         </div>
-                        <div>
+                        <div className="flex gap-4">
                             <BotaoGeral onClickFn={abrirModalLocacaoMoveisFn} principalBranco={true} text="Adicionar Novo Bem Móvel (Locação)"/>
+                            <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
+                            <input type="file" ref={fileRef} className="opacity-0" />
                         </div>
                     </div>
                 </div>

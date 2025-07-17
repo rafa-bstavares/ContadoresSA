@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useContext, useEffect } from "react"
+import { Dispatch, SetStateAction, useState, useContext, useEffect, useRef } from "react"
 import { objAtividadesAdquitidasType } from "../SegundoPasso/SegundoPasso"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
@@ -17,6 +17,11 @@ type Props = {
 }
 
 export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtividadesAdquiridas}: Props){
+    const fileRef = useRef<HTMLInputElement>(null)
+
+    function clicarInput(){
+        fileRef.current?.click()
+    }
 
     const {objMinhaEmpresaOuPessoaAtual} = useContext(ContextoGeral)
 
@@ -529,8 +534,10 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
             <div className="font-bold text-3xl mb-2">
                 Serviços Tomados
             </div>
-            <div>
+            <div className="flex gap-4">
                 <BotaoGeral onClickFn={abrirModalServicosTomadosFn} principalBranco={true} text="Adicionar Serviço Tomado"/>
+                <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
+                <input type="file" ref={fileRef} className="opacity-0" />
             </div>
 
 

@@ -3,6 +3,7 @@ import { createContext, useState, Dispatch, SetStateAction } from "react";
 type objAreaComprasTransicaoType = {
       ano: anosType
       valor: number,
+      valorSemIva: number,
       impostos: number,
       credito: number,
       custo: number,
@@ -26,6 +27,7 @@ type objAreaComprasType = {
 type objAreaVendasTransicaoType = {
       ano: anosType
       valor: number,
+      valorSemIva: number,
       impostos: number,
       porcentagemCargaTributaria: number
 }
@@ -113,6 +115,7 @@ type objAntesReforma = {
 type objDepoisReforma = {
     ano: string,
     valor: number,
+    valorSemIva: number,
     valorImpostos: number,
     porcentagemCargaTributaria: number,
     custo: number | null

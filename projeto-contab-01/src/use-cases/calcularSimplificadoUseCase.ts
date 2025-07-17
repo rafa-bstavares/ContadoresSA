@@ -158,7 +158,7 @@ export interface ProdutoVendidoObj {
 
 type MetodoAdquiridoType = "Por Operação" | "Por CNPJ"
 
-type TipoOperacaoAdquiridoType = "Consumo" | "Insumo" | "Alimentação" | "Imobilizado" | "Revenda"
+type TipoOperacaoAdquiridoType = "Consumo" | "Insumo" | "Alimentação" | "Imobilizado" | "Revenda" | "Depreciação"
 
 export interface ProdutoAdquiridoObj {
     metodo: MetodoAdquiridoType,
@@ -749,6 +749,7 @@ export class calcularSimplificadoUseCase{
           type objAreaComprasTransicaoType = {
                 ano: anosType
                 valor: number,
+                valorSemIva: number,
                 impostos: number,
                 credito: number,
                 custo: number,
@@ -772,6 +773,7 @@ export class calcularSimplificadoUseCase{
           type objAreaVendasTransicaoType = {
                 ano: anosType
                 valor: number,
+                valorSemIva: number,
                 impostos: number,
                 porcentagemCargaTributaria: number
           }
@@ -819,6 +821,7 @@ export class calcularSimplificadoUseCase{
           type objDepoisReforma = {
              ano: anosType,
              valor: number,
+             valorSemIva: number,
              valorImpostos: number,
              porcentagemCargaTributaria: number,
              custo: number | null
@@ -899,14 +902,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   servicosTomados: {
@@ -920,14 +923,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   locacaoMoveis: {
@@ -941,14 +944,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   locacaoImoveis: {
@@ -962,14 +965,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   total: {
@@ -983,14 +986,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
               },
@@ -1003,14 +1006,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   servicosPrestados: {
@@ -1021,14 +1024,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   locacaoMoveis: {
@@ -1039,14 +1042,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   locacaoImoveis: {
@@ -1057,14 +1060,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
                   total: {
@@ -1075,14 +1078,14 @@ export class calcularSimplificadoUseCase{
                       porcentagemCargaTributariaAR: 0,
                     },
                     depoisReforma: [
-                      {ano: "2026", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
                     ]
                   },
               },
@@ -1384,9 +1387,11 @@ export class calcularSimplificadoUseCase{
                                       const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                                       const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoMensalDesonerado
                                       const novoValorAnoVigente = faturamentoMensalDesonerado + valorImpostosAnoVigente
+                                      const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                                       const objAnoVigente: objDepoisReforma = {
                                           ano: objAno.ano,
                                           valor: novoValorAnoVigente,
+                                          valorSemIva: valorSemIvaAnoVigente,
                                           valorImpostos: valorImpostosAnoVigente,
                                           porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                           custo: null
@@ -1398,10 +1403,12 @@ export class calcularSimplificadoUseCase{
 
                                       if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                                         objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                                        objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                                         objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
                                         objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoMensalDesonerado
 
                                         objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                                        objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                         objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                                         objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoMensalDesonerado
                                       }
@@ -1623,9 +1630,11 @@ export class calcularSimplificadoUseCase{
                           const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                           const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoDesonerado
                           const novoValorAnoVigente = faturamentoDesonerado + valorImpostosAnoVigente
+                          const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                           const objAnoVigente: objDepoisReforma = {
                               ano: objAno.ano,
                               valor: novoValorAnoVigente,
+                              valorSemIva: valorSemIvaAnoVigente,
                               valorImpostos: valorImpostosAnoVigente,
                               porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                               custo: null
@@ -1638,9 +1647,11 @@ export class calcularSimplificadoUseCase{
                           if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                             objAnoVigenteVendas[0].valor += novoValorAnoVigente
                             objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
+                            objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
 
                             objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
                           }
@@ -1800,9 +1811,11 @@ export class calcularSimplificadoUseCase{
                           const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                           const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / faturamentoDesonerado
                           const novoValorAnoVigente = faturamentoDesonerado + valorImpostosAnoVigente
+                          const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                           const objAnoVigente: objDepoisReforma = {
                               ano: objAno.ano,
                               valor: novoValorAnoVigente,
+                              valorSemIva: valorSemIvaAnoVigente,
                               valorImpostos: valorImpostosAnoVigente,
                               porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                               custo: null
@@ -1814,10 +1827,12 @@ export class calcularSimplificadoUseCase{
 
                           if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                             objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
 
                             objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / faturamentoDesonerado
                           }
@@ -2068,12 +2083,14 @@ export class calcularSimplificadoUseCase{
                               const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                               const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                               const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                              const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                               const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
                               custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
 
                               const objAnoVigente: objDepoisReforma = {
                                   ano: objAno.ano,
                                   valor: novoValorAnoVigente,
+                                  valorSemIva: valorSemIvaAnoVigente,
                                   valorImpostos: valorImpostosAnoVigente,
                                   porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                   custo: custoAnoVigente
@@ -2085,6 +2102,7 @@ export class calcularSimplificadoUseCase{
 
                                 if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                                   objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteCompras[0].credito += creditoAnoVigente
                                   objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -2092,6 +2110,7 @@ export class calcularSimplificadoUseCase{
                                   objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
 
                                   objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                                   objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -2319,12 +2338,14 @@ export class calcularSimplificadoUseCase{
                                 const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                                 const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                                 const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                                const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
                                 custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
 
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
                                     valor: novoValorAnoVigente,
+                                    valorSemIva: valorSemIvaAnoVigente,
                                     valorImpostos: valorImpostosAnoVigente,
                                     porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                     custo: custoAnoVigente
@@ -2336,6 +2357,7 @@ export class calcularSimplificadoUseCase{
 
                                 if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                                   objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteCompras[0].credito += creditoAnoVigente
                                   objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -2343,6 +2365,7 @@ export class calcularSimplificadoUseCase{
                                   objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
 
                                   objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                                   objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -2532,11 +2555,13 @@ export class calcularSimplificadoUseCase{
                                 const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                                 const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorServicoDesonerado
                                 const novoValorAnoVigente = valorServicoDesonerado + valorImpostosAnoVigente
+                                const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
                                 custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
                                     valor: novoValorAnoVigente,
+                                    valorSemIva: valorSemIvaAnoVigente,
                                     valorImpostos: valorImpostosAnoVigente,
                                     porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                     custo: custoAnoVigente
@@ -2548,6 +2573,7 @@ export class calcularSimplificadoUseCase{
 
                                 if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                                   objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteCompras[0].credito += creditoAnoVigente
                                   objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -2555,6 +2581,7 @@ export class calcularSimplificadoUseCase{
                                   objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorServicoDesonerado
 
                                   objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                                   objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -2885,9 +2912,11 @@ export class calcularSimplificadoUseCase{
                             const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                             const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
                             const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente // Mas nesse caso como eu fiz as porcentagens do IVA receberem 0, o valor que entra aqui é o valor sem IVA
+                            const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                             const objAnoVigente: objDepoisReforma = {
                                 ano: objAno.ano,
                                 valor: novoValorAnoVigente,
+                                valorSemIva: valorSemIvaAnoVigente,
                                 valorImpostos: valorImpostosAnoVigente,
                                 porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                 custo: null
@@ -2929,6 +2958,7 @@ export class calcularSimplificadoUseCase{
                             const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                             const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorBaseNovosTributosSimu1
                             const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                            const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                             let custoAnoVigente = novoValorAnoVigente
                             let creditoAnoVigente = 0
 
@@ -2944,6 +2974,7 @@ export class calcularSimplificadoUseCase{
                             const objAnoVigente: objDepoisReforma = {
                                 ano: objAno.ano,
                                 valor: novoValorAnoVigente,
+                                valorSemIva: valorSemIvaAnoVigente,
                                 valorImpostos: valorImpostosAnoVigente,
                                 porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                                 custo: custoAnoVigente
@@ -2956,6 +2987,7 @@ export class calcularSimplificadoUseCase{
 
                                 if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                                   objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                                  objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteCompras[0].credito += creditoAnoVigente
                                   objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -2963,6 +2995,7 @@ export class calcularSimplificadoUseCase{
                                   objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
 
                                   objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                                  objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                   objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                                   objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                                   objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -2987,10 +3020,12 @@ export class calcularSimplificadoUseCase{
 
                               if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                                 objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                                objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                                 objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
                                 objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
 
                                 objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                                objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                                 objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                                 objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
                               }
@@ -3629,11 +3664,13 @@ export class calcularSimplificadoUseCase{
                         const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                         const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
                         const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                        const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                         const creditoAnoVigente = (temCreditoIva ? valorIvaAnoVigente : 0)
                         const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
                         const objAnoVigente: objDepoisReforma = {
                             ano: objAno.ano,
                             valor: novoValorAnoVigente,
+                            valorSemIva: valorSemIvaAnoVigente,
                             valorImpostos: valorImpostosAnoVigente,
                             porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                             custo: movel.tipoAluguel == "Aluguel pago" ? custoAnoVigente : null
@@ -3646,6 +3683,7 @@ export class calcularSimplificadoUseCase{
 
                           if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                             objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                            objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteCompras[0].credito += creditoAnoVigente
                             objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -3653,6 +3691,7 @@ export class calcularSimplificadoUseCase{
                             objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
 
                             objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                             objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -3678,10 +3717,12 @@ export class calcularSimplificadoUseCase{
 
                           if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                             objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
 
                             objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                            objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                             objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                             objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
                           }
@@ -3812,6 +3853,8 @@ export class calcularSimplificadoUseCase{
 
                   let pisCo = produtoVendido.pisCofins / 100
                   let icms = produtoVendido.icms / 100
+                  let icmsDifal = produtoVendido.icmsDifal / 100
+                  let icmsSt = produtoVendido.icmsSt / 100
                   let iss = 0
                   let ipi = produtoVendido.ipi / 100
 
@@ -3987,37 +4030,33 @@ export class calcularSimplificadoUseCase{
 
 
 
-                  }else if(regimeAtual == "Lucro Real"){
+                  }else{
+                    // independente de ser real ou presumido, o icms vem sempre dos inputs
                     let aliquotaDesonerar = 0
-                    if(meuRegime == "Lucro Real"){
-                      // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
-                      icms = (produtoVendido.icms / 100)
-                      ipi = (produtoVendido.ipi / 100)
-                      aliquotaDesonerar = icms + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100) 
-                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                    }else{
-                      const tabelaLucroReal = parametrosEntrada.tabelaLucroReal
-                      icms = (tabelaLucroReal.comercial.icms ? (tabelaLucroReal.comercial.icms / 100) : 0)
-                      ipi = (tabelaLucroReal.comercial.ipi ? (tabelaLucroReal.comercial.ipi / 100) : 0)
-                      aliquotaDesonerar = icms + ipi + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100)
-                    }
+                    icms = (produtoVendido.icms / 100)
+                    ipi = (produtoVendido.ipi / 100)
+                    aliquotaDesonerar = icms + icmsDifal + icmsSt
+                    console.log("aliquota a desonerar: " + aliquotaDesonerar)
                     valorImpostosAtuais = valorBase * aliquotaDesonerar
 
-                  }else if(regimeAtual == "Lucro Presumido"){
-                    let aliquotaDesonerar = 0
-                    if(meuRegime == "Lucro Presumido"){
-                      // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
-                      icms = (produtoVendido.icms / 100)
-                      ipi = (produtoVendido.ipi / 100)
-                      aliquotaDesonerar = icms + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100) 
-                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                    }else{
-                      const tabelaLucroPresumido = parametrosEntrada.tabelaLucroPresumido
-                      icms = (tabelaLucroPresumido.comercial.icms ? (tabelaLucroPresumido.comercial.icms / 100) : 0)
-                      ipi = (tabelaLucroPresumido.comercial.ipi ? (tabelaLucroPresumido.comercial.ipi / 100) : 0)
-                      aliquotaDesonerar = icms + ipi + (produtoVendido.icmsDifal / 100) + (produtoVendido.icmsSt / 100)
+                    // Já o pisCofins vai depender se a minha empresa de fato é do msm regime que está sendo simulado agora
+                    if(regimeAtual == "Lucro Real"){
+                      if(meuRegime == "Lucro Real"){
+                        // O regime simulado atual é lucro real e minha empresa é do lucro real
+                        pisCo = produtoVendido.pisCofins
+                      }else{
+                        pisCo = parametrosEntrada.tabelaLucroReal.comercial.pisCo ? (parametrosEntrada.tabelaLucroReal.comercial.pisCo / 100) : 0
+                      }
+                    }else if(regimeAtual == "Lucro Presumido"){
+                      if(meuRegime == "Lucro Presumido"){
+                        // o regime simulado é presumido e minha empresa é do presumido
+                        pisCo = produtoVendido.pisCofins
+                      }else{
+                        pisCo = parametrosEntrada.tabelaLucroPresumido.comercial.pisCo ? (parametrosEntrada.tabelaLucroPresumido.comercial.pisCo) : 0
+                      }
                     }
-                    valorImpostosAtuais = valorBase * aliquotaDesonerar
+
+
                   }
 
                   console.log("valor dos impostos atuais (antes da reforma): " + valorImpostosAtuais)
@@ -4057,16 +4096,18 @@ export class calcularSimplificadoUseCase{
                       const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
 
                       // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
-                      const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                      const aliquotaIcmsAnoVigente = (icms + icmsSt + icmsDifal) * objAno.porcentagemIcmsIss
                       const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
 
                       // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
                       const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                       const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
                       const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                      const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                       const objAnoVigente: objDepoisReforma = {
                           ano: objAno.ano,
                           valor: novoValorAnoVigente,
+                          valorSemIva: valorSemIvaAnoVigente,
                           valorImpostos: valorImpostosAnoVigente,
                           porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                           custo: null
@@ -4078,10 +4119,12 @@ export class calcularSimplificadoUseCase{
 
                       if((objAnoVigenteVendas.length > 0) && (objAnoVigenteVendasTotal.length > 0)){
                         objAnoVigenteVendas[0].valor += novoValorAnoVigente
+                        objAnoVigenteVendas[0].valorSemIva += valorSemIvaAnoVigente
                         objAnoVigenteVendas[0].impostos += valorImpostosAnoVigente
                         objAnoVigenteVendas[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
 
                         objAnoVigenteVendasTotal[0].valor += novoValorAnoVigente
+                        objAnoVigenteVendasTotal[0].valorSemIva += valorSemIvaAnoVigente
                         objAnoVigenteVendasTotal[0].impostos += valorImpostosAnoVigente
                         objAnoVigenteVendasTotal[0].porcentagemCargaTributaria = objAnoVigenteVendas[0].impostos / valorDesonerado
                       }
@@ -4283,11 +4326,13 @@ export class calcularSimplificadoUseCase{
                       const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
                       const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
                       const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
+                      const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                       const creditoAnoVigente = (produtoAdquirido.creditoIcms ? valorIcmsAnoVigente : 0)
                       let custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
                       const objAnoVigente: objDepoisReforma = {
                           ano: objAno.ano,
                           valor: novoValorAnoVigente,
+                          valorSemIva: valorSemIvaAnoVigente,
                           valorImpostos: valorImpostosAnoVigente,
                           porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
                           custo: custoAnoVigente
@@ -4299,6 +4344,7 @@ export class calcularSimplificadoUseCase{
 
                       if((objAnoVigenteCompras.length > 0) && (objAnoVigenteComprasTotal.length > 0)){
                         objAnoVigenteCompras[0].valor += novoValorAnoVigente
+                        objAnoVigenteCompras[0].valorSemIva += valorSemIvaAnoVigente
                         objAnoVigenteCompras[0].impostos += valorImpostosAnoVigente
                         objAnoVigenteCompras[0].credito += creditoAnoVigente
                         objAnoVigenteCompras[0].custo += custoAnoVigente
@@ -4306,6 +4352,7 @@ export class calcularSimplificadoUseCase{
                         objAnoVigenteCompras[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
 
                         objAnoVigenteComprasTotal[0].valor += novoValorAnoVigente
+                        objAnoVigenteComprasTotal[0].valorSemIva += valorSemIvaAnoVigente
                         objAnoVigenteComprasTotal[0].impostos += valorImpostosAnoVigente
                         objAnoVigenteComprasTotal[0].credito += creditoAnoVigente
                         objAnoVigenteComprasTotal[0].custo += custoAnoVigente
@@ -4568,9 +4615,9 @@ export class calcularSimplificadoUseCase{
 
                 // ***** TABELA DRE TRANSIÇÃO *****
 
-                  // Receita Bruta (Estou colocando todos como valorDesonerado total. Seria para fazer apenas sem IVA?)
-                const valorVendaDesonerado = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado
-                const objLinhaReceitaBrutaAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaDesonerado}
+                  // Receita Bruta (valores de cada ano sem o IVA, apenas com os impostos remanescentes na transição)
+                const valorVendaSemIvaAtual = tabelaVendasTotalAnoAtual[0].valorSemIva
+                const objLinhaReceitaBrutaAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaSemIvaAtual}
                 respostaFinalCalculo[chaveRegimeObjFinal].dre.receitaBruta.depoisReforma.push(objLinhaReceitaBrutaAnoAtual)
 
                   //Deduções Tributos
@@ -4607,12 +4654,12 @@ export class calcularSimplificadoUseCase{
 
 
                   //  Lucro Bruto
-                const objLinhaLucroBrutoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaDesonerado - deducoesTributosAtual - dreCustoGeralAtual}
+                const objLinhaLucroBrutoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: valorVendaSemIvaAtual - deducoesTributosAtual - dreCustoGeralAtual}
                 respostaFinalCalculo[chaveRegimeObjFinal].dre.lucroBruto.depoisReforma.push(objLinhaLucroBrutoAtual)
 
                   // Lucro Antes IR/CS (Lucro Antes IR/CS = Receita Bruta - Deduções Tributos - Custo Mercadoria - Despesas)
                   // antigo lucroAntesIrCsDR
-                const lucroAntesIrCsAtual = valorVendaDesonerado - deducoesTributosAtual - dreCustoGeralAtual - dreDespesasAtual
+                const lucroAntesIrCsAtual = valorVendaSemIvaAtual - deducoesTributosAtual - dreCustoGeralAtual - dreDespesasAtual
                 const objLinhaLucroAntesIrCsAnoAtual: objDepoisReformaDreCaixa = {ano: anoAtual, valor: lucroAntesIrCsAtual}
                 respostaFinalCalculo[chaveRegimeObjFinal].dre.lucrosAntesIrCs.depoisReforma.push(objLinhaLucroAntesIrCsAnoAtual)
 
@@ -4635,23 +4682,23 @@ export class calcularSimplificadoUseCase{
 
                 }else if(regimeAtual == "Lucro Presumido"){
                     const valorTotalServicosPrestadosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR
-                    const valorDesoneradoServicosPrestados = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado
+                    const valorSemIvaServicosPrestados = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.find(item => item.ano == anoAtual)?.valorSemIva
 
                     const valorTotalLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorAR
                     const valorTotalLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorAR
                     const valorTotalLocacaoAR = valorTotalLocacaoImoveisAR + valorTotalLocacaoMoveisAR
 
-                    const valorDesoneradoLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado
-                    const valorDesoneradoLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado
-                    const valorDesoneradoLocacaoAR = valorDesoneradoLocacaoImoveisAR + valorDesoneradoLocacaoMoveisAR
+                    const valorSemIvaLocacaoMoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.depoisReforma.find(item => item.ano == anoAtual)?.valorSemIva
+                    const valorSemIvaLocacaoImoveisAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.depoisReforma.find(item => item.ano == anoAtual)?.valorSemIva
+                    const valorSemIvaLocacaoAR = (valorSemIvaLocacaoImoveisAR ? valorSemIvaLocacaoImoveisAR : 0) + (valorSemIvaLocacaoMoveisAR ? valorSemIvaLocacaoMoveisAR : 0)
 
                     const valorTotalProdutosVendidosAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorAR
-                    const valorDesoneradoProdutosVendidos = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
+                    const valorSemIvaProdutosVendidos = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.depoisReforma.find(item => item.ano == anoAtual)?.valorSemIva
 
                     const arrCalculoIrCs: {valorAR: number, valorDesonerado: number, aliquota: number, aliquotaIrpjCsll: number}[] = [
-                      {valorAR: valorTotalServicosPrestadosAR, valorDesonerado: valorDesoneradoServicosPrestados, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
-                      {valorAR: valorTotalLocacaoAR, valorDesonerado: valorDesoneradoLocacaoAR, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
-                      {valorAR: valorTotalProdutosVendidosAR, valorDesonerado: valorDesoneradoProdutosVendidos, aliquota: 0.08, aliquotaIrpjCsll: 0.0228 },
+                      {valorAR: valorTotalServicosPrestadosAR, valorDesonerado: valorSemIvaServicosPrestados ? valorSemIvaServicosPrestados : 0 , aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                      {valorAR: valorTotalLocacaoAR, valorDesonerado: valorSemIvaLocacaoAR, aliquota: 0.32, aliquotaIrpjCsll: 0.0768 },
+                      {valorAR: valorTotalProdutosVendidosAR, valorDesonerado: valorSemIvaProdutosVendidos ? valorSemIvaProdutosVendidos : 0, aliquota: 0.08, aliquotaIrpjCsll: 0.0228 },
                     ]
 
                     arrCalculoIrCs.forEach(item => {

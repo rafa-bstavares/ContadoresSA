@@ -13,6 +13,13 @@ import { Xis } from "../Xis/Xis"
 
 
 export function ProdutosAdquiridosInput(){
+    const fileRef = useRef<HTMLInputElement>(null)
+
+    function clicarInput(){
+        fileRef.current?.click()
+    }
+
+
 
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoAdquiridoType>()
     const [metodoAdd, setMetodoAdd] = useState<MetodoAdquiridoType>("Por CNPJ")
@@ -1122,8 +1129,10 @@ export function ProdutosAdquiridosInput(){
                         <div className="font-semibold text-3xl mb-2">
                             Produtos Adquiridos
                         </div>
-                        <div>
+                        <div className="flex gap-4">
                             <BotaoGeral onClickFn={abrirModalProdutosFn} principalBranco={true} text="Adicionar Novo Produto Adquirido"/>
+                            <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
+                            <input ref={fileRef} type="file" className="opacity-0"/>
                         </div>
                     </div>
                 </div>

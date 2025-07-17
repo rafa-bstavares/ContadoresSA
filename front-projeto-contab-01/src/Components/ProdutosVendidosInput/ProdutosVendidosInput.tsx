@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoObj } from "../../Contextos/ContextoProduto/ContextoProduto"
@@ -14,6 +14,12 @@ import { Xis } from "../Xis/Xis"
 
 
 export function ProdutosVendidosInput(){
+    const fileRef = useRef<HTMLInputElement>(null)
+
+    function clicarInput(){
+        fileRef.current?.click()
+    }
+
 
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoVendidoType>()
     const [valorOperacaoAdd, setValorOperacaoAdd] = useState<string>("")
@@ -436,17 +442,44 @@ export function ProdutosVendidosInput(){
             setIpi(tabelaSimplesNacional.comercial.ipi)
             setPisCofins(tabelaSimplesNacional.comercial.pisCo)
         }else if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
-                        console.log("meu regime presumido")
+            console.log("meu regime presumido")
             setIcms(tabelaLucroPresumido.comercial.icms)
             setIpi(tabelaLucroPresumido.comercial.ipi)
             setPisCofins(tabelaLucroPresumido.comercial.pisCo)
         }else{
-                        console.log("meu regime real")
+            console.log("meu regime real")
             setIcms(tabelaLucroReal.comercial.icms)
             setIpi(tabelaLucroReal.comercial.ipi)
             setPisCofins(tabelaLucroReal.comercial.pisCo)
         }
     }, [modalProdutosAberto])
+
+    useEffect(() => {
+        let colunaSelecionar: ("comercial" | "industrial") = "comercial"
+        if(tipoOperacaoAdd == "Indústria" || tipoOperacaoAdd == "Indústria - Consumidor final fora do Estado"){
+            colunaSelecionar = "industrial"
+        }else{
+            colunaSelecionar = "comercial"
+        }
+
+        if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
+            console.log("meu regime simples")
+            setIcms(tabelaSimplesNacional[colunaSelecionar].icms)
+            setIpi(tabelaSimplesNacional[colunaSelecionar].ipi)
+            setPisCofins(tabelaSimplesNacional[colunaSelecionar].pisCo)
+        }else if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
+            console.log("meu regime presumido")
+            setIcms(tabelaLucroPresumido[colunaSelecionar].icms)
+            setIpi(tabelaLucroPresumido[colunaSelecionar].ipi)
+            setPisCofins(tabelaLucroPresumido[colunaSelecionar].pisCo)
+        }else{
+            console.log("meu regime real")
+            setIcms(tabelaLucroReal[colunaSelecionar].icms)
+            setIpi(tabelaLucroReal[colunaSelecionar].ipi)
+            setPisCofins(tabelaLucroReal[colunaSelecionar].pisCo)
+        }
+
+    }, [tipoOperacaoAdd])
 
 
     return (
@@ -758,8 +791,10 @@ export function ProdutosVendidosInput(){
                         <div className="font-semibold text-3xl mb-2">
                             Produtos Vendidos
                         </div>
-                        <div>
+                        <div className="flex gap-4">
                             <BotaoGeral onClickFn={abrirModalProdutosFn} principalBranco={true} text="Adicionar Novo Produto Vendido"/>
+                            <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
+                            <input type="file" ref={fileRef} className="opacity-0" />
                         </div>
                     </div>
                 </div>
