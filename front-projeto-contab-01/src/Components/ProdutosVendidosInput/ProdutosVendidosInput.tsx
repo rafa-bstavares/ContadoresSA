@@ -1,25 +1,21 @@
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
-import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoObj } from "../../Contextos/ContextoProduto/ContextoProduto"
+import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoObj, ProdutoVendidoManualObj, ProdutoVendidoXmlObj } from "../../Contextos/ContextoProduto/ContextoProduto"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
+import uploadImg from "../../assets/images/uploadImg.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
 import { ToggleButton, toogleFn } from "../ToggleButton/ToggleButton"
 import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 import { Xis } from "../Xis/Xis"
+import { baseUrl } from "../../App"
 
 
 
 
 export function ProdutosVendidosInput(){
-    const fileRef = useRef<HTMLInputElement>(null)
-
-    function clicarInput(){
-        fileRef.current?.click()
-    }
-
 
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoVendidoType>()
     const [valorOperacaoAdd, setValorOperacaoAdd] = useState<string>("")
@@ -30,7 +26,7 @@ export function ProdutosVendidosInput(){
     const [pisCofins, setPisCofins] = useState<string | null>(null)
     const [ipi, setIpi] = useState<string | null>(null)
     const [ncmGenerico, setNcmGenerico] = useState<boolean>(false)
-    const [totalProdutosVendidosModal, setTotalProdutosVendidosModal] = useState<ProdutoVendidoObj[]>([])
+    const [totalProdutosVendidosModal, setTotalProdutosVendidosModal] = useState<ProdutoVendidoManualObj[]>([])
 
     const [modalProdutosAberto, setModalProdutosAberto] = useState<boolean>(false)
     const [info1Aberto, setInfo1Aberto] = useState<boolean>(true)
@@ -333,7 +329,8 @@ export function ProdutosVendidosInput(){
             
 
             const novoArr = [...totalProdutosVendidosModal]
-            const novoObjAtual: ProdutoVendidoObj = {
+            // Como vem do modal, sempre é manual aqui
+            const novoObjAtual: ProdutoVendidoManualObj = {
                 tipoOperacao: tipoOperacaoAdd,
                 icms: icms ? Number(icms.replace(",", ".")) : 0,
                 icmsSt: Number(icmsSt.replace(",", ".")),
@@ -345,6 +342,7 @@ export function ProdutosVendidosInput(){
                 beneficio: 0,
                 manterBeneficio: true,
                 descricaoAnexo: "",
+                tipoInput: "Manual",
                 id: idAtual
              }
             novoArr.push(novoObjAtual)
@@ -427,6 +425,45 @@ export function ProdutosVendidosInput(){
         const arrFinal = novoArr.filter(item => item.id !== id)
         console.log("arr Final")
         setTotalProdutosVendidosModal(arrFinal)
+    }
+
+    function onChangeXmlVendido(e: ChangeEvent<HTMLInputElement>){
+        if (e.target.files && e.target.files[0]) {
+            // ENVIAR O e.target.files[0] para o backend
+            const formData = new FormData()
+            const file = e.target.files[0]
+            formData.append("arquivo", file)
+
+            fetch(baseUrl + "/xmlProdutosVendidos", {
+                method: "POST",
+                body: formData,
+            }).then(res => res.json()).then((data: {success: true, data: (Omit<ProdutoVendidoXmlObj, "id">)[], error: null} | {success: false, data: null, error: string})=> {
+                console.log("RETORNO XML PRODUTOS VENDIDOS")
+                console.log(data)
+
+                if(data.success){
+                    const arrProdutosXml = data.data
+                    let maxId = 0
+                    if(totalProdutosVendidos.length > 0){
+                        // id do ultimo produto no array final de produtos vendidos
+                        maxId = totalProdutosVendidos[totalProdutosVendidos.length - 1].id
+                    }
+
+                    const cloneTotalProdutosVendidos = [...totalProdutosVendidos]
+                    arrProdutosXml.forEach(produtoXml => {
+                        const produtoFinalXmlTela: ProdutoVendidoXmlObj = {...produtoXml, id: maxId}
+                        cloneTotalProdutosVendidos.push(produtoFinalXmlTela)
+                        maxId++
+                    })
+
+                    setTotalProdutosVendidos(cloneTotalProdutosVendidos)
+
+                }
+
+
+            })
+
+        }
     }
 
     useEffect(() => {
@@ -793,8 +830,13 @@ export function ProdutosVendidosInput(){
                         </div>
                         <div className="flex gap-4">
                             <BotaoGeral onClickFn={abrirModalProdutosFn} principalBranco={true} text="Adicionar Novo Produto Vendido"/>
-                            <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
-                            <input type="file" ref={fileRef} className="opacity-0" />
+                            <label className="flex items-center gap-2 px-4 py-2 rounded-md border-2 border-solid border-white bg-white text-black cursor-pointer" htmlFor="xml-produtos-vendidos-upload">
+                                <div>
+                                    Subir XML
+                                </div>
+                                <img className="h-4 w-auto" src={uploadImg} alt="" />
+                            </label>
+                            <input type="file" className="hidden" accept=".xml" id="xml-produtos-vendidos-upload" onChange={(e) => onChangeXmlVendido(e)} />
                         </div>
                     </div>
                 </div>
@@ -824,15 +866,31 @@ export function ProdutosVendidosInput(){
                                             }
                         
                                             <div className={`grid grid-cols-[repeat(8,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
-                                                <div>{produto.tipoOperacao}</div>
-                                                <div>{produto.ncm}</div>
-                                                <div>{produto.icms}</div>
-                                                <div>{produto.icmsSt}</div>
-                                                <div>{produto.icmsDifal}</div>
-                                                <div>{produto.pisCofins}</div>
-                                                <div>{produto.ipi}</div>
-                                                <div>{produto.valorOperacao}</div>
-                                                <Xis onClickFn={apagarProdutoVendido} id={produto.id} />
+                                                {produto.tipoInput == "Manual" ?
+                                                    <>
+                                                        <div>{produto.tipoOperacao}</div>
+                                                        <div>{produto.ncm}</div>
+                                                        <div>{produto.icms}</div>
+                                                        <div>{produto.icmsSt}</div>
+                                                        <div>{produto.icmsDifal}</div>
+                                                        <div>{produto.pisCofins}</div>
+                                                        <div>{produto.ipi}</div>
+                                                        <div>{produto.valorOperacao}</div>
+                                                        <Xis onClickFn={apagarProdutoVendido} id={produto.id} />
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <div>{produto.tipoOperacao}</div>
+                                                        <div>{produto.ncm}</div>
+                                                        <div>{produto.valorIcms}</div>
+                                                        <div>{produto.valorIcmsSt}</div>
+                                                        <div>{produto.valorIcmsDifal}</div>
+                                                        <div>{produto.valorPisCofins}</div>
+                                                        <div>{produto.valorIpi}</div>
+                                                        <div>{produto.valorOperacao}</div>
+                                                        <Xis onClickFn={apagarProdutoVendido} id={produto.id} />      
+                                                    </>
+                                                }
                                             </div>
                                         </>
                                 )

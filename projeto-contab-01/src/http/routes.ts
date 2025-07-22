@@ -14,6 +14,8 @@ import { buscarEmpresasUsuarioController } from "./controllers/buscarEmpresasUsu
 import { confereTokenController } from "./controllers/confereTokenController";
 import { editarEmpresaController } from "./controllers/editarEmpresaController";
 import { beneficiosController } from "./controllers/beneficiosController";
+import { xmlProdutosVendidosController } from "./controllers/xmlProdutosVendidosController";
+import { xmlProdutosAdquiridosController } from "./controllers/xmlProdutosAdquiridosController";
 
 
 export async function appRoutes(app: FastifyInstance){
@@ -38,6 +40,9 @@ export async function appRoutes(app: FastifyInstance){
     app.post("/buscarEmpresa", buscarEmpresaController)
 
     app.post("/autenticar", autenticarUsuarioController)
+
+    app.post("/xmlProdutosVendidos", xmlProdutosVendidosController)
+    app.post("/xmlProdutosAdquiridos", xmlProdutosAdquiridosController)
 
     app.get("/lerXlsx", (request: FastifyRequest, reply: FastifyReply) => {
 

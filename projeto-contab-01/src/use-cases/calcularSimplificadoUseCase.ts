@@ -28,13 +28,13 @@ export interface objAtividadesAdquitidasType {
   manterBeneficio: boolean
 }
 
-export type aliquotasParametrosBodyType = {iss: number | null, icms: number | null, pisCo: number | null, ipi: number | null}
+export type impostosParametrosBodyType = {iss: number | null, icms: number | null, pisCo: number | null, ipi: number | null}
 
 export type objParametrosEntradaBodyType = {
-    industrial: aliquotasParametrosBodyType,
-    servicos: aliquotasParametrosBodyType,
-    comercial: aliquotasParametrosBodyType,
-    locacao: aliquotasParametrosBodyType
+    industrial: impostosParametrosBodyType,
+    servicos: impostosParametrosBodyType,
+    comercial: impostosParametrosBodyType,
+    locacao: impostosParametrosBodyType
 }
 
 interface parametrosEntrada {
@@ -141,7 +141,7 @@ interface ImoveisCompraVendaObj {
 
 type TipoOperacaoVendidoType = "Revenda" | "Indústria" | "Exportação" | "Revenda - Consumidor final fora do Estado" | "Indústria - Consumidor final fora do Estado"
 
-export interface ProdutoVendidoObj {
+export type ProdutoVendidoManualObj = {
     tipoOperacao: TipoOperacaoVendidoType,
     valorOperacao: number,
     ncm: string,
@@ -153,19 +153,40 @@ export interface ProdutoVendidoObj {
     beneficio: number,
     manterBeneficio: boolean,
     descricaoAnexo: string,
-    id: number
+    tipoInput: "Manual",
+    id: number,
 }
 
-type MetodoAdquiridoType = "Por Operação" | "Por CNPJ"
+
+export type ProdutoVendidoXmlObj = {
+    tipoOperacao: TipoOperacaoVendidoType,
+    valorOperacao: number,
+    ncm: string,
+    valorIcms: number,
+    aliqIcms: number,
+    valorIcmsSt: number,
+    valorIcmsDifal: number,
+    valorPisCofins: number,
+    valorIpi: number,
+    beneficio: number,
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
+    tipoInput: "XML",
+    id: number,
+}
+
+export type ProdutoVendidoObj  = ProdutoVendidoManualObj | ProdutoVendidoXmlObj
+
+export type MetodoAdquiridoType = "Por Operação" | "Por CNPJ"
 
 type TipoOperacaoAdquiridoType = "Consumo" | "Insumo" | "Alimentação" | "Imobilizado" | "Revenda" | "Depreciação"
 
-export interface ProdutoAdquiridoObj {
+export type ProdutoAdquiridoManualObj = {
     metodo: MetodoAdquiridoType,
     tipoOperacao: TipoOperacaoAdquiridoType | "",
     valorOperacao: number,
     ncm: string,
-    aliquotas: aliquotasParametrosBodyType,
+    aliquotas: impostosParametrosBodyType,
     creditoIcms: boolean,
     creditoPisCofins: boolean,
     creditoIpi: boolean,
@@ -175,8 +196,33 @@ export interface ProdutoAdquiridoObj {
     beneficio: number,
     manterBeneficio: boolean,
     descricaoAnexo: string,
+    tipoInput: "Manual",
     id: number
 }
+
+export type custoDespesaType = "Custo" | "Despesa"
+
+export type ProdutoAdquiridoXmlObj = {
+    metodo: MetodoAdquiridoType,
+    custoDespesa: custoDespesaType,
+    valorOperacao: number,
+    ncm: string,
+    aliquotas: impostosParametrosBodyType,
+    valores: impostosParametrosBodyType,
+    creditoIcms: boolean,
+    creditoPisCofins: boolean,
+    creditoIpi: boolean,
+    cnpjFornecedor: string,
+    regimeTributarioOutro: string,
+    fornecedorIndustrial: boolean,
+    beneficio: number,
+    manterBeneficio: boolean,
+    descricaoAnexo: string,
+    tipoInput: "XML",
+    id: number
+}
+
+export type ProdutoAdquiridoObj = ProdutoAdquiridoManualObj | ProdutoAdquiridoXmlObj
 
 interface respostaTotalType {
   servicosPrestados: objRespostaServicosPrestados[],
@@ -819,12 +865,12 @@ export class calcularSimplificadoUseCase{
           } 
           
           type objDepoisReforma = {
-             ano: anosType,
-             valor: number,
-             valorSemIva: number,
-             valorImpostos: number,
-             porcentagemCargaTributaria: number,
-             custo: number | null
+            ano: anosType,
+            valor: number,
+            valorSemIva: number,
+            valorImpostos: number,
+            porcentagemCargaTributaria: number,
+            custo: number | null
           }
 
           type objItemFinal = {
@@ -3130,7 +3176,7 @@ export class calcularSimplificadoUseCase{
                                   
                                     // SIMULAÇÃO 2
                                   console.log("Valor final simulação 2:")
-                                    // Somei "(600 * imovel.quantidade)" porque na simulaçao 2 não tem redução em nenhuma hipotese
+                                    // usei valorDesonerado porque na simulaçao 2 não tem redução devido a ser residencial em nenhuma hipotese
                                   let valorFinalSimu2SemCredito = valorDesonerado + novosTributosSimu2
                                   if(temCreditoIva){
                                     console.log("Você tem direito ao crédito novo")
@@ -3851,12 +3897,12 @@ export class calcularSimplificadoUseCase{
                   console.log(respostaFinalCalculo[chaveRegimeObjFinal].produtosVendidos)
 
 
-                  let pisCo = produtoVendido.pisCofins / 100
-                  let icms = produtoVendido.icms / 100
-                  let icmsDifal = produtoVendido.icmsDifal / 100
-                  let icmsSt = produtoVendido.icmsSt / 100
+                  let pisCo = 0
+                  let icms = 0
+                  let icmsDifal = 0
+                  let icmsSt = 0
                   let iss = 0
-                  let ipi = produtoVendido.ipi / 100
+                  let ipi = 0
 
                   let respProdutosVendidosAtual: objItemFinal = {
                     antesReforma: {
@@ -4031,33 +4077,86 @@ export class calcularSimplificadoUseCase{
 
 
                   }else{
-                    // independente de ser real ou presumido, o icms vem sempre dos inputs
-                    let aliquotaDesonerar = 0
-                    icms = (produtoVendido.icms / 100)
-                    ipi = (produtoVendido.ipi / 100)
-                    aliquotaDesonerar = icms + icmsDifal + icmsSt
-                    console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                    valorImpostosAtuais = valorBase * aliquotaDesonerar
+                    if(produtoVendido.tipoInput == "Manual"){
+                      // independente de ser real ou presumido, o icms vem sempre dos inputs
+                      let aliquotaDesonerar = 0
+                      icms = (produtoVendido.icms / 100)
+                      ipi = (produtoVendido.ipi / 100)
+                      aliquotaDesonerar = icms + icmsDifal + icmsSt
+                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                      valorImpostosAtuais = valorBase * aliquotaDesonerar
 
-                    // Já o pisCofins vai depender se a minha empresa de fato é do msm regime que está sendo simulado agora
-                    if(regimeAtual == "Lucro Real"){
-                      if(meuRegime == "Lucro Real"){
-                        // O regime simulado atual é lucro real e minha empresa é do lucro real
-                        pisCo = produtoVendido.pisCofins
-                      }else{
-                        pisCo = parametrosEntrada.tabelaLucroReal.comercial.pisCo ? (parametrosEntrada.tabelaLucroReal.comercial.pisCo / 100) : 0
+                      // Já o pisCofins vai depender se a minha empresa de fato é do msm regime que está sendo simulado agora
+                      if(regimeAtual == "Lucro Real"){
+                        if(meuRegime == "Lucro Real"){
+                          // O regime simulado atual é lucro real e minha empresa é do lucro real
+                          pisCo = produtoVendido.pisCofins
+                        }else{
+                          pisCo = parametrosEntrada.tabelaLucroReal.comercial.pisCo ? (parametrosEntrada.tabelaLucroReal.comercial.pisCo / 100) : 0
+                        }
+                      }else if(regimeAtual == "Lucro Presumido"){
+                        if(meuRegime == "Lucro Presumido"){
+                          // o regime simulado é presumido e minha empresa é do presumido
+                          pisCo = produtoVendido.pisCofins
+                        }else{
+                          pisCo = parametrosEntrada.tabelaLucroPresumido.comercial.pisCo ? (parametrosEntrada.tabelaLucroPresumido.comercial.pisCo) : 0
+                        }
                       }
-                    }else if(regimeAtual == "Lucro Presumido"){
-                      if(meuRegime == "Lucro Presumido"){
-                        // o regime simulado é presumido e minha empresa é do presumido
-                        pisCo = produtoVendido.pisCofins
+                    }else if(produtoVendido.tipoInput == "XML"){
+                      // Sempre que for XML, eu pego o icms e ipi pelo valor direto do XML, não pelas alíquotas. Como nesse caso, não atualizo alíquotas, no ano a ano, sempre que for 
+                      // XML eu pego pela alíquota do ICMS do XML tambem.
+
+                      const valorIcms = produtoVendido.valorIcms + produtoVendido.valorIcmsDifal + produtoVendido.valorIcmsSt 
+                      const valorIpi = produtoVendido.valorIpi
+
+                      if(regimeAtual == meuRegime){
+                        // pegar do XML (no caso os inputs estão preenchidos com os valores do XML)
+                        valorImpostosAtuais = valorIcms + valorIpi + produtoVendido.valorPisCofins
+
                       }else{
-                        pisCo = parametrosEntrada.tabelaLucroPresumido.comercial.pisCo ? (parametrosEntrada.tabelaLucroPresumido.comercial.pisCo) : 0
+                        // Preciso pegar da tabela do Real ou Presumido]
+                        // Antes descubro qual a coluna correta a conferir a partir do tipoOperacao
+                        let colunaTabela: "comercial" | "industrial" | "exportacao"
+                        switch(produtoVendido.tipoOperacao){
+                          case "Revenda - Consumidor final fora do Estado":
+                            colunaTabela = "comercial"
+                            break
+                          case "Revenda":
+                            colunaTabela = "comercial"
+                            break
+                          case "Indústria":
+                            colunaTabela = "industrial"
+                            break
+                          case "Indústria - Consumidor final fora do Estado":
+                            colunaTabela = "industrial"
+                            break 
+                          case "Exportação":
+                            colunaTabela = "exportacao"
+                            break
+                        }
+                        if(colunaTabela == "exportacao"){
+                          valorImpostosAtuais = 0
+                        }else{
+                          if(regimeAtual == "Lucro Presumido"){
+                            // pegar alíquotas da tabela do Lucro Presumido
+                            const tabelaLucroPresumido = parametrosEntrada.tabelaLucroPresumido
+                            pisCo = tabelaLucroPresumido[colunaTabela].pisCo ?? 0
+                            iss = tabelaLucroPresumido[colunaTabela].iss ?? 0
+                          }else if(regimeAtual == "Lucro Real"){
+                            // pegar alíquotas da tabela do Lucro Real 
+                            const tabelaLucroReal = parametrosEntrada.tabelaLucroReal
+                            pisCo = tabelaLucroReal[colunaTabela].pisCo ?? 0
+                            iss = tabelaLucroReal[colunaTabela].iss ?? 0
+                          }
+                          aliquotaDesonerar = pisCo + iss
+                          valorImpostosAtuais = (valorBase * aliquotaDesonerar) + valorIcms + valorIpi
+                        }
                       }
                     }
 
 
                   }
+
 
                   console.log("valor dos impostos atuais (antes da reforma): " + valorImpostosAtuais)
 
@@ -4096,8 +4195,14 @@ export class calcularSimplificadoUseCase{
                       const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
 
                       // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
-                      const aliquotaIcmsAnoVigente = (icms + icmsSt + icmsDifal) * objAno.porcentagemIcmsIss
-                      const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+                      let aliquotaIcmsAnoVigente = 0
+                      let valorIcmsAnoVigente = 0
+                      if(produtoVendido.tipoInput == "XML"){
+                        aliquotaIcmsAnoVigente = produtoVendido.aliqIcms * objAno.porcentagemIcmsIss
+                      }else{
+                        aliquotaIcmsAnoVigente = (icms + icmsSt + icmsDifal) * objAno.porcentagemIcmsIss
+                      }
+                      valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
 
                       // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
                       const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
@@ -4269,10 +4374,14 @@ export class calcularSimplificadoUseCase{
                     valorImpostosAtuais = valorBase * aliquotaDesonerar
 
                   }else{
-                    // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
-                    const aliquotaDesonerar = (produtoAdquirido.aliquotas.icms !== null ? produtoAdquirido.aliquotas.icms / 100 : 0) + (produtoAdquirido.aliquotas.pisCo !== null ? produtoAdquirido.aliquotas.pisCo / 100 : 0) + (produtoAdquirido.aliquotas.ipi !== null ? produtoAdquirido.aliquotas.ipi / 100 : 0) 
-                    console.log("aliquota a desonerar: " + aliquotaDesonerar)
-                    valorImpostosAtuais = valorBase * aliquotaDesonerar
+                    if(produtoAdquirido.tipoInput == "XML"){
+                      valorImpostosAtuais = (produtoAdquirido.valores.icms ? produtoAdquirido.valores.icms : 0) + (produtoAdquirido.valores.ipi ? produtoAdquirido.valores.ipi : 0) + (produtoAdquirido.valores.iss ? produtoAdquirido.valores.iss : 0) + (produtoAdquirido.valores.pisCo ? produtoAdquirido.valores.pisCo : 0)
+                    }else{
+                      // Tanto Lucro Real quanto Lucro Presumido tem que calcular os impostos atuais através dos parametros de entrada, então pode ser a mesma coisa
+                      const aliquotaDesonerar = (produtoAdquirido.aliquotas.icms !== null ? produtoAdquirido.aliquotas.icms / 100 : 0) + (produtoAdquirido.aliquotas.pisCo !== null ? produtoAdquirido.aliquotas.pisCo / 100 : 0) + (produtoAdquirido.aliquotas.ipi !== null ? produtoAdquirido.aliquotas.ipi / 100 : 0) 
+                      console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                      valorImpostosAtuais = valorBase * aliquotaDesonerar
+                    }
                   }
 
                   // CRÉDITO ATUAL 
@@ -4319,8 +4428,16 @@ export class calcularSimplificadoUseCase{
                       const valorIssAnoVigente = (valorDesonerado + valorIvaAnoVigente) * aliquotaIssAnoVigente
 
                       // CALCULAR VALOR ICMS (base é valorDesonerado + ICMS (ou seja, por dentro) + IVA)
-                      const aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
-                      const valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+                      let aliquotaIcmsAnoVigente
+                      let valorIcmsAnoVigente
+                      if(produtoAdquirido.tipoInput == "XML"){
+                        aliquotaIcmsAnoVigente = (produtoAdquirido.aliquotas.icms || 0) * objAno.porcentagemIcmsIss
+                        valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+                      }else{
+                        aliquotaIcmsAnoVigente = icms * objAno.porcentagemIcmsIss
+                        valorIcmsAnoVigente = ((valorDesonerado + valorIvaAnoVigente) * aliquotaIcmsAnoVigente) / (1 - aliquotaIcmsAnoVigente)
+                      }
+
 
                       // VALORES FINAIS E CONSTRUÇÃO DO OBJETO DO ANO
                       const valorImpostosAnoVigente = valorIvaAnoVigente + valorIssAnoVigente + valorIcmsAnoVigente
@@ -4360,15 +4477,29 @@ export class calcularSimplificadoUseCase{
                         objAnoVigenteComprasTotal[0].porcentagemCargaTributaria = objAnoVigenteCompras[0].impostos / valorDesonerado
                       }
 
-                      if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
-                        const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
-                        if(objCustoGeralAtual){
-                          objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                      if(produtoAdquirido.tipoInput == "Manual"){
+                        if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
+                          const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                          if(objCustoGeralAtual){
+                            objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                          }
+                        }else{
+                          const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                          if(objDespesaAtual){
+                            objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                          }
                         }
                       }else{
-                        const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
-                        if(objDespesaAtual){
-                          objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                        if(produtoAdquirido.custoDespesa == "Custo"){
+                          const objCustoGeralAtual = dreCustoGeralTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                          if(objCustoGeralAtual){
+                            objCustoGeralAtual.custoGeralAnoVigente += custoAnoVigente
+                          }
+                        }else{
+                          const objDespesaAtual = dreDespesasTransicao.find(objAnoCusto => objAnoCusto.ano == objAno.ano)
+                          if(objDespesaAtual){
+                            objDespesaAtual.despesaAnoVigente += custoAnoVigente
+                          }
                         }
                       }
 
@@ -4445,10 +4576,18 @@ export class calcularSimplificadoUseCase{
                   respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR += custoAR
                   respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.custoAR / respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorAR
 
-                  if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
-                    dreCustoGeralAR += custoAR
+                  if(produtoAdquirido.tipoInput == "Manual"){
+                    if(produtoAdquirido.tipoOperacao == "Revenda" || produtoAdquirido.tipoOperacao == "Insumo"){
+                      dreCustoGeralAR += custoAR
+                    }else{
+                      dreDespesasAR += custoAR
+                    }
                   }else{
-                    dreDespesasAR += custoAR
+                    if(produtoAdquirido.custoDespesa == "Custo"){
+                      dreCustoGeralAR += custoAR
+                    }else{
+                      dreDespesasAR += custoAR
+                    }
                   }
           
 

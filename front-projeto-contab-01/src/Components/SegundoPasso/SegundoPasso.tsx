@@ -24,7 +24,7 @@ import { ContextoMoveis } from '../../Contextos/ContextoMoveis/ContextoMoveis';
 import ProdutosBotao from '../ProdutosBotao/ProdutosBotao'
 import { ProdutosVendidosInput } from '../ProdutosVendidosInput/ProdutosVendidosInput'
 import { ProdutosAdquiridosInput } from '../ProdutosAdquiridosInput/ProdutosAdquiridosInput'
-import { aliquotasParametrosFinalType, ContextoProduto, ProdutoAdquiridoObj, ProdutoVendidoObj } from '../../Contextos/ContextoProduto/ContextoProduto'
+import { impostosParametrosFinalType, ContextoProduto, ProdutoAdquiridoObj, ProdutoVendidoObj } from '../../Contextos/ContextoProduto/ContextoProduto'
 import { ModalPerguntaBeneficios } from '../ModalPerguntaBeneficios/ModalPerguntaBeneficios'
 import { ModalConferirBeneficios } from '../ModalConferirBeneficios/ModalConferirBeneficios'
 import { ContextoResultadoSimulador, objRespostaFinalType } from '../../Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador'
@@ -219,10 +219,10 @@ export function SegundoPasso({modoBranco}: Props){
 
 
     type objParametrosEntradaFinalType = {
-        industrial: aliquotasParametrosFinalType,
-        servicos: aliquotasParametrosFinalType,
-        comercial: aliquotasParametrosFinalType,
-        locacao: aliquotasParametrosFinalType
+        industrial: impostosParametrosFinalType,
+        servicos: impostosParametrosFinalType,
+        comercial: impostosParametrosFinalType,
+        locacao: impostosParametrosFinalType
     }
 
     function converterParametrosOpcionais(obj: objAreas): objParametrosEntradaFinalType{
@@ -237,7 +237,7 @@ export function SegundoPasso({modoBranco}: Props){
 
             for (const [imposto, valor] of Object.entries(aliquotas)) {
                 if(valor !== null){
-                    novoObj[area as keyof objParametrosEntradaFinalType][imposto as keyof aliquotasParametrosFinalType] = parseFloat(valor.replace(",", "*").replace(".", ",").replace("*", "."))
+                    novoObj[area as keyof objParametrosEntradaFinalType][imposto as keyof impostosParametrosFinalType] = parseFloat(valor.replace(",", "*").replace(".", ",").replace("*", "."))
                 }
             }
         }

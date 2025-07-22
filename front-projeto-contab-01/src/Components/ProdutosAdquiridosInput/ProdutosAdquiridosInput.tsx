@@ -1,24 +1,20 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
-import { ContextoProduto, tipoOperacaoAdquiridoArr, TipoOperacaoAdquiridoType, ProdutoAdquiridoObj, MetodoAdquiridoType, metodoAdquiridoArr, RegimesAdquiridoType, regimesAdquiridoArr, SimNaoType, simNaoArr, aliquotasParametrosFinalType} from "../../Contextos/ContextoProduto/ContextoProduto"
+import { ContextoProduto, tipoOperacaoAdquiridoArr, TipoOperacaoAdquiridoType, ProdutoAdquiridoObj, MetodoAdquiridoType, metodoAdquiridoArr, RegimesAdquiridoType, regimesAdquiridoArr, SimNaoType, simNaoArr, impostosParametrosFinalType, ProdutoAdquiridoXmlObj, custoDespesaXmlType} from "../../Contextos/ContextoProduto/ContextoProduto"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import lixeira from "../../assets/images/lixeira.svg"
+import uploadImg from "../../assets/images/uploadImg.svg"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
 import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 import { ToggleButton, toogleFn } from "../ToggleButton/ToggleButton"
 import { Xis } from "../Xis/Xis"
-
-
+import { baseUrl } from "../../App"
 
 
 export function ProdutosAdquiridosInput(){
+
     const fileRef = useRef<HTMLInputElement>(null)
-
-    function clicarInput(){
-        fileRef.current?.click()
-    }
-
 
 
     const [tipoOperacaoAdd, setTipoOperacaoAdd] = useState<TipoOperacaoAdquiridoType>()
@@ -35,6 +31,8 @@ export function ProdutosAdquiridosInput(){
     const [cnpjGenerico, setCnpjGenerico] = useState<boolean>(false)
     const [totalProdutosAdquiridosModal, setTotalProdutosAdquiridosModal] = useState<ProdutoAdquiridoObj[]>([])
     const [fornecedorIndustrialAdd, setFornecedorIndustrialAdd] = useState<boolean>(false)
+    const [custoDespesaXml, setCustoDespesaXml] = useState<custoDespesaXmlType>()
+
 
     const [modalProdutosAberto, setModalProdutosAberto] = useState<boolean>(false)
     const [info1Aberto, setInfo1Aberto] = useState<boolean>(true)
@@ -43,11 +41,15 @@ export function ProdutosAdquiridosInput(){
     const [metodoAberto, setMetodoAberto] = useState<boolean>(false)
     const [regimeFornecedorAberto, setRegimeFornecedorAberto] = useState<boolean>(false)
     const [fornecedorIndustrialAberto, setFornecedorIndustrialAberto] = useState<boolean>(false)
+    const [modalCustoDespesaAberto, setModalCustoDespesaAberto] = useState<boolean>(false)
+    const [custoDespesaAberto, setCustoDespesaAberto] = useState<boolean>(false)
 
     const {totalProdutosAdquiridos, setTotalProdutosAdquiridos} = useContext(ContextoProduto)
     const {aliquotasIva, tabelaSimplesNacional, tabelaLucroReal, tabelaLucroPresumido, setAliquotasIva, setTabelaSimplesNacional, setTabelaLucroReal, setTabelaLucroPresumido} = useContext(ContextoParametrosOpcionais)
     const {setTemErro, setTextoErro} = useContext(ContextoErro)
 
+    
+    const arrCustoDespesa: custoDespesaXmlType[] = ["Custo", "Despesa"]
     
 
 
@@ -57,6 +59,10 @@ export function ProdutosAdquiridosInput(){
 
     function trocarDropTipoOperacao(){
         setTipoOperacaoAberto(!tipoOperacaoAberto)
+    }
+
+    function trocarDropCustoDespesa(){
+        setCustoDespesaAberto(!custoDespesaAberto)
     }
 
     function trocarDropMetodo(){
@@ -84,6 +90,11 @@ export function ProdutosAdquiridosInput(){
     function escolherRegime(item: RegimesAdquiridoType){
         setRegimeFornecedorAdd(item)
         trocarDropRegimeFornecedor()
+    }
+
+    function escolherCustoDespesa(item: custoDespesaXmlType){
+        setCustoDespesaXml(item)
+        trocarDropCustoDespesa()
     }
 
     function escolherIcms(e: React.ChangeEvent<HTMLInputElement>){
@@ -299,13 +310,13 @@ export function ProdutosAdquiridosInput(){
     }
 
 
-    function tratarObjAliquotas(objAliquotasAdd: objAliquotas): aliquotasParametrosFinalType{
+    function tratarObjAliquotas(objAliquotasAdd: objAliquotas): impostosParametrosFinalType{
 
-        let objAliquotasFinal: aliquotasParametrosFinalType = {icms: null, ipi: null, iss: null, pisCo: null}
+        let objAliquotasFinal: impostosParametrosFinalType = {icms: null, ipi: null, iss: null, pisCo: null}
 
         for(const [nomeAliquota, valorAliquota] of Object.entries(objAliquotasAdd)){
             if(valorAliquota !== null){
-                objAliquotasFinal[`${nomeAliquota}` as keyof aliquotasParametrosFinalType] = Number(valorAliquota.replace(",", "*").replace(".", ",").replace("*", "."))
+                objAliquotasFinal[`${nomeAliquota}` as keyof impostosParametrosFinalType] = Number(valorAliquota.replace(",", "*").replace(".", ",").replace("*", "."))
             }
         }
 
@@ -347,6 +358,7 @@ export function ProdutosAdquiridosInput(){
                     beneficio: 0,
                     manterBeneficio: true,
                     descricaoAnexo: "",
+                    tipoInput: "Manual",
                     id: idAtual
                 }
                 novoArr.push(novoObjAtual)
@@ -598,9 +610,104 @@ export function ProdutosAdquiridosInput(){
         }
     }
 
+    function abrirOpcaoCustoDespesa(){
+        setModalCustoDespesaAberto(true)
+        setCustoDespesaXml(undefined)
+    }
+
+    function fecharModalCustoDespesa(){
+        setModalCustoDespesaAberto(false)
+    }
+
+    function continuarModalCustoDespesa(){
+        // Verificar se ele preencheu o custo despesa
+        if(custoDespesaXml){
+            fecharModalCustoDespesa()
+            fileRef.current?.click()
+        }else{
+            setTemErro(true)
+            setTextoErro("Escolha um valor para continuar ou clique no botão 'Voltar'")
+        }
+    }
+
+
+    function onChangeXmlAdquirido(e: ChangeEvent<HTMLInputElement>){
+        if (e.target.files && e.target.files[0]) {
+            // ENVIAR O e.target.files[0] para o backend
+            const formData = new FormData()
+            const file = e.target.files[0]
+            formData.append("arquivo", file)
+            console.log("Custo despesa XML")
+            console.log(custoDespesaXml)
+            formData.append("custoDespesa", custoDespesaXml ? custoDespesaXml : "Custo")
+
+            fetch(baseUrl + "/xmlProdutosAdquiridos", {
+                method: "POST",
+                body: formData,
+            }).then(res => res.json()).then((data: {success: true, data: (Omit<ProdutoAdquiridoXmlObj, "id">)[], error: null} | {success: false, data: null, error: string})=> {
+                console.log("RETORNO XML PRODUTOS ADQUIRIDOS")
+                console.log(data)
+
+                if(data.success){
+                    const arrProdutosXml = data.data
+                    let maxId = 0
+                    if(totalProdutosAdquiridos.length > 0){
+                        // id do ultimo produto no array final de produtos adquiridos
+                        maxId = totalProdutosAdquiridos[totalProdutosAdquiridos.length - 1].id
+                    }
+
+                    const cloneTotalProdutosAdquiridos = [...totalProdutosAdquiridos]
+                    arrProdutosXml.forEach(produtoXml => {
+                        const produtoFinalXmlTela: ProdutoAdquiridoXmlObj = {...produtoXml, id: maxId}
+
+                        // Verificar quais aliquotas dos parametros vou enviar baseado no regime tributário do fornecedor
+                        if(produtoXml.regimeTributarioOutro == "Simples Nacional"){
+                            if(produtoXml.fornecedorIndustrial){
+                                // TABELA SIMPLES COLUNA INDUSTRIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaSimplesNacional.industrial)
+                            }else{
+                                // TABELA SIMPLES COLUNA COMERCIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaSimplesNacional.comercial)
+                            }
+                        }else if(produtoXml.regimeTributarioOutro == "Lucro Presumido"){
+                            if(produtoXml.fornecedorIndustrial){
+                                // TABELA LUCRO PRESUMIDO COLUNA INDUSTRIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaLucroPresumido.industrial)
+                            }else{
+                                // TABELA LUCRO PRESUMIDO COLUNA COMERCIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaLucroPresumido.comercial)
+                            }
+                        }else if(produtoXml.regimeTributarioOutro == "Lucro Real"){
+                            if(produtoXml.fornecedorIndustrial){
+                                // TABELA LUCRO REAL COLUNA INDUSTRIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaLucroReal.industrial)
+                            }else{
+                                // TABELA LUCRO REAL COLUNA COMERCIAL
+                                produtoFinalXmlTela.aliquotas = tratarObjAliquotas(tabelaLucroReal.comercial)
+                            }
+                        }
+
+                        cloneTotalProdutosAdquiridos.push(produtoFinalXmlTela)
+                        maxId++
+                    })
+
+                    setTotalProdutosAdquiridos(cloneTotalProdutosAdquiridos)
+
+                }
+
+
+            })
+
+        }
+    }
+
     useEffect(() => {
         console.log(totalProdutosAdquiridosModal)
     }, [totalProdutosAdquiridosModal])
+    
+        useEffect(() => {
+        console.log(custoDespesaXml)
+    }, [custoDespesaXml])
 
     useEffect(() => {
         if(tipoOperacaoAdd == "Insumo" || tipoOperacaoAdd == "Revenda" || !ncmGenerico){
@@ -1086,7 +1193,7 @@ export function ProdutosAdquiridosInput(){
                                 
                                                     <div className={`grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                         <div>{produto.metodo == "Por Operação" ? "Diversos" : produto.cnpjFornecedor}</div>
-                                                        <div>{produto.tipoOperacao}</div>                                                       
+                                                        <div>{produto.tipoInput == "Manual" ? produto.tipoOperacao : "Não informado (XML)"}</div>                                                       
                                                         <div>{produto.regimeTributarioOutro}</div>
                                                         <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                         <div>{produto.ncm}</div>
@@ -1120,6 +1227,64 @@ export function ProdutosAdquiridosInput(){
             )
             }
 
+            {
+                modalCustoDespesaAberto &&
+                <div className="fixed left-0 right-0 top-0 h-screen flex flex-col items-center justify-center bg-black/90 text-white z-50">
+                    <div className="flex flex-col gap-4 items-center p-12 rounded-2xl bg-fundoCinzaEscuro">
+                        <div className="text-center">
+                            Selecione abaixo se os produtos desse XML são custo ou despesa:
+                        </div>
+                        <div className="flex">
+                            <div className="flex flex-col border-gray-300 border-solid border-2 rounded-md">
+                                <div
+                                onClick={trocarDropCustoDespesa}
+                                className="flex gap-2 items-center justify-between p-2 cursor-pointer"
+                                >
+                                <div className="opacity-50">
+                                    {custoDespesaXml ? custoDespesaXml : "Escolha"}
+                                </div>
+                                <div
+                                    className={`
+                                    ${custoDespesaAberto ? "rotate-180" : "rotate-0"}
+                                    transition-all ease-linear duration-500
+                                    `}
+                                >
+                                    <img
+                                    src={setaSeletor}
+                                    alt="seta-seletor"
+                                    className="w-4 h-4"
+                                    />
+                                </div>
+                                </div>
+
+                                <div
+                                className={`
+                                    ${custoDespesaAberto ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}
+                                    [transition:grid-template-rows_500ms]
+                                `}
+                                >
+                                <div className="overflow-hidden">
+                                    {arrCustoDespesa.map(item => (
+                                    <div
+                                        key={item}
+                                        className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
+                                        onClick={() => escolherCustoDespesa(item)}
+                                    >
+                                        {item}
+                                    </div>
+                                    ))}
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <BotaoGeral principalBranco={false} text="Voltar" onClickFn={fecharModalCustoDespesa} />
+                            <BotaoGeral principalBranco={true} text="Continuar" onClickFn={continuarModalCustoDespesa} />
+                        </div>
+                    </div>
+                </div>
+            }
+
 
 
 
@@ -1131,8 +1296,13 @@ export function ProdutosAdquiridosInput(){
                         </div>
                         <div className="flex gap-4">
                             <BotaoGeral onClickFn={abrirModalProdutosFn} principalBranco={true} text="Adicionar Novo Produto Adquirido"/>
-                            <BotaoGeral onClickFn={clicarInput} principalBranco={true} text="Subir XML" />
-                            <input ref={fileRef} type="file" className="opacity-0"/>
+                            <div onClick={abrirOpcaoCustoDespesa} className="flex items-center gap-2 px-4 py-2 rounded-md border-2 border-solid border-white bg-white text-black cursor-pointer">
+                                <div>
+                                    Subir XML
+                                </div>
+                                <img className="h-4 w-auto" src={uploadImg} alt="" />
+                            </div>
+                            <input type="file" ref={fileRef} className="hidden" accept=".xml" id="xml-produtos-vendidos-upload" onChange={(e) => onChangeXmlAdquirido(e)} />
                         </div>
                     </div>
                 </div>
@@ -1164,7 +1334,7 @@ export function ProdutosAdquiridosInput(){
                         
                                             <div className={`grid grid-cols-[repeat(9,_1fr)_auto] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                 <div>{produto.metodo == "Por CNPJ" ? produto.cnpjFornecedor : "Diversos"}</div>
-                                                <div>{produto.tipoOperacao}</div>
+                                                <div>{produto.tipoInput == "Manual" ? produto.tipoOperacao : "Não informado (XML)"}</div>
                                                 <div>{produto.regimeTributarioOutro}</div>
                                                 <div>{produto.fornecedorIndustrial ? "Sim" : "Não"}</div>
                                                 <div>{produto.ncm}</div>

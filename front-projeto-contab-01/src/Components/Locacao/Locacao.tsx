@@ -207,6 +207,7 @@ export default function Locacao({modoBranco}: Props){
 
             const novoArr = [...totalImoveisLocacao]
             const novoObjAtual: ImoveisLocacaoObj = {
+                
                 valorAluguel: Number(valorAluguelAdd),
                 tipoAluguel: tipoAluguelAdd,
                 acrescimos: Number(acrescimosAdd),

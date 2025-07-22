@@ -75,11 +75,12 @@ export const objTotalImoveisCompraVenda = z.object({
 
 export const TipoOperacaoVendidoType = z.enum(["Revenda", "Indústria", "Exportação", "Revenda - Consumidor final fora do Estado", "Indústria - Consumidor final fora do Estado"])
 
-export const ProdutoVendidoObj = z.object({
+const ProdutoVendidoManualSchema = z.object({
+    tipoInput: z.literal("Manual"),
     tipoOperacao: TipoOperacaoVendidoType,
     valorOperacao: z.number(),
     ncm: z.string(),
-    icms: z.number(),
+    icms: z.number(),    
     icmsSt: z.number(),
     icmsDifal: z.number(),
     pisCofins: z.number(),
@@ -88,25 +89,47 @@ export const ProdutoVendidoObj = z.object({
     manterBeneficio: z.boolean(),
     descricaoAnexo: z.string(),
     id: z.number()
-})
+});
+
+const ProdutoVendidoXmlSchema = z.object({
+    tipoInput: z.literal("XML"),
+    tipoOperacao: TipoOperacaoVendidoType,
+    valorOperacao: z.number(),
+    ncm: z.string(),
+    valorIcms: z.number(),     
+    aliqIcms: z.number(),
+    valorIcmsSt: z.number(),
+    valorIcmsDifal: z.number(),
+    valorPisCofins: z.number(),
+    valorIpi: z.number(),
+    beneficio: z.number(),
+    manterBeneficio: z.boolean(),
+    descricaoAnexo: z.string(),
+    id: z.number()
+});
+
+export const ProdutoVendidoObj = z.union([
+    ProdutoVendidoManualSchema,
+    ProdutoVendidoXmlSchema
+])
 
 export const MetodoAdquiridoType = z.enum(["Por Operação", "Por CNPJ" ])
 
 export const TipoOperacaoAdquiridoType = z.enum(["Consumo", "Insumo", "Alimentação", "Imobilizado", "Revenda"])
 
-export const aliquotasParametrosBodyType = z.object({
+export const impostosParametrosBodyType = z.object({
     iss: z.union([z.number(), z.null()]), 
     icms: z.union([z.number(), z.null()]), 
     pisCo: z.union([z.number(), z.null()]), 
     ipi: z.union([z.number(), z.null()])
 })
 
-export const ProdutoAdquiridoObj = z.object({
+export const ProdutoAdquiridoManualObj = z.object({
     metodo: MetodoAdquiridoType,
     tipoOperacao: z.union([TipoOperacaoAdquiridoType, z.literal("")]),
     valorOperacao: z.number(),
     ncm: z.string(),
-    aliquotas: aliquotasParametrosBodyType,
+    aliquotas: impostosParametrosBodyType,
     creditoIcms: z.boolean(),
     creditoPisCofins: z.boolean(),
     creditoIpi: z.boolean(),
@@ -116,16 +139,42 @@ export const ProdutoAdquiridoObj = z.object({
     beneficio: z.number(),
     manterBeneficio: z.boolean(),
     descricaoAnexo: z.string(),
+    tipoInput: z.literal("Manual"),
     id: z.number()
 })
+
+export const ProdutoAdquiridoXmlObj = z.object({
+    metodo: MetodoAdquiridoType,
+    custoDespesa: z.enum(["Custo", "Despesa"]),
+    valorOperacao: z.number(),
+    ncm: z.string(),
+    aliquotas: impostosParametrosBodyType,
+    valores: impostosParametrosBodyType,
+    creditoIcms: z.boolean(),
+    creditoPisCofins: z.boolean(),
+    creditoIpi: z.boolean(),
+    cnpjFornecedor: z.string(),
+    regimeTributarioOutro: z.string(),
+    fornecedorIndustrial: z.boolean(),
+    beneficio: z.number(),
+    manterBeneficio: z.boolean(),
+    descricaoAnexo: z.string(),
+    tipoInput: z.literal("XML"),
+    id: z.number()
+})
+
+export const ProdutoAdquiridoObj = z.union([
+    ProdutoAdquiridoManualObj,
+    ProdutoAdquiridoXmlObj
+])
 
 
 
 export const objParametrosEntradaBodyType = z.object({
-    industrial: aliquotasParametrosBodyType,
-    servicos: aliquotasParametrosBodyType,
-    comercial: aliquotasParametrosBodyType,
-    locacao: aliquotasParametrosBodyType
+    industrial: impostosParametrosBodyType,
+    servicos: impostosParametrosBodyType,
+    comercial: impostosParametrosBodyType,
+    locacao: impostosParametrosBodyType
 })
 
 
