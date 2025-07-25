@@ -26,7 +26,7 @@ export default function ProdutosBotao({objIsChecked, setObjIsChecked}: Props){
             setObjIsChecked(objIsCheckedClone)
         }
 
-      };
+      }
 
 
       

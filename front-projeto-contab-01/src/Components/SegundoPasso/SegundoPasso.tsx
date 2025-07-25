@@ -10,7 +10,7 @@ import { baseUrl } from '../../App'
 import { ContextoParametrosOpcionais, objAreas } from '../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais'
 import { ContextoErro } from '../../Contextos/ContextoErro/ContextoErro'
 import Imoveis from '../Imoveis/Imoveis'
-import { ContextoImoveis } from '../../Contextos/ContextoImoveis/ContextoImoveis'
+import { ContextoImoveis, ImoveisCompraVendaObj, ImoveisLocacaoObj } from '../../Contextos/ContextoImoveis/ContextoImoveis'
 import { ContextoGeral } from '../../Contextos/ContextoGeral/ContextoGeral'
 import ServicoPrestadoInput from "../ServicoPrestadoInput/ServicoPrestadoInput";
 import { ServicoAdquiridoInput } from "../ServicoAdquiridoInput/ServicoAdquiridoInput";
@@ -20,7 +20,7 @@ import SetaNao from "../../Components/SetaNao/SetaNao"
 import { Incorporacao } from '../Incorporacao/Incorporacao';
 import BensMoveisBotao from '../BensMoveisBotao/BensMoveisBotao';
 import LocacaoMoveis from '../LocacaoMoveis/LocacaoMoveis';
-import { ContextoMoveis } from '../../Contextos/ContextoMoveis/ContextoMoveis';
+import { ContextoMoveis, MoveisLocacaoObj } from '../../Contextos/ContextoMoveis/ContextoMoveis';
 import ProdutosBotao from '../ProdutosBotao/ProdutosBotao'
 import { ProdutosVendidosInput } from '../ProdutosVendidosInput/ProdutosVendidosInput'
 import { ProdutosAdquiridosInput } from '../ProdutosAdquiridosInput/ProdutosAdquiridosInput'
@@ -73,6 +73,45 @@ export type objIsCheckedType = {
     isCheckedProdutos: boolean
 }
 
+type tabelaParametrosEntradaFinalType = {
+    industrial: impostosParametrosFinalType,
+    servicos: impostosParametrosFinalType,
+    comercial: impostosParametrosFinalType,
+    locacao: impostosParametrosFinalType
+}
+
+export type parametrosBodyCalcularType = {
+    aliquotaIbs: number,
+    aliquotaCbs: number,
+    aliquotaIva: number,
+    tabelaSimplesNacional: tabelaParametrosEntradaFinalType,
+    tabelaLucroReal: tabelaParametrosEntradaFinalType,
+    tabelaLucroPresumido: tabelaParametrosEntradaFinalType,
+}
+
+type bodyEmpresa = {
+    tipoInput: "Empresa",
+    cnpj: string,
+    folha: string,
+    meuRegime: "Simples Nacional" | "Lucro Real" | "Lucro Presumido",
+    totalAtividadesPrestadas: objAtividadeFinal[],
+    parametrosEntrada: parametrosBodyCalcularType,
+    totalAtividadesAdquiridas: objAtividadesAdquitidasType[],
+    totalImoveisLocacao: ImoveisLocacaoObj[],
+    totalImoveisCompraVenda: ImoveisCompraVendaObj[],
+    totalMoveisLocacao: MoveisLocacaoObj[],
+    totalProdutosVendidos: ProdutoVendidoObj[],
+    totalProdutosAdquiridos: ProdutoAdquiridoObj[],
+}
+
+type bodyPessoa = {
+    tipoInput: "Pessoa Física",
+    cpf: string,
+    totalMoveisLocacao: MoveisLocacaoObj[],
+    totalImoveisLocacao: ImoveisLocacaoObj[],
+}
+
+type bodyCalcular = bodyEmpresa | bodyPessoa
 
 type beneficiosBodySchema = {
     beneficiosPorCnae: {
@@ -98,9 +137,9 @@ type respostaApiType = {
     data: null
     error: any
 };
+const arrVazio: string[] = []
 
 export function SegundoPasso({modoBranco}: Props){
-
     const [arrInfosEmpresa, setArrInfosEmpresa] = useState<ObjInfosType[]>([])
     const [totalAtividadesPrestadas, setTotalAtividadesPrestadas] = useState<objAtividadeFinal[]>([])
     const [totalAtividadesAdquiridas, setTotalAtividadesAdquiridas] = useState<objAtividadesAdquitidasType[]>([])
@@ -133,100 +172,100 @@ export function SegundoPasso({modoBranco}: Props){
 
     async function conferirBeneficios(){
 
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
 
-        if(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)
+            if(objMinhaEmpresaOuPessoaAtual.cnpj && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)
 
 
-            const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
-            const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
+                const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
+                const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
 
-            if(ibs && cbs){
-                const body: beneficiosBodySchema = {
-                        beneficiosPorCnae: {
-                            totalAtividadesAdquiridas,
-                            totalAtividadesPrestadas
-                        },
-                        beneficiosPorNcm: {
-                            totalProdutosAdquiridos,
-                            totalProdutosVendidos
+                if(ibs && cbs){
+                    const body: beneficiosBodySchema = {
+                            beneficiosPorCnae: {
+                                totalAtividadesAdquiridas,
+                                totalAtividadesPrestadas
+                            },
+                            beneficiosPorNcm: {
+                                totalProdutosAdquiridos,
+                                totalProdutosVendidos
+                            }
                         }
-                    }
 
-                    console.log("BODY encontrar benmeficios")
-                    console.log(body)
+                        console.log("BODY encontrar benmeficios")
+                        console.log(body)
 
-                fetch(baseUrl + "/encontrarBeneficios", {
-                    method: "POST",
-                    headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
-                    body: JSON.stringify(body)
-                }).then(res => res.json()).then(data => {
-                    console.log("Retorno da rota encontrar benefícios")
-                    console.log(data)
+                    fetch(baseUrl + "/encontrarBeneficios", {
+                        method: "POST",
+                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                        body: JSON.stringify(body)
+                    }).then(res => res.json()).then(data => {
+                        console.log("Retorno da rota encontrar benefícios")
+                        console.log(data)
 
-                    if(data.data){
-                        // setando quem tem NCM
-                        setTotalProdutosAdquiridos(data.data.beneficiosPorNcm.totalProdutosAdquiridos)
-                        setTotalProdutosVendidos(data.data.beneficiosPorNcm.totalProdutosVendidos)
+                        if(data.data){
+                            // setando quem tem NCM
+                            setTotalProdutosAdquiridos(data.data.beneficiosPorNcm.totalProdutosAdquiridos)
+                            setTotalProdutosVendidos(data.data.beneficiosPorNcm.totalProdutosVendidos)
 
-                        // setando quem tem CNAE
-                        setTotalAtividadesAdquiridas(data.data.beneficiosPorCnae.totalAtividadesAdquiridas)
-                        setTotalAtividadesPrestadas(data.data.beneficiosPorCnae.totalAtividadesPrestadas)
+                            // setando quem tem CNAE
+                            setTotalAtividadesAdquiridas(data.data.beneficiosPorCnae.totalAtividadesAdquiridas)
+                            setTotalAtividadesPrestadas(data.data.beneficiosPorCnae.totalAtividadesPrestadas)
 
-                        // Mostrar modal para conferir ou não benefícios
-                        setModalPerguntaBeneficiosAberto(true)
+                            // Mostrar modal para conferir ou não benefícios
+                            setModalPerguntaBeneficiosAberto(true)
 
-                    }else{
-                        setTemErro(true)
-                        setTextoErro("Ocorreu um erro ao tentar buscar os benefícios, por favor, tente novamente.")
-                    }
+                        }else{
+                            setTemErro(true)
+                            setTextoErro("Ocorreu um erro ao tentar buscar os benefícios, por favor, tente novamente.")
+                        }
 
-                })
-
-    
-                /*
-                fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
-                    method: "POST",
-                    headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        cpfOuCnpj: objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf,
-                        folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
-                        meuRegime: objMinhaEmpresaOuPessoaAtual.meuRegime,
-                        totalAtividadesPrestadas,
-                        totalAtividadesAdquiridas,
-                        parametrosEntrada,
-                        totalImoveisLocacao,
-                        totalImoveisCompraVenda,
-                        totalMoveisLocacao,
-                        totalProdutosVendidos,
-                        totalProdutosAdquiridos
                     })
-                }).then(res => res.json()).then(data => {
-                    console.log(data)
-                })
-                */
+
+        
+                    /*
+                    fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
+                        method: "POST",
+                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            cpfOuCnpj: objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf,
+                            folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
+                            meuRegime: objMinhaEmpresaOuPessoaAtual.meuRegime,
+                            totalAtividadesPrestadas,
+                            totalAtividadesAdquiridas,
+                            parametrosEntrada,
+                            totalImoveisLocacao,
+                            totalImoveisCompraVenda,
+                            totalMoveisLocacao,
+                            totalProdutosVendidos,
+                            totalProdutosAdquiridos
+                        })
+                    }).then(res => res.json()).then(data => {
+                        console.log(data)
+                    })
+                    */
+
+                }else{
+                    console.log("mande um numero valido")
+                    setTemErro(true)
+                    setTextoErro("Parâmetros de entrada inválidos (Configurações -> Parâmetros de entrada)")
+                }
+
 
             }else{
-                console.log("mande um numero valido")
-                setTemErro(true)
-                setTextoErro("Parâmetros de entrada inválidos (Configurações -> Parâmetros de entrada)")
+                console.log("Para enviar, todos os campos precisam estar preenchidos e você deve ter inserido pelo menos uma atividade com seu valor de faturamento mensal")
             }
-
-
         }else{
-            console.log("Para enviar, todos os campos precisam estar preenchidos e você deve ter inserido pelo menos uma atividade com seu valor de faturamento mensal")
+            enviarInfosAtividades()
         }
+
     }
 
 
-    type objParametrosEntradaFinalType = {
-        industrial: impostosParametrosFinalType,
-        servicos: impostosParametrosFinalType,
-        comercial: impostosParametrosFinalType,
-        locacao: impostosParametrosFinalType
-    }
 
-    function converterParametrosOpcionais(obj: objAreas): objParametrosEntradaFinalType{
-        const novoObj: objParametrosEntradaFinalType = {
+
+    function converterParametrosOpcionais(obj: objAreas): tabelaParametrosEntradaFinalType{
+        const novoObj: tabelaParametrosEntradaFinalType = {
             industrial: {icms: null, ipi: null, iss: null, pisCo: null},
             comercial: {icms: null, ipi: null, iss: null, pisCo: null},
             servicos: {icms: null, ipi: null, iss: null, pisCo: null},
@@ -237,7 +276,7 @@ export function SegundoPasso({modoBranco}: Props){
 
             for (const [imposto, valor] of Object.entries(aliquotas)) {
                 if(valor !== null){
-                    novoObj[area as keyof objParametrosEntradaFinalType][imposto as keyof impostosParametrosFinalType] = parseFloat(valor.replace(",", "*").replace(".", ",").replace("*", "."))
+                    novoObj[area as keyof tabelaParametrosEntradaFinalType][imposto as keyof impostosParametrosFinalType] = parseFloat(valor.replace(",", "*").replace(".", ",").replace("*", "."))
                 }
             }
         }
@@ -249,67 +288,92 @@ export function SegundoPasso({modoBranco}: Props){
     async function enviarInfosAtividades(){
 
 
+        const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
+        const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
+        
+        // No front end é melhor tratarmos como string, mas no back ele espera receber number, por isso temos que fazer:
+        const tabelaSimplesNacionalTradada = converterParametrosOpcionais(tabelaSimplesNacional)
+        const tabelaLucroRealTradada = converterParametrosOpcionais(tabelaLucroReal)
+        const tabelaLucroPresumidoTradada = converterParametrosOpcionais(tabelaLucroPresumido)
+        
+        const parametrosEntrada = {
+            aliquotaIbs: ibs,
+            aliquotaCbs: cbs,
+            aliquotaIva: ibs + cbs,
+            tabelaSimplesNacional: tabelaSimplesNacionalTradada,
+            tabelaLucroReal: tabelaLucroRealTradada,
+            tabelaLucroPresumido: tabelaLucroPresumidoTradada,
+        }
 
-        if(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)
+        if(ibs && cbs){
 
-
-            const ibs = Number(aliquotasIva.ibs.replace(",", "*").replace(".", ",").replace("*", "."))
-            const cbs = Number(aliquotasIva.cbs.replace(",", "*").replace(".", ",").replace("*", "."))
-            
-            // No front end é melhor tratarmos como string, mas no back ele espera receber number, por isso temos que fazer:
-            const tabelaSimplesNacionalTradada = converterParametrosOpcionais(tabelaSimplesNacional)
-            const tabelaLucroRealTradada = converterParametrosOpcionais(tabelaLucroReal)
-            const tabelaLucroPresumidoTradada = converterParametrosOpcionais(tabelaLucroPresumido)
-
-            
-            if(ibs && cbs){
-
-                const parametrosEntrada = {
-                    aliquotaIbs: ibs,
-                    aliquotaCbs: cbs,
-                    aliquotaIva: ibs + cbs,
-                    tabelaSimplesNacional: tabelaSimplesNacionalTradada,
-                    tabelaLucroReal: tabelaLucroRealTradada,
-                    tabelaLucroPresumido: tabelaLucroPresumidoTradada,
-                }
-
-            
-                fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
-                    method: "POST",
-                    headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        cpfOuCnpj: objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf,
-                        folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
-                        meuRegime: objMinhaEmpresaOuPessoaAtual.meuRegime,
-                        totalAtividadesPrestadas,
-                        totalAtividadesAdquiridas,
-                        parametrosEntrada,
-                        totalImoveisLocacao,
-                        totalImoveisCompraVenda,
-                        totalMoveisLocacao,
-                        totalProdutosVendidos,
-                        totalProdutosAdquiridos
+            if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+                if(objMinhaEmpresaOuPessoaAtual.cnpj && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)       
+                    
+                    fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
+                        method: "POST",
+                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            tipoUsuario: "Empresa",
+                            cnpj: objMinhaEmpresaOuPessoaAtual.cnpj,
+                            folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
+                            meuRegime: objMinhaEmpresaOuPessoaAtual.meuRegime,
+                            totalAtividadesPrestadas,
+                            totalAtividadesAdquiridas,
+                            parametrosEntrada,
+                            totalImoveisLocacao,
+                            totalImoveisCompraVenda,
+                            totalMoveisLocacao,
+                            totalProdutosVendidos,
+                            totalProdutosAdquiridos
+                        })
+                    }).then(res => res.json()).then((data: respostaApiType) => {
+                        console.log("retorno do calcular simplificado")
+                        console.log(data)
+                        if(data.success){
+                            setObjResultado(data.data)
+                            navigate("/Perfil/Resultado")
+                        }
                     })
-                }).then(res => res.json()).then((data: respostaApiType) => {
-                    console.log("retorno do calcular simplificado")
-                    console.log(data)
-                    if(data.success){
-                        setObjResultado(data.data)
-                        navigate("/Perfil/Resultado")
-                    }
-                })
-                
+                        
 
+                }else{
+                    console.log("Para enviar, todos os campos precisam estar preenchidos e você deve ter inserido pelo menos uma atividade com seu valor de faturamento mensal")
+                }
             }else{
-                console.log("mande um numero valido")
-                setTemErro(true)
-                setTextoErro("Parâmetros de entrada inválidos (Configurações -> Parâmetros de entrada)")
+                if(objMinhaEmpresaOuPessoaAtual.cpf ){ // && (arrInfosEmpresa.length > 0)       
+                    
+                    fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
+                        method: "POST",
+                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            tipoUsuario: "Pessoa Física",
+                            cpf: objMinhaEmpresaOuPessoaAtual.cpf,
+                            parametrosEntrada,
+                            totalImoveisLocacao,
+                            totalMoveisLocacao,
+                        })
+                    }).then(res => res.json()).then((data: respostaApiType) => {
+                        console.log("retorno do calcular simplificado")
+                        console.log(data)
+                        if(data.success){
+                            setObjResultado(data.data)
+                            navigate("/Perfil/Resultado")
+                        }
+                    })
+                        
+
+                }else{
+                    console.log("Erro ao enviar, cpf não encontrado.")
+                }  
             }
 
-
         }else{
-            console.log("Para enviar, todos os campos precisam estar preenchidos e você deve ter inserido pelo menos uma atividade com seu valor de faturamento mensal")
+            console.log("mande um numero valido")
+            setTemErro(true)
+            setTextoErro("Parâmetros de entrada inválidos (Configurações -> Parâmetros de entrada)")
         }
+
 
         setModalPerguntaBeneficiosAberto(false)
     }
@@ -341,6 +405,11 @@ export function SegundoPasso({modoBranco}: Props){
     }, [totalProdutosVendidos])
 
     useEffect(() => {
+        console.log("Obj minha empresa ou pessoa atual mudado")
+        console.log(objMinhaEmpresaOuPessoaAtual)
+    }, [objMinhaEmpresaOuPessoaAtual])
+
+    useEffect(() => {
         if(passo2){
             console.log("OBJ MINHA EMPRESAAAAAAAAAA")
             console.log(objMinhaEmpresaOuPessoaAtual)
@@ -348,12 +417,13 @@ export function SegundoPasso({modoBranco}: Props){
     }, [passo2])
 
 
+    console.log("componente pai rerenderizou")
 
     return (
         <div className='w-full'>
             <div className='flex gap-14 my-12 flex-wrap'>
                 <ProdutosBotao objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} />
-                <Servicos objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} totalAtividadesAdquiridas={totalAtividadesAdquiridas} setTotalAtividadesAdquiridas={setTotalAtividadesAdquiridas} setTotalAtividadesPrestadas={setTotalAtividadesPrestadas} totalAtividadesPrestadas={totalAtividadesPrestadas} arrInfosEmpresa={arrInfosEmpresa} setArrInfosEmpresa={setArrInfosEmpresa} cnaes={objMinhaEmpresaOuPessoaAtual.cnaes}/>
+                <Servicos objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} totalAtividadesAdquiridas={totalAtividadesAdquiridas} setTotalAtividadesAdquiridas={setTotalAtividadesAdquiridas} setTotalAtividadesPrestadas={setTotalAtividadesPrestadas} totalAtividadesPrestadas={totalAtividadesPrestadas} arrInfosEmpresa={arrInfosEmpresa} setArrInfosEmpresa={setArrInfosEmpresa} cnaes={objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" ? objMinhaEmpresaOuPessoaAtual.cnaes : arrVazio}/>
                 <Imoveis objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked}/>
                 <BensMoveisBotao objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} />
             </div>

@@ -1050,32 +1050,38 @@ export function ResultadoSimulador(){
 
     useEffect(() => {
 
-        let meuRegimeChave: regimesChavesObjType = "simplesNacional"
+        if(objResultado.tipoUsuario == "Empresa"){
+            let meuRegimeChave: regimesChavesObjType = "simplesNacional"
 
-        switch(regimeAtual){
-            case "Simples Nacional":
-                meuRegimeChave = "simplesNacional"
-                break
+            switch(regimeAtual){
+                case "Simples Nacional":
+                    meuRegimeChave = "simplesNacional"
+                    break
 
-            case "Lucro Presumido":
-                meuRegimeChave = "lucroPresumido"
-                break
+                case "Lucro Presumido":
+                    meuRegimeChave = "lucroPresumido"
+                    break
 
-            case "Lucro Real":
-                meuRegimeChave = "lucroReal"
-                break
+                case "Lucro Real":
+                    meuRegimeChave = "lucroReal"
+                    break
 
-            default:
-                meuRegimeChave = "simplesNacional"
+                default:
+                    meuRegimeChave = "simplesNacional"
+            }
+
+            setObjRegimeAtual(objResultado[meuRegimeChave])
         }
-
-        setObjRegimeAtual(objResultado[meuRegimeChave])
 
     }, [regimeAtual])
 
 
     useEffect(() => {
-        setRegimeAtual(objResultado.meuRegime)
+        if(objResultado.tipoUsuario == "Empresa"){
+            setRegimeAtual(objResultado.meuRegime)
+        }else if(objResultado.tipoUsuario == "Pessoa Física"){
+            setObjRegimeAtual(objResultado.respostaFinal)
+        }
     }, [objResultado])
 
 /*

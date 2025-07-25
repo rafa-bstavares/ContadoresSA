@@ -459,13 +459,13 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                             <div className="mt-8">
                                                 {
                                                     index == 0 &&
-                                                    <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
+                                                    <div className={`grid ${(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real")? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
                                                         <div>Método</div>
                                                         <div>CNPJ</div>
                                                         <div>Faturamento</div>
                                                         <div>Regime Tributário</div>
                                                         {
-                                                            objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                                            (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") &&
                                                             <div>Crédito PIS-COFINS</div>
                                                         }
                                                         <div onClick={() => {}} className="bg-red-600 p-1 rounded-sm w-5 h-5 flex justify-center items-center cursor-pointer opacity-0">
@@ -473,7 +473,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                                         </div>
                                                     </div>
                                                 }
-                                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                                <div className={`grid ${(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") ? "grid-cols-[repeat(5,1fr)_auto]" : "grid-cols-[repeat(4,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                                     <div>{item.metodo}</div>
                                                     <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
                                                     <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
@@ -503,7 +503,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                                         </div>
                                                     }
                                                     {
-                                                        objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                                        (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") &&
                                                         <ToggleButtonMapeado texto="" valor={totalServicosTomadosModal[index].temCreditoPisCofins} onChangeFn={() => checkTemCreditoPisCofinsModal(item.id)} />
                                                         /*<div className="flex gap-2">
                                                             <input onChange={(e) => checkTemCreditoPisCofins(e, item.id)} type="checkbox" name="temCreditoPisCofins" id="temCreditoPisCofins" />
@@ -551,13 +551,13 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                             <div className="">
                                 {
                                     index == 0 &&
-                                    <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
+                                    <div className={`grid ${(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center mb-4 p-4 font-bold`}>
                                         <div>Método</div>
                                         <div>CNPJ</div>
                                         <div>Faturamento</div>
                                         <div>Regime Tributário</div>
                                         {
-                                            objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" &&
+                                            (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") &&
                                             <div>Crédito PIS-COFINS</div>
                                         }
                                         <div>Compõe Custo</div>
@@ -567,7 +567,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     </div> 
                                 }
 
-                                <div className={`grid ${objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
+                                <div className={`grid ${(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") ? "grid-cols-[repeat(6,1fr)_auto]" : "grid-cols-[repeat(5,1fr)_auto]"} gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
                                     <div>{item.metodo}</div>
                                     <div>{item.metodo == "Por CNPJ" ? item.cpfOuCnpj : "Diversos"}</div>
                                     <div>{"R$ " + item.faturamento.toLocaleString("pt-br")}</div>
@@ -599,7 +599,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
 
                                     }
                                     {
-                                        objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real" && 
+                                        (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") && 
                                         <ToggleButtonMapeado texto="" valor={totalAtividadesAdquiridas[index].temCreditoPisCofins} onChangeFn={() => checkTemCreditoPisCofins(item.id)} />
                                     }
                                     <ToggleButtonMapeado texto="" valor={totalAtividadesAdquiridas[index].compoeCusto} onChangeFn={() => alterarCompoeCusto(item.id)} />

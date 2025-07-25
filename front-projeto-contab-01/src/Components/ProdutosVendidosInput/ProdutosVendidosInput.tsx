@@ -473,12 +473,12 @@ export function ProdutosVendidosInput(){
     useEffect(() => {
         console.log("ABRIU O BGLH Q TEM Q VER O REGIME")
         // Em produtos, para saber de qual tabela pegar os parametros inicais, sempre vemos o regime do fornecedor, como nesse caso o meu cliente é o fornecedor (produtos vendidos):
-        if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
             console.log("meu regime simples")
             setIcms(tabelaSimplesNacional.comercial.icms)
             setIpi(tabelaSimplesNacional.comercial.ipi)
             setPisCofins(tabelaSimplesNacional.comercial.pisCo)
-        }else if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
+        }else if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
             console.log("meu regime presumido")
             setIcms(tabelaLucroPresumido.comercial.icms)
             setIpi(tabelaLucroPresumido.comercial.ipi)
@@ -499,12 +499,12 @@ export function ProdutosVendidosInput(){
             colunaSelecionar = "comercial"
         }
 
-        if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
             console.log("meu regime simples")
             setIcms(tabelaSimplesNacional[colunaSelecionar].icms)
             setIpi(tabelaSimplesNacional[colunaSelecionar].ipi)
             setPisCofins(tabelaSimplesNacional[colunaSelecionar].pisCo)
-        }else if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
+        }else if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido"){
             console.log("meu regime presumido")
             setIcms(tabelaLucroPresumido[colunaSelecionar].icms)
             setIpi(tabelaLucroPresumido[colunaSelecionar].ipi)

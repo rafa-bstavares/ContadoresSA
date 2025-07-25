@@ -81,8 +81,8 @@ export class XmlProdutosVendidosUseCase{
                                 const valorIcmsSt = Number(imposto?.ICMS[icmsTag]?.vICMSST || 0)
                                 const valorIcmsDifal = Number(imposto?.ICMSUFDest?.vICMSUFDest || 0) // pode ajustar depois
                                 const aliqIcmsPuro = Number(imposto?.ICMS[icmsTag]?.pICMS || 0) - (Number(imposto?.ICMS[icmsTag]?.pICMS || 0) * Number(imposto?.ICMS[icmsTag]?.pRedBC || 0))
-                                const aliqIcmsDifal = Number(imposto?.ICMSUFDest?.vICMSUFDest || 0) / Number(imposto?.ICMSUFDest?.vBCFCPUFDest || 0)
-                                const aliqIcmsSt = Number(imposto?.ICMS[icmsTag]?.vICMSST || 0) / Number(imposto?.ICMS[icmsTag]?.vBCST || 0)
+                                const aliqIcmsDifal = Number(imposto?.ICMSUFDest?.vBCFCPUFDest || 0) ? (Number(imposto?.ICMSUFDest?.vICMSUFDest || 0) / Number(imposto?.ICMSUFDest?.vBCFCPUFDest || 0)) : 0
+                                const aliqIcmsSt = Number(imposto?.ICMS[icmsTag]?.vBCST || 0) ? (Number(imposto?.ICMS[icmsTag]?.vICMSST || 0) / Number(imposto?.ICMS[icmsTag]?.vBCST || 0)) : 0
 
                                 const aliqIcmsTotal = aliqIcmsPuro + aliqIcmsDifal + aliqIcmsSt
 

@@ -3,6 +3,7 @@ import { calcularSimplificadoUseCase } from "../../use-cases/calcularSimplificad
 import {nullable, z} from "zod"
 import { RegimeTributario } from "@prisma/client";
 import { PrismaEmpresaRepository } from "../../repositories/prisma/prisma-empresas-repository";
+import { CalcularPessoaFisicaUseCase } from "../../use-cases/calcularPessoaFisicaUseCase";
 
 
 
@@ -106,7 +107,7 @@ const ProdutoVendidoXmlSchema = z.object({
     manterBeneficio: z.boolean(),
     descricaoAnexo: z.string(),
     id: z.number()
-});
+})
 
 export const ProdutoVendidoObj = z.union([
     ProdutoVendidoManualSchema,
@@ -178,11 +179,11 @@ export const objParametrosEntradaBodyType = z.object({
 })
 
 
-
-export const bodySchema = z.object({
-    cpfOuCnpj: z.string(),
+export const empresaBody = z.object({
+    tipoUsuario: z.literal("Empresa"),
+    cnpj: z.string(),
     folha: z.string(),
-    meuRegime: z.enum(["Simples Nacional", "Lucro Real", "Lucro Presumido", "Pessoa Fisica"]),
+    meuRegime: z.enum(["Simples Nacional", "Lucro Real", "Lucro Presumido"]),
     totalAtividadesPrestadas: z.array(infosEmpresaSchema),
     parametrosEntrada: z.object({
         aliquotaIbs: z.number(),
@@ -200,6 +201,27 @@ export const bodySchema = z.object({
     totalProdutosAdquiridos: z.array(ProdutoAdquiridoObj),
 })
 
+export const pessoaBody = z.object({
+    tipoUsuario: z.literal("Pessoa Física"),
+    cpf: z.string(),
+    parametrosEntrada: z.object({
+        aliquotaIbs: z.number(),
+        aliquotaCbs: z.number(),
+        aliquotaIva: z.number(),
+        tabelaSimplesNacional: objParametrosEntradaBodyType,
+        tabelaLucroReal: objParametrosEntradaBodyType,
+        tabelaLucroPresumido: objParametrosEntradaBodyType,
+    }),
+    totalImoveisLocacao: z.array(objTotalImoveisLocacao),
+    totalMoveisLocacao: z.array(objTotalMoveisLocacao),
+})
+
+
+export const bodySchema = z.union([
+    empresaBody,
+    pessoaBody
+])
+
 
 
 
@@ -213,8 +235,15 @@ export async function calcularSimplificadoController(request: FastifyRequest, re
     try{
 
         const empresaRepo = new PrismaEmpresaRepository
+        let calcularSimplificado
 
-        const calcularSimplificado = new calcularSimplificadoUseCase(empresaRepo, body.cpfOuCnpj, body.totalAtividadesPrestadas, body.parametrosEntrada, body.totalAtividadesAdquiridas, body.totalImoveisLocacao, body.totalImoveisCompraVenda, body.totalMoveisLocacao, body.totalProdutosVendidos, body.totalProdutosAdquiridos, body.meuRegime)
+        if(body.tipoUsuario == "Empresa"){
+            calcularSimplificado = new calcularSimplificadoUseCase(empresaRepo, body.cnpj, body.totalAtividadesPrestadas, body.parametrosEntrada, body.totalAtividadesAdquiridas, body.totalImoveisLocacao, body.totalImoveisCompraVenda, body.totalMoveisLocacao, body.totalProdutosVendidos, body.totalProdutosAdquiridos, body.meuRegime)
+        }else{
+            calcularSimplificado = new CalcularPessoaFisicaUseCase(body.cpf, body.totalImoveisLocacao, body.totalMoveisLocacao, body.parametrosEntrada)
+            
+        }
+
 
         try{
             const respostaCalculo = await calcularSimplificado.execute()

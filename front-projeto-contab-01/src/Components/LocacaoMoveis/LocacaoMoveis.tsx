@@ -190,7 +190,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
     }
 
     function conferirMovelLocacao(){
-        if((tipoAluguelAdd == "Aluguel pago" && (regimeOutroAdd == "Lucro Presumido" || regimeOutroAdd == "Lucro Real")) || (tipoAluguelAdd == "Aluguel recebido" && (objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real"))){
+        if((tipoAluguelAdd == "Aluguel pago" && (regimeOutroAdd == "Lucro Presumido" || regimeOutroAdd == "Lucro Real")) || (tipoAluguelAdd == "Aluguel recebido" && (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && (objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real")))){
             // O locador é lucro real ou lucro presumido, logo, tem que ter valor mão de obra
             if(valorMaoObraAdd){
                 addItemMovelLocacao(true)
@@ -378,7 +378,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
     useEffect(() => {
 
         console.log("REGIME MINHA EMPRESA")
-        console.log(objMinhaEmpresaOuPessoaAtual.meuRegime)    
+        console.log( objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" ? objMinhaEmpresaOuPessoaAtual.meuRegime : 0)    
 
         if(tipoAluguelAdd == "Aluguel pago"){
             // O locador é o outro, preciso conferir se ele é real ou presumido, se sim, habilitar campo valor mão de obra
@@ -393,7 +393,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
             }
         }else{
             // O locador é o meu cliente, preciso conferir se ele é real ou presumido, se sim, habilitar campo valor mão de obra
-            if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real"){
+            if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && (objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real")){
                 setMaoObraNaTela(true)
             }else{
                 setMaoObraNaTela(false)

@@ -145,11 +145,16 @@ export type regimesType = "Simples Nacional" | "Lucro Real" | "Lucro Presumido" 
 export type regimesChavesObjType = "simplesNacional" | "lucroReal" | "lucroPresumido"
 
 export type objRespostaFinalType = {
+  tipoUsuario: "Empresa",
   simplesNacional: objRegimeType,
   lucroReal: objRegimeType,
   lucroPresumido: objRegimeType,
   meuRegime: regimesType,
   cnpj: string
+} | {
+  tipoUsuario: "Pessoa Física",
+  respostaFinal: objRegimeType,
+  cpf: string
 }
 
 type TiposContextoResultadoSimulador = {       
@@ -389,6 +394,7 @@ export const valorInicialobjRegime = {
           }  
 
   const valorInicialResultadoSimulador: objRespostaFinalType = {
+    tipoUsuario: "Empresa",
     simplesNacional: JSON.parse(JSON.stringify(valorInicialobjRegime)),
     lucroReal: JSON.parse(JSON.stringify(valorInicialobjRegime)),
     lucroPresumido: JSON.parse(JSON.stringify(valorInicialobjRegime)),

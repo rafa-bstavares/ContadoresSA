@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral";
 import { baseUrl } from "../../App";
-import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral";
+import { ContextoGeral, tipoObjEmpresa, tipoObjPessoaFisica } from "../../Contextos/ContextoGeral/ContextoGeral";
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro";
 import { ContextoUsuario } from "../../Contextos/ContextoUsuario/ContextoUsuario";
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
@@ -162,7 +162,10 @@ export function PrimeiroPasso({modoBranco}: Props){
     const [aposPrimeiroRender, setAposPrimeiroRender] = useState<boolean>(false)
     const [regimeAberto, setRegimeAberto] = useState<boolean>(false)
     const [ regimeTela, setRegimeTela] = useState<"Simples Nacional" | "Lucro Real" | "Lucro Presumido">()
+    const [folhaAdd, setFolhaAdd] = useState<number>(0)
+    const [faturamentoMensalAdd, setFaturementoMensalAdd] = useState<number>(0)
     let meuCnpjOuCpfVerificado = ""
+    
 
 
     const { objMinhaEmpresaOuPessoaAtual, setObjMinhaEmpresaOuPessoaAtual, setSoImoveis, passo1, passo2, setPasso1, setPasso2} = useContext(ContextoGeral)
@@ -179,26 +182,119 @@ export function PrimeiroPasso({modoBranco}: Props){
 
 
     function checkCnpj(cnpj: string){
-        const objCnpj = validarCnpj(cnpj)
-        if(objCnpj.valido){
-            //CNPJ VÁLIDO, podemos chamar API
-            console.log("cnpj válido")
-            //varificar se tem na nossa base de dados
-            fetch(baseUrl + "/buscarEmpresa", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    cnpj: objCnpj.cnpj
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+            const objCnpj = validarCnpj(cnpj)
+            if(objCnpj.valido){
+                //CNPJ VÁLIDO, podemos chamar API
+                console.log("cnpj válido")
+                //varificar se tem na nossa base de dados
+                fetch(baseUrl + "/buscarEmpresa", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        cnpj: objCnpj.cnpj
+                    })
+                }).then(res => res.json()).then((data) => {
+                    if(data.success == true){
+                        // encontrou cnpj
+                        console.log("encontrou cnpj")
+                        console.log("dados retornados da empresa existente: ")
+                        console.log(data)
+                        console.log(data.data.regime_tributario)
+                        let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
+                        switch(data.data.regime_tributario){
+                            case "SIMPLES_NACIONAL":
+                                regimeAtual = "Simples Nacional" 
+                                break
+
+                            case "LUCRO_PRESUMIDO":
+                                regimeAtual = "Lucro Presumido"
+                                break
+
+                            case "LUCRO_REAL": 
+                                regimeAtual = "Lucro Real"
+                                break
+                        }
+                        const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                        objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                        setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+
+                        buscarCnaesApi(objMinhaEmpresaOuPessoaAtual.cnpj)
+
+                        // IR PARA PASSO 2
+                        setPasso1(false)
+                        setPasso2(true)
+                        
+                    }else if(data.success == false){
+                        if(data.error.code == 404){
+                            console.log("CNPJ não encontrado")
+                            setPrecisaRegime(true)
+                        }
+                        
+                    }
                 })
-            }).then(res => res.json()).then((data) => {
+
+
+            }else{
+                console.log("O campo CNPJ não pode estar vazio, deve conter exatamente 14 dígitos e precisa ser um CNPJ válido.")
+            }
+        }
+    }
+
+
+    async function registrarEmpresaDb(): Promise<{erroChamada: boolean, criadoSucesso: boolean}>{
+
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+            if(objMinhaEmpresaOuPessoaAtual.cnpj && regimeTributario && objMinhaEmpresaOuPessoaAtual.folha && inputNomeFantasia && objMinhaEmpresaOuPessoaAtual.faturamentoMensalMedio){
+
+                console.log("Regime")
+                console.log(objMinhaEmpresaOuPessoaAtual.meuRegime)
+
+                console.log("CNAE PRINCIPAL")
+                console.log(objMinhaEmpresaOuPessoaAtual.cnaes[0])
+                console.log("CNPJ ENVIADO:")
+                console.log(objMinhaEmpresaOuPessoaAtual.cnpj)
+
+                const novoArrCnaes = await buscarCnaesApi(objMinhaEmpresaOuPessoaAtual.cnpj)
+
+                const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                objInfosMinhaEmpresaOuPessoaClone.cnaes = novoArrCnaes
+                setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+
+                // Como eu acabei de buscar os CNAES, não posso usar o state objMinhaEmpresaOuPessoaAtual.cnaes para preencher o body, pois o estado ainda não vai estar atualizado
+
+
+                const body: CriarEmpresaBodyType = {
+                    cnpj: objMinhaEmpresaOuPessoaAtual.cnpj,
+                    regime_tributario: regimeTributario,
+                    nome_fantasia: inputNomeFantasia,
+                    cnae_principal: novoArrCnaes.length > 0 ? novoArrCnaes[0] : "",
+                    folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
+                    faturamento_mensal_medio: objMinhaEmpresaOuPessoaAtual.faturamentoMensalMedio.toString(),
+                    cnaes: novoArrCnaes
+                } 
+        
+                // fazer o cadastro "simplificado" da empresa, buscar CNAES na api e caso de certo habilitar os campos de baixo dos toggles buttons 
+                const resposta = await fetch(baseUrl + "/criarEmpresa", {
+                    method: "POST",
+                    headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                    body: JSON.stringify(body)
+                })
+
+                const data = await resposta.json()
+                console.log("resposta criar empresa")
+                console.log(data)
                 if(data.success == true){
-                    // encontrou cnpj
-                    console.log("encontrou cnpj")
-                    console.log("dados retornados da empresa existente: ")
-                    console.log(data)
-                    console.log(data.data.regime_tributario)
+                    console.log("Dados da empresa cadastrados com sucesso")
+                    // await buscarCnaesApi() APAGUEI 14/05
+                    
+                    // setPrecisaFolha(true)
+
+                    //IR PARA PASSO 2 (isso precisa ser ativado na função do bt de envio da folha)
+                    //setPasso1(false)
+                    //setPasso2(true)
                     let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
-                    switch(data.data.regime_tributario){
+                    switch(regimeTributario){
                         case "SIMPLES_NACIONAL":
                             regimeAtual = "Simples Nacional" 
                             break
@@ -211,117 +307,32 @@ export function PrimeiroPasso({modoBranco}: Props){
                             regimeAtual = "Lucro Real"
                             break
                     }
-                    const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                    objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
-                    setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
 
-                    buscarCnaesApi(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf)
+                    //const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                    //objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                    //setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
 
-                    // IR PARA PASSO 2
-                    setPasso1(false)
-                    setPasso2(true)
-                    
-                }else if(data.success == false){
-                    if(data.error.code == 404){
-                        console.log("CNPJ não encontrado")
-                        setPrecisaRegime(true)
+                    return {criadoSucesso: true, erroChamada: false}
+                }else{
+                    if(data.error.code == 400){
+                        setTemErro(true)
+                        setTextoErro("Você já cadastrou essa empresa")
+                        // Caso eu já tenha cadastrado e isso passou despercebido na ultima conferencia, deve-se passar para o próximo passo com o regime que tá no banco
+                    }else if(data.error.code == 500){
+                        setTemErro(true)
+                        setTextoErro("Tivemos problemas para cadastrar sua empresa, por favor, tente novamente")
                     }
-                    
+                    return {criadoSucesso: false, erroChamada: true}
+
                 }
-            })
-
-
-        }else{
-            console.log("O campo CNPJ não pode estar vazio, deve conter exatamente 14 dígitos e precisa ser um CNPJ válido.")
-        }
-    }
-
-
-    async function registrarEmpresaDb(): Promise<{erroChamada: boolean, criadoSucesso: boolean}>{
-
-        if(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf && regimeTributario && objMinhaEmpresaOuPessoaAtual.folha && inputNomeFantasia && objMinhaEmpresaOuPessoaAtual.faturamentoMensalMedio){
-
-            console.log("Regime")
-            console.log(objMinhaEmpresaOuPessoaAtual.meuRegime)
-
-            console.log("CNAE PRINCIPAL")
-            console.log(objMinhaEmpresaOuPessoaAtual.cnaes[0])
-            console.log("CNPJ ENVIADO:")
-            console.log(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf)
-
-            const novoArrCnaes = await buscarCnaesApi(objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf)
-
-            const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-            objInfosMinhaEmpresaOuPessoaClone.cnaes = novoArrCnaes
-            setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
-
-            // Como eu acabei de buscar os CNAES, não posso usar o state objMinhaEmpresaOuPessoaAtual.cnaes para preencher o body, pois o estado ainda não vai estar atualizado
-
-
-            const body: CriarEmpresaBodyType = {
-                cnpj: objMinhaEmpresaOuPessoaAtual.meuCnpjouCpf,
-                regime_tributario: regimeTributario,
-                nome_fantasia: inputNomeFantasia,
-                cnae_principal: novoArrCnaes.length > 0 ? novoArrCnaes[0] : "",
-                folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
-                faturamento_mensal_medio: objMinhaEmpresaOuPessoaAtual.faturamentoMensalMedio.toString(),
-                cnaes: novoArrCnaes
-            } 
-    
-            // fazer o cadastro "simplificado" da empresa, buscar CNAES na api e caso de certo habilitar os campos de baixo dos toggles buttons 
-            const resposta = await fetch(baseUrl + "/criarEmpresa", {
-                method: "POST",
-                headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
-                body: JSON.stringify(body)
-            })
-
-            const data = await resposta.json()
-            console.log("resposta criar empresa")
-            console.log(data)
-            if(data.success == true){
-                console.log("Dados da empresa cadastrados com sucesso")
-                // await buscarCnaesApi() APAGUEI 14/05
-                
-                // setPrecisaFolha(true)
-
-                //IR PARA PASSO 2 (isso precisa ser ativado na função do bt de envio da folha)
-                //setPasso1(false)
-                //setPasso2(true)
-                let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
-                switch(regimeTributario){
-                    case "SIMPLES_NACIONAL":
-                        regimeAtual = "Simples Nacional" 
-                        break
-
-                    case "LUCRO_PRESUMIDO":
-                        regimeAtual = "Lucro Presumido"
-                        break
-
-                    case "LUCRO_REAL": 
-                        regimeAtual = "Lucro Real"
-                        break
-                }
-
-                //const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                //objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
-                //setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
-
-                return {criadoSucesso: true, erroChamada: false}
             }else{
-                if(data.error.code == 400){
-                    setTemErro(true)
-                    setTextoErro("Você já cadastrou essa empresa")
-                    // Caso eu já tenha cadastrado e isso passou despercebido na ultima conferencia, deve-se passar para o próximo passo com o regime que tá no banco
-                }else if(data.error.code == 500){
-                    setTemErro(true)
-                    setTextoErro("Tivemos problemas para cadastrar sua empresa, por favor, tente novamente")
-                }
+                setTemErro(true)
+                setTextoErro("Preencha todos os campos, por favor.")
                 return {criadoSucesso: false, erroChamada: true}
-
             }
         }else{
             setTemErro(true)
-            setTextoErro("Preencha todos os campos, por favor.")
+            setTextoErro("Você está tentando criar uma empresa a partir de um CPF, o que não é possível")
             return {criadoSucesso: false, erroChamada: true}
         }
         
@@ -372,7 +383,7 @@ export function PrimeiroPasso({modoBranco}: Props){
 
     }
 
-
+    // função para verificar se o que foi digitado no passo 1 é cnpj ou cpf e se os valores são válidos
     async function identificarCnpjOuCpf(cpfOuCnpj: string): Promise<{tamanhoValido: boolean, valido: boolean, tipo: "cpf" | "cnpj", registradoDb: boolean | null, erroDeApi: boolean}>{
         if(cpfOuCnpj.length == 11){
             // Verificar se é CPF válido
@@ -382,9 +393,11 @@ export function PrimeiroPasso({modoBranco}: Props){
                 meuCnpjOuCpfVerificado = respCpf.cpf ? respCpf.cpf : ""
 
                 // Se for pessoa fisica não verifico no db
-                const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                objInfosMinhaEmpresaOuPessoaClone.meuRegime = "Pessoa Fisica"
-                setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+                const objInfosMinhaEmpresaOuPessoaNovo: tipoObjPessoaFisica = {
+                    cpf: meuCnpjOuCpfVerificado,
+                    tipoUsuario: "Pessoa Física"
+                }
+                setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaNovo)
                 setPasso1(false)
                 setPasso2(true)
                 // COLOCAR STATE PARA ABRIR SÓ OS IMOVEIS
@@ -444,12 +457,15 @@ export function PrimeiroPasso({modoBranco}: Props){
 
                         // const arrCnaes = await buscarCnaesApi() Não vamos mais fazer pois se o CNPJ foi encontrado, os cnaes dele já estão na tabela CNAES do db e deve vir no "data
 
-                        const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                        objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
-                        objInfosMinhaEmpresaOuPessoaClone.cnaes = data.data.cnaes
-                        objInfosMinhaEmpresaOuPessoaClone.meuCnpjouCpf = meuCnpjOuCpfVerificado
-                        objInfosMinhaEmpresaOuPessoaClone.folha = Number(data.data.folha)
-                        setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+                        const objInfosMinhaEmpresaOuPessoaNovo: tipoObjEmpresa = {
+                            tipoUsuario: "Empresa",
+                            meuRegime: regimeAtual,
+                            cnpj: meuCnpjOuCpfVerificado,
+                            cnaes: data.data.cnaes,
+                            folha: Number(data.data.folha),
+                            faturamentoMensalMedio: Number(data.data.faturamento_mensal_medio)
+                        }
+                        setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaNovo)
 
 
 
@@ -470,10 +486,16 @@ export function PrimeiroPasso({modoBranco}: Props){
                             // const arrCnaes = await buscarCnaesApi() Vai buscar os CNAES na hora de enviar, na hora de criar empresa (botão avançar da folha)
 
                             console.log("CNPJ não encontrado")
-                            const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                            objInfosMinhaEmpresaOuPessoaClone.meuCnpjouCpf = meuCnpjOuCpfVerificado
+                            const objInfosMinhaEmpresaOuPessoaNovo: tipoObjEmpresa = {
+                                tipoUsuario: "Empresa",
+                                cnpj: meuCnpjOuCpfVerificado,
+                                meuRegime: "",
+                                cnaes: [],
+                                faturamentoMensalMedio: 0,
+                                folha: 0
+                            }
                             console.log("CONSOLE NO MOMENTO QUE ALTERA O OBJINFOS")
-                            setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+                            setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaNovo)
                             //setPrecisaCpf(false)
                             //setPrecisaRegime(true)
                         }
@@ -565,45 +587,50 @@ export function PrimeiroPasso({modoBranco}: Props){
 
         if(posicaoRegime.naTela){
 
-            if(regimeTributario && inputNomeFantasia){
-                
-                let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
-                switch(regimeTributario){
-                    case "SIMPLES_NACIONAL":
-                        regimeAtual = "Simples Nacional" 
-                        break
+            if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+                if(regimeTributario && inputNomeFantasia){
+                    
+                    let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
+                    switch(regimeTributario){
+                        case "SIMPLES_NACIONAL":
+                            regimeAtual = "Simples Nacional" 
+                            break
 
-                    case "LUCRO_PRESUMIDO":
-                        regimeAtual = "Lucro Presumido"
-                        break
+                        case "LUCRO_PRESUMIDO":
+                            regimeAtual = "Lucro Presumido"
+                            break
 
-                    case "LUCRO_REAL": 
-                        regimeAtual = "Lucro Real"
-                        break
+                        case "LUCRO_REAL": 
+                            regimeAtual = "Lucro Real"
+                            break
+                    }
+                    
+                    const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
+                    objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
+                    setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
+
+                    // Ir para folha (regime pra cima e folha pra tela)
+                    const objPosicaoRegimeClone = {...posicaoRegime}
+                    objPosicaoRegimeClone.emBaixo = false
+                    objPosicaoRegimeClone.naTela = false
+                    objPosicaoRegimeClone.emCima = true
+                    setPosicaoRegime(objPosicaoRegimeClone)
+
+                    const objPosicaoFolhaClone = {...posicaoFolha}
+                    objPosicaoFolhaClone.emBaixo = false
+                    objPosicaoFolhaClone.naTela = true
+                    objPosicaoFolhaClone.emCima = false
+                    setPosicaoFolha(objPosicaoFolhaClone)
+
+                    setUltimoNaTela("regime")
+
+                }else{
+                    setTemErro(true)
+                    setTextoErro("Por favor, Regime Tributário e o Nome Fantasia devem ser preenchidos corretamente")
                 }
-                
-                const objInfosMinhaEmpresaOuPessoaClone = {...objMinhaEmpresaOuPessoaAtual}
-                objInfosMinhaEmpresaOuPessoaClone.meuRegime = regimeAtual
-                setObjMinhaEmpresaOuPessoaAtual(objInfosMinhaEmpresaOuPessoaClone)
-
-                // Ir para folha (regime pra cima e folha pra tela)
-                const objPosicaoRegimeClone = {...posicaoRegime}
-                objPosicaoRegimeClone.emBaixo = false
-                objPosicaoRegimeClone.naTela = false
-                objPosicaoRegimeClone.emCima = true
-                setPosicaoRegime(objPosicaoRegimeClone)
-
-                const objPosicaoFolhaClone = {...posicaoFolha}
-                objPosicaoFolhaClone.emBaixo = false
-                objPosicaoFolhaClone.naTela = true
-                objPosicaoFolhaClone.emCima = false
-                setPosicaoFolha(objPosicaoFolhaClone)
-
-                setUltimoNaTela("regime")
-
             }else{
                 setTemErro(true)
-                setTextoErro("Por favor, Regime Tributário e o Nome Fantasia devem ser preenchidos corretamente")
+                setTextoErro("Você está tentando adicionar um regime tributário para uma Pessoa Física, o que não é possível. Por favor, reinicie o processo ou entre em contato com o suporte")
             }
 
 
@@ -681,16 +708,28 @@ export function PrimeiroPasso({modoBranco}: Props){
 
 
     function setPropFolha(folhaAtual: number){
-            const objMinhaEmpresaOuPessoaAtualClone = {...objMinhaEmpresaOuPessoaAtual}
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+            const objMinhaEmpresaOuPessoaAtualClone: tipoObjEmpresa = {...objMinhaEmpresaOuPessoaAtual}
             objMinhaEmpresaOuPessoaAtualClone.folha = folhaAtual
             setObjMinhaEmpresaOuPessoaAtual(objMinhaEmpresaOuPessoaAtualClone)
+        }else{
+            setTemErro(true)
+            setTextoErro("Você está tentando adicionar uma folha de pagamento para uma Pessoa Física, o que não é possível. Por favor, reinicie o processo ou entre em contato com o suporte")
+        }
 
     }
 
     function setPropFaturamento(faturamentoAtual: number){
-        const objMinhaEmpresaOuPessoaAtualClone = {...objMinhaEmpresaOuPessoaAtual}
-        objMinhaEmpresaOuPessoaAtualClone.faturamentoMensalMedio = faturamentoAtual
-        setObjMinhaEmpresaOuPessoaAtual(objMinhaEmpresaOuPessoaAtualClone)
+
+        if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
+            const objMinhaEmpresaOuPessoaAtualClone = {...objMinhaEmpresaOuPessoaAtual}
+            objMinhaEmpresaOuPessoaAtualClone.faturamentoMensalMedio = faturamentoAtual
+            setObjMinhaEmpresaOuPessoaAtual(objMinhaEmpresaOuPessoaAtualClone)
+        }else{
+            setTemErro(true)
+            setTextoErro("Você está tentando adicionar um faturamento médio para uma Pessoa Física, o que não é possível. Por favor, reinicie o processo ou entre em contato com o suporte")
+        }
+
 
     }
 
@@ -754,14 +793,6 @@ export function PrimeiroPasso({modoBranco}: Props){
         console.log(dadosEmpresaAtual)
         if(dadosEmpresaAtual.length > 0){
 
-
-
-
-            const objMinhaEmpresaOuPessoaAtualClone = {...objMinhaEmpresaOuPessoaAtual}
-            objMinhaEmpresaOuPessoaAtualClone.folha = dadosEmpresaAtual[0].folha
-            objMinhaEmpresaOuPessoaAtualClone.meuCnpjouCpf = dadosEmpresaAtual[0].cnpj
-            objMinhaEmpresaOuPessoaAtualClone.cnaes = dadosEmpresaAtual[0].cnaes
-
             let regimeAtual: "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "" = ""
             switch(dadosEmpresaAtual[0].regime_tributario){
                 case "SIMPLES_NACIONAL":
@@ -776,9 +807,19 @@ export function PrimeiroPasso({modoBranco}: Props){
                     regimeAtual = "Lucro Real"
                     break
             }
-            objMinhaEmpresaOuPessoaAtualClone.meuRegime = regimeAtual
 
-            setObjMinhaEmpresaOuPessoaAtual(objMinhaEmpresaOuPessoaAtualClone)
+
+            const objMinhaEmpresaOuPessoaAtualNovo: tipoObjEmpresa = {
+                tipoUsuario: "Empresa",
+                cnpj: dadosEmpresaAtual[0].cnpj,
+                cnaes: dadosEmpresaAtual[0].cnaes,
+                meuRegime: regimeAtual,
+                faturamentoMensalMedio: dadosEmpresaAtual[0].faturamento_mensal_medio,
+                folha: dadosEmpresaAtual[0].folha
+
+            }
+
+            setObjMinhaEmpresaOuPessoaAtual(objMinhaEmpresaOuPessoaAtualNovo)
 
             setPasso1(false)
             setPasso2(true)
@@ -1002,11 +1043,11 @@ export function PrimeiroPasso({modoBranco}: Props){
                                         <div className={`absolute w-full flex flex-col gap-2 items-center ${posicaoFolha.naTela ? "bottom-1/2 translate-y-1/2" : posicaoFolha.emCima? "bottom-full translate-y-0" : "bottom-0 translate-y-full"} right-1/2 translate-x-1/2 ${aposPrimeiroRender ? 'transition-[bottom,translate] duration-500 ease-in-out' : ''}`}>
                                             <div>
                                                 <label htmlFor="folhaIn">Digite a folha de pagamento mensal relativa ao CNPJ acima (apenas números. Exemplo: 100000):</label>
-                                                <InputReais onChange={setPropFolha} value={objMinhaEmpresaOuPessoaAtual.folha.toString()} />
+                                                <InputReais onChange={setPropFolha} value={folhaAdd.toString()} />
                                             </div>
                                             <div>
                                                 <label htmlFor="folhaIn">Digite o faturamento mensal médio:</label>
-                                                <InputReais onChange={setPropFaturamento} value={objMinhaEmpresaOuPessoaAtual.faturamentoMensalMedio.toString()} />
+                                                <InputReais onChange={setPropFaturamento} value={faturamentoMensalAdd.toString()} />
                                             </div>
                                             {/*<BotaoGeral onClickFn={enviarFolhaFn} text="enviar folha" />*/}
                                             <div className="pt-2 flex gap-4 mt-8">
@@ -1035,7 +1076,7 @@ export function PrimeiroPasso({modoBranco}: Props){
                 {
                     passo2 &&
                     <div>
-                        Meu regime: {objMinhaEmpresaOuPessoaAtual.meuRegime}
+                        Meu regime: {objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" ? objMinhaEmpresaOuPessoaAtual.meuRegime : "Pessoa Física"}
                     </div>
                 }
             </div>

@@ -40,6 +40,7 @@ export default function Servicos({cnaes, arrInfosEmpresa, setArrInfosEmpresa, to
 
 
     async function buscarAtividadesPorCnae(){
+        console.log("BUSCAR ATIVIDADES POR CNAE ACIONADA DE NOVO")
         try {
             // Supondo que o arquivo esteja em "public/data/arquivo.xlsx"
             const response = await fetch('src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx');
@@ -84,8 +85,6 @@ export default function Servicos({cnaes, arrInfosEmpresa, setArrInfosEmpresa, to
     useEffect(() => {
         console.log(data)
     }, [data])
-
-
 
 
   function handleToggle(){

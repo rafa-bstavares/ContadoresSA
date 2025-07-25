@@ -37,7 +37,7 @@ export type objParametrosEntradaBodyType = {
     locacao: impostosParametrosBodyType
 }
 
-interface parametrosEntrada {
+export type parametrosEntrada = {
     aliquotaIbs: number,
     aliquotaCbs: number,
     aliquotaIva: number,
@@ -96,7 +96,7 @@ type objRespostaServicosPrestados = {
   novoValorServico: number
 } 
 
-interface ImoveisLocacaoObj {
+export type ImoveisLocacaoObj = {
   valorAluguel: number,
   tipoAluguel: "Aluguel pago" | "Aluguel recebido",
   valorCondominio: number,
@@ -111,7 +111,7 @@ interface ImoveisLocacaoObj {
   quantidade: number
 }
 
-interface MoveisLocacaoObj {
+export type MoveisLocacaoObj = {
     valorLocacao: number,
     tipoAluguel: "Aluguel pago" | "Aluguel recebido" // por aqui vamos saber quem é o locador e locatário
     tipoOutraParte: "Pessoa física" | "Pessoa jurídica",
@@ -124,7 +124,7 @@ interface MoveisLocacaoObj {
     id: number
 }
 
-interface ImoveisCompraVendaObj {
+export type ImoveisCompraVendaObj = {
   residencial: boolean,
   valorVendaImovel: number,
   valorAquisicao: number,
@@ -235,7 +235,7 @@ export class calcularSimplificadoUseCase{
 
     
 
-    constructor( private EmpresaRepository: EmpresasRepository, private cpfOuCnpj: string, private totalAtividades: objAtividadeFinal[], private parametrosEntrada: parametrosEntrada, private totalAtividadesAdquiridas: objAtividadesAdquitidasType[], private totalImoveisLocacao: ImoveisLocacaoObj[], private totalImoveisCompraVenda: ImoveisCompraVendaObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private totalProdutosVendidos: ProdutoVendidoObj[], private totalProdutosAdquiridos: ProdutoAdquiridoObj[], private meuRegime: tiposRegime){}
+    constructor( private EmpresaRepository: EmpresasRepository, private cnpj: string, private totalAtividades: objAtividadeFinal[], private parametrosEntrada: parametrosEntrada, private totalAtividadesAdquiridas: objAtividadesAdquitidasType[], private totalImoveisLocacao: ImoveisLocacaoObj[], private totalImoveisCompraVenda: ImoveisCompraVendaObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private totalProdutosVendidos: ProdutoVendidoObj[], private totalProdutosAdquiridos: ProdutoAdquiridoObj[], private meuRegime: tiposRegime){}
 
     async execute(){
 
@@ -282,7 +282,7 @@ export class calcularSimplificadoUseCase{
           }
 
 
-          const cnpj = this.cpfOuCnpj
+          const cnpj = this.cnpj
           console.log("cnpj: " + cnpj)
   
           const dadosEmpresaAtual = await this.EmpresaRepository.buscarEmpresa(cnpj)
@@ -1160,6 +1160,7 @@ export class calcularSimplificadoUseCase{
           }    
           
           type respostaFinalCaluloType = {
+            tipoUsuario: "Empresa",
             simplesNacional: objRegimeType,
             lucroReal: objRegimeType,
             lucroPresumido: objRegimeType,
@@ -1170,6 +1171,7 @@ export class calcularSimplificadoUseCase{
           type regimesChavesObjType = "simplesNacional" | "lucroReal" | "lucroPresumido"
 
           let respostaFinalCalculo: respostaFinalCaluloType = {
+            tipoUsuario: "Empresa",
             simplesNacional: JSON.parse(JSON.stringify(valorInicialObjRegime)),
             lucroReal: JSON.parse(JSON.stringify(valorInicialObjRegime)),
             lucroPresumido: JSON.parse(JSON.stringify(valorInicialObjRegime)),

@@ -431,7 +431,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
         if(passo1 == false){
             // Ajeitando tipos Algueis
             // Se eu for do Simples Nacional não pode ter Aluguel Recebido pq simples não pode ser locador
-            if(objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
+            if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && objMinhaEmpresaOuPessoaAtual.meuRegime == "Simples Nacional"){
                 setTiposAlugueis(tiposAlugueis.filter(item => item == "Aluguel pago"))
             }
 
@@ -442,10 +442,10 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
         // Se mudou o tipo alugueis, com certeza o passo 1 já é false
         console.log("mudaou aluguel add: " + tipoAluguelAdd)
         console.log("está ativando o useEffect")
-        console.log("meu Regime: " + objMinhaEmpresaOuPessoaAtual.meuRegime)
+        console.log("meu Regime: " + (objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" ? objMinhaEmpresaOuPessoaAtual.meuRegime : ""))
         console.log("tipo aluguel add: " + tipoAluguelAdd)
         if(tipoAluguelAdd){
-            if(!((objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real") && tipoAluguelAdd == "Aluguel recebido")){
+            if(!((objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" && (objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Presumido" || objMinhaEmpresaOuPessoaAtual.meuRegime == "Lucro Real")) && tipoAluguelAdd == "Aluguel recebido")){
                 // entra aqui se o meuRegime for Simples Nacional ou se o tipoAluguelAdd !== Aluguel recebido
                 // Ou seja, aqui estamos tirando a possibilidade do LOCADOR ser Simples Nacional
                 console.log("entrou no if do ")

@@ -28,7 +28,7 @@ export async function beneficiosController(request: FastifyRequest, reply: Fasti
     try{
         const finalBeneficios = await encontrarBeneficios.execute(body)
 
-        return reply.status(500).send({success: true, data: finalBeneficios, error: null})
+        return reply.status(200).send({success: true, data: finalBeneficios, error: null})
 
     }catch(err){
         return reply.status(500).send({success: false, data: null, error: {code: 500, message: err}})
