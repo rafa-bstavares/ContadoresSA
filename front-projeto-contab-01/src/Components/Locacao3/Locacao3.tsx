@@ -11,6 +11,7 @@ import xis from "../../assets/images/xisContab.svg"
 import lixeira from "../../assets/images/lixeira.svg"
 import { Xis } from "../Xis/Xis"
 import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 type Props = {
     modoBranco: boolean
@@ -44,8 +45,7 @@ export default function Locacao3({modoBranco}: Props){
     const [condominioEmbutidoAdd, setCondominioEmbutidoAdd] = useState<boolean>()
     const [prazoDeterminadoAdd, setPrazoDeterminadoAdd] = useState<boolean>(true)
     const [regimeOutroAdd, setRegimeOutroAdd] = useState<regimeOutroType>()
-    const [quantidadeAdd, setQuantidadeAdd] = useState<number>(1)
-    const [quantidadeTela, setQuantidadeTela] = useState<string>("1")
+    const [quantidadeAdd, setQuantidadeAdd] = useState<string>("1")
     const [tiposAlugueis, setTiposAlugueis] = useState<(TiposAluguelType)[]>(["Aluguel pago","Aluguel recebido"])
     const [regimesOutro, setRegimesOutro] = useState<regimeOutroType[]>(["Lucro Presumido","Lucro Real","Simples Nacional"])
     const [info1Aberto, setInfo1Aberto] = useState<boolean>(true)
@@ -142,16 +142,20 @@ export default function Locacao3({modoBranco}: Props){
     }
 
 function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
-  const raw = e.target.value
-  // retira TUDO que não seja 0–9
-  const digitsOnly = raw.replace(/\D/g, "")
+        const valorInput = e.target.value
 
-  // mantém o campo mostrando apenas dígitos
-  setQuantidadeTela(digitsOnly)
+        if(valorInput === ""){
+            setQuantidadeAdd(valorInput)
+            return 
+        }
 
-  // se quiser manter também um número no outro state:
-  const num = digitsOnly === "" ? 0 : parseInt(digitsOnly, 10)
-  setQuantidadeAdd(num)
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
+
+        if(regexStrNum.test(valorInput)){
+            setQuantidadeAdd(valorInput)
+            return 
+        }
 }
 
     function mudarResidencial(e: React.ChangeEvent<HTMLInputElement>){
@@ -185,8 +189,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
         setCondominioEmbutidoAdd(undefined)
         setPrazoDeterminadoAdd(true)
         setRegimeOutroAdd("Pessoa Fisica")
-        setQuantidadeAdd(1)
-        setQuantidadeTela("1")
+        setQuantidadeAdd("1")
         setTotalImoveisModal([])
         
         setInfo2Aberto(false)
@@ -217,18 +220,18 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
 
             const novoArr = [...totalImoveisModal]
             const novoObjAtual: ImoveisLocacaoObj = {
-                valorAluguel: Number(valorAluguelAdd),
+                valorAluguel: Number(valorAluguelAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 tipoAluguel: tipoAluguelAdd,
                 acrescimos: Number(acrescimosAdd),
-                juros: Number(jurosAdd),
+                juros: Number(jurosAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 residencial: residencialAdd,
-                valorCondominio: Number(valorCondominioAdd),
+                valorCondominio: Number(valorCondominioAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 condominioEmbutido: condominioEmbutidoAdd,
                 tipoOutraParte: tipoOutroAdd,
                 prazoDeterminado: prazoDeterminadoAdd,
                 regimeOutro: tipoOutroAdd == "Pessoa física" ? "Pessoa Fisica" : regimeOutroAdd ? regimeOutroAdd : "Simples Nacional",
                 compoeCusto: false,
-                quantidade: quantidadeAdd,
+                quantidade: Number(quantidadeAdd),
                 id: idAtual 
              }
             novoArr.push(novoObjAtual)
@@ -244,8 +247,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
              setCondominioEmbutidoAdd(undefined)
              setPrazoDeterminadoAdd(true)
              setRegimeOutroAdd("Pessoa Fisica")
-             setQuantidadeAdd(1)
-             setQuantidadeTela("1")
+             setQuantidadeAdd("1")
              
              setInfo2Aberto(false)
              setInfo1Aberto(true)
@@ -846,34 +848,24 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                         <div className="flex flex-col overflow-hidden gap-8">
                         <div className="flex gap-8 p-6">
                             <div className="flex flex-col flex-1">
-                            <label
-                                htmlFor="valorAluguel"
-                                className="flex gap-2 items-center text-gray-400 "
-                            >
-                                Valor Aluguel
-                                <div className="text-gray-400 text-sm">*sem condomínio</div>
-                            </label>
-                            <input
-                                className="outline-none rounded-md border-2 border-solid border-gray-300 p-1"
-                                type="number"
-                                id="valorAluguel"
-                                onChange={mudarValorAluguelAdd}
-                            />
+                                <label
+                                    htmlFor="valorAluguel"
+                                    className="flex gap-2 items-center text-gray-400 "
+                                >
+                                    Valor Aluguel
+                                    <div className="text-gray-400 text-sm">*sem condomínio</div>
+                                </label>
+                                <InputFinanceiro stateValor={valorAluguelAdd} onValueChange={(values) => setValorAluguelAdd(values.formattedValue)} />
                             </div>
 
                             <div className="flex flex-col flex-1">
-                            <label
-                                htmlFor="valorCondominio"
-                                className="text-gray-400"
-                            >
-                                Valor Condomínio:
-                            </label>
-                            <input
-                                className="outline-none rounded-md border-2 border-solid border-gray-300 p-1 "
-                                type="number"
-                                id="valorCondominio"
-                                onChange={mudarValorCondominioAdd}
-                            />
+                                <label
+                                    htmlFor="valorCondominio"
+                                    className="text-gray-400"
+                                >
+                                    Valor Condomínio:
+                                </label>
+                                <InputFinanceiro stateValor={valorCondominioAdd} onValueChange={(values) => setValorCondominioAdd(values.formattedValue)} />
                             </div>
 
                             <div className="flex flex-col flex-1">
@@ -890,12 +882,7 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                     tooltipText="Do valor dos juros e das variações monetárias, em função da taxa de câmbio ou de índice ou coeficiente aplicáveis por disposição legal ou contratual"
                                     />
                                 </div>
-                                <input 
-                                    className="outline-none rounded-md border-2 border-solid border-gray-300 p-1 "
-                                    type="number"
-                                    id="juros"
-                                    onChange={mudarJurosAdd}
-                                />
+                                <InputFinanceiro stateValor={jurosAdd} onValueChange={(values) => setJurosAdd(values.formattedValue)} />
                             </div>
                         
                             <div>
@@ -908,11 +895,9 @@ function mudarQuantidade(e: ChangeEvent<HTMLInputElement>) {
                                     </label>
                                 </div>                                
                                 <input
-                                value={quantidadeTela}
+                                value={quantidadeAdd}
                                 className="outline-none rounded-md border-2 border-solid border-gray-300 p-1"
                                 type="text"
-                                inputMode="numeric"
-                                pattern="\d*"
                                 id="quantidade"
                                 onChange={mudarQuantidade}
                                 />

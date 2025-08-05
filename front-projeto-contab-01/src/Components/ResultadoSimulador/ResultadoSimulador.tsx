@@ -10,7 +10,7 @@ export function ResultadoSimulador(){
 
     {/* TIPAGEM A INICIALIZAÇÃO DE VALORES DAS TABELAS QUE VÃO PRA TELA */}
 
-    type linhaFinalARDRDiferencasEAnoAAno = {valorAR: number, valorAnoBase: number, diferencaReais: number, diferencaPercentual: number,  valor2026: number, valor2027: number, valor2028: number, valor2029: number, valor2030: number, valor2031: number, valor2032: number, valor2033: number}
+    type linhaFinalARDRDiferencasEAnoAAno = {valorAR: number, valorAnoBase: number, diferencaReais: number, diferencaPercentual: number,  valorA2026: number, valorA2027: number, valorA2028: number, valorA2029: number, valorA2030: number, valorA2031: number, valorA2032: number, valorA2033: number}
 
     type linhaFinalCompras = {valorAR: number, impostosAR: number, valorDesonerado: number, custoAR: number, porcentagemCustoEfetivoAR: number, creditoAR: number, porcentagemCargaTributariaAR: number, valorAnoBase: number, impostosAnoBase: number, custoAnoBase: number, porcentagemCustoEfetivoAnoBase: number, creditoAnoBase: number, porcentagemCargaTributariaAnoBase: number}
 
@@ -28,14 +28,14 @@ export function ResultadoSimulador(){
     }
 
     const tabelaDreTelaValorInicial = {
-        receitaBruta: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        deducoesTributos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        custoGeral: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        lucroBruto: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        despesas: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        lucrosAntesIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0, valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        lucroLiquido: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        receitaBruta: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        deducoesTributos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        custoGeral: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        lucroBruto: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        despesas: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        lucrosAntesIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0, valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        lucroLiquido: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
     }
 
     type tabelaCaixaTelaType = {
@@ -52,16 +52,16 @@ export function ResultadoSimulador(){
     }
 
     const tabelaCaixaTelaValorInicial = {
-        fornecedores: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        tributosCredito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        clientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        tributosDebito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        tributosRecolhidos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        saldoCredor: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        resultado: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        resultadoPosIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
-        resultadoSobreClientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0,  valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0},
+        fornecedores: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        tributosCredito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        clientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        tributosDebito: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        tributosRecolhidos: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        saldoCredor: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        resultado: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        irCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        resultadoPosIrCs: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
+        resultadoSobreClientes: {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0,  valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0},
     }
 
     type tabelaComprasTelaType = {
@@ -103,7 +103,7 @@ export function ResultadoSimulador(){
     const [regimeAtual, setRegimeAtual] = useState<regimesType>("Simples Nacional")
     const [regimeAtualAberto, setRegimeAtualAberto] = useState<boolean>(false)
     const [anoBaseAberto, setAnoBaseAberto] = useState<boolean>(false)
-    const [anoBase, setAnoBase] = useState<anosType>("2033")
+    const [anoBase, setAnoBase] = useState<anosType>("A2033")
 
     const [tabelaDreTela, setTabelaDreTela] = useState<tabelaDreTelaType>(tabelaDreTelaValorInicial)
     const [tabelaCaixaTela, setTabelaCaixaTela] = useState<tabelaCaixaTelaType>(tabelaCaixaTelaValorInicial)
@@ -209,7 +209,7 @@ export function ResultadoSimulador(){
         Object.entries(objTabelaCrua).forEach(([chave, dados]) => {
             const valorAR = dados.antesReforma.valor
 
-            const objLinhaAtual: linhaFinalARDRDiferencasEAnoAAno = {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valor2026: 0, valor2027: 0, valor2028: 0, valor2029: 0, valor2030: 0, valor2031: 0, valor2032: 0, valor2033: 0}
+            const objLinhaAtual: linhaFinalARDRDiferencasEAnoAAno = {valorAR: 0, valorAnoBase: 0, diferencaReais: 0, diferencaPercentual: 0, valorA2026: 0, valorA2027: 0, valorA2028: 0, valorA2029: 0, valorA2030: 0, valorA2031: 0, valorA2032: 0, valorA2033: 0}
 
             const objAnosTransicao = dados.depoisReforma
             const objAnoBase = objAnosTransicao.find(item => item.ano == anoBase)
@@ -1321,7 +1321,7 @@ export function ResultadoSimulador(){
                                 <div
                                     key={item}
                                     className="p-2 rounded-md cursor-pointer hover:bg-premiumBg"
-                                    onClick={() => escolherAnoBase(item as anosType)}
+                                    onClick={() => escolherAnoBase("A" + item as anosType)}
                                 >
                                     {item}
                                 </div>
@@ -1392,14 +1392,14 @@ export function ResultadoSimulador(){
                                                     <div>{retornarValorDinheiro(dados.valorAnoBase)}</div>
                                                     <div>{retornarValorDinheiro(dados.diferencaReais)}</div>
                                                     <div>{retornarValorPorcentagem(dados.diferencaPercentual)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2026)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2027)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2028)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2029)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2030)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2031)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2032)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valor2033)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2026)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2027)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2028)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2029)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2030)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2031)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2032)}</div>
+                                                    <div>{retornarValorDinheiro(dados.valorA2033)}</div>
                                                 </div>
                                             </>
                                     )
@@ -1488,14 +1488,14 @@ export function ResultadoSimulador(){
                                                     <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorAnoBase) : retornarValorDinheiro(dados.valorAnoBase)}</div>
                                                     <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.diferencaReais) : retornarValorDinheiro(dados.diferencaReais)}</div>
                                                     <div>{retornarValorPorcentagem(dados.diferencaPercentual)}</div>    
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2026) : retornarValorDinheiro(dados.valor2026)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2027) : retornarValorDinheiro(dados.valor2027)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2028) : retornarValorDinheiro(dados.valor2028)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2029) : retornarValorDinheiro(dados.valor2029)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2030) : retornarValorDinheiro(dados.valor2030)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2031) : retornarValorDinheiro(dados.valor2031)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2032) : retornarValorDinheiro(dados.valor2032)}</div>
-                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valor2033) : retornarValorDinheiro(dados.valor2033)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2026) : retornarValorDinheiro(dados.valorA2026)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2027) : retornarValorDinheiro(dados.valorA2027)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2028) : retornarValorDinheiro(dados.valorA2028)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2029) : retornarValorDinheiro(dados.valorA2029)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2030) : retornarValorDinheiro(dados.valorA2030)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2031) : retornarValorDinheiro(dados.valorA2031)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2032) : retornarValorDinheiro(dados.valorA2032)}</div>
+                                                    <div>{(index == arrPropriedadesCaixa.length - 1) ? retornarValorPorcentagem(dados.valorA2033) : retornarValorDinheiro(dados.valorA2033)}</div>
                                                 </div>
                                             </>
                                     )
@@ -1534,51 +1534,63 @@ export function ResultadoSimulador(){
                                 </div>
                             </div>
                         </div>
-                        <div className={`${controleDropTabelas.compras ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"} [transition:grid-template-rows_500ms]`}>
+                        <div
+                        className={`${
+                            controleDropTabelas.compras
+                            ? "grid grid-rows-[1fr]"
+                            : "grid grid-rows-[0fr]"
+                        } [transition:grid-template-rows_500ms]`}
+                        >
                             <div className="overflow-hidden">
-                                {Object.entries(tabelaComprasTela).map(([nomeCategoria, dados], index) => {
-                                    return (
-                                            <>
-                                                {
-                                                    index == 0 &&
-                                                    <div className="grid grid-cols-[repeat(14,_1fr)] gap-10 items-center mb-4 p-4 font-bold">
-                                                        <div>Categoria</div>
-                                                        <div>valorAR</div>
-                                                        <div>impostosAR</div>
-                                                        <div>valorDesonerado</div>
-                                                        <div>custoAR</div>
-                                                        <div>% Custo Efetivo AR</div>
-                                                        <div>Crédito AR</div>
-                                                        <div>% Carga Tributária AR</div>
-                                                        <div>valorDR</div>
-                                                        <div>impostosDR</div>
-                                                        <div>custoDR</div>
-                                                        <div>% Custo Efetivo DR</div>
-                                                        <div>Crédito DR</div>
-                                                        <div>% Carga Tributária DR</div>
-                                                    </div>
-                                                }
-
-
-                                                <div className={`grid grid-cols-[repeat(14,_1fr)] gap-10 items-center rounded-2xl p-4 ${index % 2 == 0? "bg-fundoPreto" : ""}`}>
-                                                    <div className="font-bold">{nomeLinhasTabelaCompras[nomeCategoria as keyof totalComprasType]}</div>
-                                                    <div>{retornarValorDinheiro(dados.valorAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.impostosAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valorDesonerado)}</div>
-                                                    <div>{retornarValorDinheiro(dados.custoAR)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.creditoAR)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAR)}</div>
-                                                    <div>{retornarValorDinheiro(dados.valorAnoBase)}</div>
-                                                    <div>{retornarValorDinheiro(dados.impostosAnoBase)}</div>
-                                                    <div>{retornarValorDinheiro(dados.custoAnoBase)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAnoBase)}</div>
-                                                    <div>{retornarValorDinheiro(dados.creditoAnoBase)}</div>
-                                                    <div>{retornarValorPorcentagem(dados.porcentagemCargaTributariaAnoBase)}</div>
-                                                </div>
-                                            </>
-                                    )
-                                })}
+                                <div className="overflow-x-auto">
+                                    <table className="table-fixed w-full  text-white overflow-x-auto rounded-2xl scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-700">
+                                        <thead>
+                                            <tr className=" font-bold text-left">
+                                                <th className="w-40 p-4">Categoria</th>
+                                                <th className="w-32 p-4">valorAR</th>
+                                                <th className="w-32 p-4">impostosAR</th>
+                                                <th className="w-40 p-4 break-words">valor Desonerado</th>
+                                                <th className="w-32 p-4">custoAR</th>
+                                                <th className="w-40 p-4">% Custo Efetivo AR</th>
+                                                <th className="w-32 p-4">Crédito AR</th>
+                                                <th className="w-40 p-4">% Carga Tributária AR</th>
+                                                <th className="w-32 p-4">valorDR</th>
+                                                <th className="w-32 p-4">impostosDR</th>
+                                                <th className="w-32 p-4">custoDR</th>
+                                                <th className="w-40 p-4">% Custo Efetivo DR</th>
+                                                <th className="w-32 p-4">Crédito DR</th>
+                                                <th className="w-40 p-4">% Carga Tributária DR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Object.entries(tabelaComprasTela).map(([nomeCategoria, dados], index) => (
+                                                <tr
+                                                    key={nomeCategoria}
+                                                    className={`${
+                                                        index % 2 === 0 ? "bg-fundoPreto" : "bg-neutral-900"
+                                                    } rounded-2xl`}
+                                                    >
+                                                    <td className="p-4 font-bold">
+                                                        {nomeLinhasTabelaCompras[nomeCategoria as keyof totalComprasType]}
+                                                    </td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.valorAR)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.impostosAR)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.valorDesonerado)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.custoAR)}</td>
+                                                    <td className="p-4">{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAR)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.creditoAR)}</td>
+                                                    <td className="p-4">{retornarValorPorcentagem(dados.porcentagemCargaTributariaAR)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.valorAnoBase)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.impostosAnoBase)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.custoAnoBase)}</td>
+                                                    <td className="p-4">{retornarValorPorcentagem(dados.porcentagemCustoEfetivoAnoBase)}</td>
+                                                    <td className="p-4">{retornarValorDinheiro(dados.creditoAnoBase)}</td>
+                                                    <td className="p-4">{retornarValorPorcentagem(dados.porcentagemCargaTributariaAnoBase)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

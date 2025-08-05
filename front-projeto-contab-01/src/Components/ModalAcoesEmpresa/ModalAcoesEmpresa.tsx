@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
 import { empresasType } from "../../Contextos/ContextoUsuario/ContextoUsuario"
 import TitulosPagPrincipal from "../TitulosPagPrincipal/TitulosPagPrincipal"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
@@ -50,6 +50,23 @@ export function ModalAcoesEmpresa({fnFinal, modo, textoBotao, valoresIniciais, s
         setModalAberto(false)
     }
 
+    function mudarCnpjFornecedor(e: ChangeEvent<HTMLInputElement>){
+        const valorInput = e.target.value
+
+        if(valorInput === ""){
+            setInputCnpjModal(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            return 
+        }
+
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
+
+        if(regexStrNum.test(valorInput)){
+            setInputCnpjModal(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            return 
+        }
+    }    
+
 
     useEffect(() => {
         if(valoresIniciais){
@@ -85,7 +102,7 @@ export function ModalAcoesEmpresa({fnFinal, modo, textoBotao, valoresIniciais, s
                     <div>
                         CNPJ:
                     </div>
-                    <input value={inputCnpjModal} onChange={(e) => setInputCnpjModal(e.target.value)} id="cnpjIn" type="number" placeholder='CNPJ ou CPF' className={`outline-none border-2 border-solid rounded-md px-4 py-2  w-full`}/>
+                    <input value={inputCnpjModal} onChange={mudarCnpjFornecedor} id="cnpjIn" type="text" placeholder='CNPJ ou CPF' className={`outline-none border-2 border-solid rounded-md px-4 py-2  w-full`}/>
                 </div>
 
                 <div className="flex flex-col ">

@@ -5,6 +5,7 @@ import { objAtividadeFinal } from "../SegundoPasso/SegundoPasso"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import xis from "../../assets/images/xisContab.svg"
 import { Xis } from "../Xis/Xis"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 type ObjInfosType = {
     cnae: string,
@@ -29,7 +30,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
     }
 
     const [atividadeSelecionada, setAtividadeSelecionada] = useState<ObjInfosType>()
-    const [faturamentoSelecionado, setFaturamentoSelecionado] = useState<number>(0)
+    const [faturamentoSelecionado, setFaturamentoSelecionado] = useState<string>("")
     const [aberto, setAberto] = useState<boolean>(false)
     const [modalServicosPrestadosAberto, setModalServicosPrestadosAberto] = useState<boolean>(false)
 
@@ -60,7 +61,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                 const novoArr = [...totalAtividadesPrestadas]
                 novoArr.push({
                     atividade: atividadeSelecionada.descricao, 
-                    faturamentoMensal: faturamentoSelecionado, 
+                    faturamentoMensal: Number(faturamentoSelecionado.slice(3).replace(/\./g, "").replace(",", ".")), 
                     id: idAtual, 
                     cnaePrincipal: atividadeSelecionada.cnae.toString(), 
                     beneficio: 0,
@@ -71,7 +72,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                 setTotalAtividadesPrestadas(novoArr)
                 setModalServicosPrestadosAberto(false)
                 setAtividadeSelecionada(undefined)
-                setFaturamentoSelecionado(0)
+                setFaturamentoSelecionado("")
             }
         }else{
             console.log("tanto a atividade quanto o faturamento precisam estar preenchidos e o faturamento não pode ser 0")
@@ -149,10 +150,7 @@ export default function ServicoPrestadoInput({arrInfosEmpresa, totalAtividadesPr
                                 {/*Input faturamento*/}
                                 <div className="flex flex-col gap-1">
                                     <label className="text-gray-400">Faturamento da atividade:</label>
-                                    <div className="flex gap-2 items-center border-2 border-solid rounded-md border-gray-300 p-1">
-                                        <div className="">R$</div>
-                                        <input className="outline-none" type="number" onChange={(e) => setFaturamentoSelecionado(Number(e.target.value))}/>
-                                    </div>
+                                    <InputFinanceiro stateValor={faturamentoSelecionado} onValueChange={(values) => setFaturamentoSelecionado(values.formattedValue)} />
                                 </div>
                                 {/*Botao adicionar*/}
                                 <div className="flex flex-col">

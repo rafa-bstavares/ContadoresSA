@@ -1,7 +1,7 @@
 import { Empresa } from "@prisma/client";
 import { CnaesRepository } from "../repositories/cnaes-repository";
 import { EmpresasRepository } from "../repositories/empresas-repository";
-import { recursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
+import { RecursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
 
 interface BuscarEmpresaInput {
     cnpj: string

@@ -10,6 +10,7 @@ import { ContextoParametrosOpcionais, objAliquotas } from "../../Contextos/Conte
 import { ToggleButton, toogleFn } from "../ToggleButton/ToggleButton"
 import { Xis } from "../Xis/Xis"
 import { baseUrl } from "../../App"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 
 export function ProdutosAdquiridosInput(){
@@ -348,7 +349,7 @@ export function ProdutosAdquiridosInput(){
                     metodo: metodoAdd,
                     ncm: ncmGenerico ? "" : ncmAdd,
                     aliquotas: objAliquotasFinal,
-                    valorOperacao: Number(valorOperacaoAdd),
+                    valorOperacao: Number(valorOperacaoAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                     cnpjFornecedor: metodoAdd == "Por CNPJ" ? cnpjFornecedorAdd : "",
                     creditoIcms,
                     creditoIpi,
@@ -407,14 +408,15 @@ export function ProdutosAdquiridosInput(){
         const valorInput = e.target.value
 
         if(valorInput === ""){
-            setNcmAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            setNcmAdd(valorInput)
             return 
         }
 
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
 
         if(regexStrNum.test(valorInput)){
-            setNcmAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            setNcmAdd(valorInput)
             return 
         }
     }
@@ -427,7 +429,8 @@ export function ProdutosAdquiridosInput(){
             return 
         }
 
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
 
         if(regexStrNum.test(valorInput)){
             setCnpjFornecedorAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
@@ -854,7 +857,7 @@ export function ProdutosAdquiridosInput(){
                                             </label>
                                             <input
                                                 className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                                type="number"
+                                                type="text"
                                                 id="ncm"
                                                 value={cnpjFornecedorAdd}
                                                 onChange={mudarCnpjFornecedor}
@@ -973,7 +976,7 @@ export function ProdutosAdquiridosInput(){
                                             </label>
                                             <input
                                                 className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                                type="number"
+                                                type="text"
                                                 id="ncm"
                                                 value={ncmAdd}
                                                 onChange={mudarNcmAdd}
@@ -1071,13 +1074,7 @@ export function ProdutosAdquiridosInput(){
                                     > 
                                         <div>Valor Operação</div>
                                     </label>
-                                    <input
-                                        className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                        type="number"
-                                        id="valorAluguel"
-                                        value={valorOperacaoAdd}
-                                        onChange={mudarValorOperacaoAdd}
-                                    />
+                                    <InputFinanceiro stateValor={valorOperacaoAdd} onValueChange={(values) => setValorOperacaoAdd(values.formattedValue)} />
                                 </div>
 
                                 {        

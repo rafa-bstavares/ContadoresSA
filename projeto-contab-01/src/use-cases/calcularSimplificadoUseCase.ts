@@ -1,7 +1,14 @@
-import * as XLSX from 'xlsx';
-import path from 'path';
-import { EmpresasRepository } from "../repositories/empresas-repository";
-import { RegimeTributario } from '@prisma/client';
+import * as XLSX from 'xlsx'
+import path from 'path'
+import { EmpresasRepository } from "../repositories/empresas-repository"
+import { AnosType, AntesReformaCategoria, Categoria, CategoriaType, DepoisReformaCategoria, LinhasCaixaType, LinhasDreType, Prisma, RegimesType, RegimeTributario } from '@prisma/client'
+import { RespostaGeralRepository } from '../repositories/resposta-geral-repository'
+import { RespostaCategoriasRepository } from '../repositories/resposta-categorias-repository'
+import { Decimal } from '@prisma/client/runtime/library'
+import { v4 as uuidv4 } from 'uuid'
+import { ErroConexaoBanco } from './errors/erro-conexao-banco'
+import { RecursoNaoEncontradoErro } from './errors/recurso-nao-encontrado-erro'
+import { RespostaTabelasRepository } from '../repositories/resposta-tabelas-repository'
 
 export interface objAtividadeFinal {
     atividade: string,
@@ -229,15 +236,444 @@ interface respostaTotalType {
   servicosTomados: any[]
 }
 
-type tiposRegime = "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "Pessoa Fisica" | ""
+export type tiposRegime = "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "Pessoa Fisica" | ""
+
+
+
+
+// Tipagens para a resposta
+export type anosType = "A2026" | "A2027" | "A2028" | "A2029" | "A2030" | "A2031" | "A2032" | "A2033"
+
+export type objAreaComprasTransicaoType = {
+      ano: anosType
+      valor: number,
+      valorSemIva: number,
+      impostos: number,
+      credito: number,
+      custo: number,
+      porcentagemCustoEfetivo: number,
+      porcentagemCargaTributaria: number
+}
+
+export type antesReformaComprasType = {
+  valorAR: number,
+  impostosAR: number,
+  valorDesonerado: number,
+  creditoAR: number, 
+  custoAR: number,
+  porcentagemCustoEfetivoAR: number,
+  porcentagemCargaTributariaAR: number
+}
+
+export type objAreaComprasType = {
+    antesReforma: antesReformaComprasType,
+    depoisReforma: objAreaComprasTransicaoType[]
+}
+
+export type objAreaVendasTransicaoType = {
+      ano: anosType
+      valor: number,
+      valorSemIva: number,
+      impostos: number,
+      porcentagemCargaTributaria: number
+}
+
+export type antesReformaVendasType = {
+  valorAR: number,
+  impostosAR: number,
+  valorDesonerado: number,
+  porcentagemCargaTributariaAR: number
+}
+
+export type objAreaVendasType = {
+    antesReforma: antesReformaVendasType,
+    depoisReforma: objAreaVendasTransicaoType[]
+}
+
+type totalComprasType = {
+    comprasProdutos: objAreaComprasType,
+    servicosTomados: objAreaComprasType,
+    locacaoMoveis: objAreaComprasType,
+    locacaoImoveis: objAreaComprasType,
+    total: objAreaComprasType
+}
+
+type totalVendasType = {
+    vendasProdutos: objAreaVendasType,
+    servicosPrestados: objAreaVendasType,
+    locacaoMoveis: objAreaVendasType,
+    locacaoImoveis: objAreaVendasType,
+    total: objAreaVendasType
+}
+
+type linhasDreType = {
+  custoGeral: {AR: number, DR: number},
+  despesas: {AR: number, DR: number},
+}
+
+
+export type objAntesReforma = {
+    valor: number, 
+    valorImpostos: number,
+    valorDesonerado: number,
+    porcentagemCargaTributaria: number,
+    custo: number | null, 
+} 
+
+export type objDepoisReforma = {
+  ano: anosType,
+  valor: number,
+  valorSemIva: number,
+  valorImpostos: number,
+  porcentagemCargaTributaria: number,
+  custo: number | null
+}
+
+export type objItemFinal = {
+  antesReforma: objAntesReforma,
+  depoisReforma: objDepoisReforma[]
+}    
+
+ export type objDepoisReformaDreCaixa = {
+  ano: anosType,
+  valor: number
+}
+
+export type antesReformaDreCaixaType = {
+  valor: number
+}
+
+export type linhaArDrDiferencas = {
+  antesReforma: antesReformaDreCaixaType,
+  depoisReforma: objDepoisReformaDreCaixa[]
+} 
+
+type tabelaDreType = {
+  receitaBruta: linhaArDrDiferencas,
+  deducoesTributos: linhaArDrDiferencas,
+  custoGeral: linhaArDrDiferencas,
+  lucroBruto: linhaArDrDiferencas,
+  despesas: linhaArDrDiferencas,
+  lucrosAntesIrCs: linhaArDrDiferencas,
+  irCs: linhaArDrDiferencas,
+  lucroLiquido: linhaArDrDiferencas
+}
+
+type tabelaCaixaType = {
+  fornecedores: linhaArDrDiferencas,
+  tributosCredito: linhaArDrDiferencas,
+  clientes: linhaArDrDiferencas,
+  tributosDebito: linhaArDrDiferencas,
+  tributosRecolhidos: linhaArDrDiferencas,
+  saldoCredor: linhaArDrDiferencas,
+  resultado: linhaArDrDiferencas,
+  irCs: linhaArDrDiferencas,
+  resultadoPosIrCs: linhaArDrDiferencas,
+  resultadoSobreClientes: linhaArDrDiferencas,
+}
+
+export type objRegimeType = {
+    servicosPrestados: objItemFinal[],
+    servicosTomados: objItemFinal[],
+    locacaoBensMoveis: objItemFinal[],
+    produtosVendidos: objItemFinal[],
+    produtosAdquiridos: objItemFinal[],
+    locacaoBensImoveis: objItemFinal[],
+    compraVendaBensImoveis: objItemFinal[],
+    totalCompras: totalComprasType,
+    totalVendas: totalVendasType,
+    dre: tabelaDreType,
+    caixa: tabelaCaixaType
+}
+
+
+export const valorInicialObjRegime: objRegimeType = {
+    servicosPrestados: [],
+    servicosTomados: [],
+    locacaoBensMoveis: [],
+    produtosVendidos: [],
+    produtosAdquiridos: [],
+    locacaoBensImoveis: [],
+    compraVendaBensImoveis: [],
+    totalCompras: {
+        comprasProdutos: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            creditoAR: 0,
+            custoAR: 0, 
+            porcentagemCustoEfetivoAR: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        servicosTomados: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            creditoAR: 0,
+            custoAR: 0, 
+            porcentagemCustoEfetivoAR: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        locacaoMoveis: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            creditoAR: 0,
+            custoAR: 0, 
+            porcentagemCustoEfetivoAR: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        locacaoImoveis: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            creditoAR: 0,
+            custoAR: 0, 
+            porcentagemCustoEfetivoAR: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        total: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            creditoAR: 0,
+            custoAR: 0, 
+            porcentagemCustoEfetivoAR: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+    },
+    totalVendas: {
+        vendasProdutos: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        servicosPrestados: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        locacaoMoveis: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        locacaoImoveis: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+        total: {
+          antesReforma: {
+            valorAR: 0,
+            impostosAR: 0,
+            valorDesonerado: 0,
+            porcentagemCargaTributariaAR: 0,
+          },
+          depoisReforma: [
+            {ano: "A2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+            {ano: "A2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
+          ]
+        },
+    },
+    dre: {
+      receitaBruta: {antesReforma: {valor: 0}, depoisReforma: []},
+      deducoesTributos: {antesReforma: {valor: 0}, depoisReforma: []},
+      custoGeral: {antesReforma: {valor: 0}, depoisReforma: []},
+      lucroBruto: {antesReforma: {valor: 0}, depoisReforma: []},
+      despesas: {antesReforma: {valor: 0}, depoisReforma: []},
+      lucrosAntesIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+      irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+      lucroLiquido: {antesReforma: {valor: 0}, depoisReforma: []}
+    },
+    caixa: {
+      fornecedores: {antesReforma: {valor: 0}, depoisReforma: []},
+      tributosCredito: {antesReforma: {valor: 0}, depoisReforma: []},
+      clientes: {antesReforma: {valor: 0}, depoisReforma: []},
+      tributosDebito: {antesReforma: {valor: 0}, depoisReforma: []},
+      tributosRecolhidos: {antesReforma: {valor: 0}, depoisReforma: []},
+      saldoCredor: {antesReforma: {valor: 0}, depoisReforma: []},
+      resultado: {antesReforma: {valor: 0}, depoisReforma: []},
+      irCs: {antesReforma: {valor: 0}, depoisReforma: []},
+      resultadoPosIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
+      resultadoSobreClientes: {antesReforma: {valor: 0}, depoisReforma: []}
+    }
+}
+
+
+export type respostaFinalCaluloEmpresaType = {
+  tipoUsuario: "Empresa",
+  simplesNacional: objRegimeType,
+  lucroReal: objRegimeType,
+  lucroPresumido: objRegimeType,
+  meuRegime: tiposRegime,
+  cnpj: string
+}
+
+
+export type objAnoAAnoType = {
+  ano: anosType,
+  porcentagemCbs: number,
+  porcentagemIbs: number,
+  porcentagemIcmsIss: number
+}
+
+
 
 export class calcularSimplificadoUseCase{
-
     
 
-    constructor( private EmpresaRepository: EmpresasRepository, private cnpj: string, private totalAtividades: objAtividadeFinal[], private parametrosEntrada: parametrosEntrada, private totalAtividadesAdquiridas: objAtividadesAdquitidasType[], private totalImoveisLocacao: ImoveisLocacaoObj[], private totalImoveisCompraVenda: ImoveisCompraVendaObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private totalProdutosVendidos: ProdutoVendidoObj[], private totalProdutosAdquiridos: ProdutoAdquiridoObj[], private meuRegime: tiposRegime){}
+    constructor(private usuarioId: string, private RespTabelasRepository: RespostaTabelasRepository, private RespGeralRepository: RespostaGeralRepository, private RespCategoriasRepository: RespostaCategoriasRepository, private EmpresaRepository: EmpresasRepository, private cnpj: string, private totalAtividades: objAtividadeFinal[], private parametrosEntrada: parametrosEntrada, private totalAtividadesAdquiridas: objAtividadesAdquitidasType[], private totalImoveisLocacao: ImoveisLocacaoObj[], private totalImoveisCompraVenda: ImoveisCompraVendaObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private totalProdutosVendidos: ProdutoVendidoObj[], private totalProdutosAdquiridos: ProdutoAdquiridoObj[], private meuRegime: tiposRegime, private nomeCalculo: string){}
 
     async execute(){
+
+      // buscar dados gerais da empresa
+
+      const cnpj = this.cnpj
+      console.log("cnpj: " + cnpj)
+      let dadosEmpresaAtual
+      try {
+        dadosEmpresaAtual = await this.EmpresaRepository.buscarEmpresa(cnpj)
+      }catch(err){
+        throw new ErroConexaoBanco()
+      }
+
+      if(!dadosEmpresaAtual){
+        throw new RecursoNaoEncontradoErro()
+      }
+
+
+      // Inicializando variaveis bancos de dados
+      const respGeralRepo = this.RespGeralRepository
+      const respCategoriasRepo = this.RespCategoriasRepository
+      const respTabelasRepo = this.RespTabelasRepository
+
+      // Criar calculo no banco de dados
+      const usuarioId = this.usuarioId
+      const nomeCalculo = this.nomeCalculo
+      const calculoCriado = await respGeralRepo.criarCalculo(usuarioId, "Empresa", nomeCalculo)
+      const calculoId = calculoCriado.id
+      await respGeralRepo.criarCalculoPorEmpresa(calculoId, dadosEmpresaAtual?.id)
+      
+
 
       console.log("TA VINDO NO EXECUTE")
 
@@ -265,9 +701,6 @@ export class calcularSimplificadoUseCase{
           }
 
 
-
-
-
           const totalAtividades = this.totalAtividades
           const totalAtividadesAdquiridas = this.totalAtividadesAdquiridas
           const totalImoveisLocacao = this.totalImoveisLocacao
@@ -281,11 +714,6 @@ export class calcularSimplificadoUseCase{
             servicosTomados: []
           }
 
-
-          const cnpj = this.cnpj
-          console.log("cnpj: " + cnpj)
-  
-          const dadosEmpresaAtual = await this.EmpresaRepository.buscarEmpresa(cnpj)
 
           console.log("Dados empresa atual: ")
           console.log(dadosEmpresaAtual)
@@ -787,390 +1215,11 @@ export class calcularSimplificadoUseCase{
                     }
                 ]
 
-
-          type anosType = "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033"
-
-          const arrAnos: anosType[] = ["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]
-
-          type objAreaComprasTransicaoType = {
-                ano: anosType
-                valor: number,
-                valorSemIva: number,
-                impostos: number,
-                credito: number,
-                custo: number,
-                porcentagemCustoEfetivo: number,
-                porcentagemCargaTributaria: number
-          }
-
-          type objAreaComprasType = {
-              antesReforma: {
-                valorAR: number,
-                impostosAR: number,
-                valorDesonerado: number,
-                creditoAR: number, 
-                custoAR: number,
-                porcentagemCustoEfetivoAR: number,
-                porcentagemCargaTributariaAR: number
-              },
-              depoisReforma: objAreaComprasTransicaoType[]
-          }
-
-          type objAreaVendasTransicaoType = {
-                ano: anosType
-                valor: number,
-                valorSemIva: number,
-                impostos: number,
-                porcentagemCargaTributaria: number
-          }
-
-          type objAreaVendasType = {
-              antesReforma: {
-                valorAR: number,
-                impostosAR: number,
-                valorDesonerado: number,
-                porcentagemCargaTributariaAR: number
-              },
-              depoisReforma: objAreaVendasTransicaoType[]
-          }
-
-          type totalComprasType = {
-              comprasProdutos: objAreaComprasType,
-              servicosTomados: objAreaComprasType,
-              locacaoMoveis: objAreaComprasType,
-              locacaoImoveis: objAreaComprasType,
-              total: objAreaComprasType
-          }
-
-          type totalVendasType = {
-              vendasProdutos: objAreaVendasType,
-              servicosPrestados: objAreaVendasType,
-              locacaoMoveis: objAreaVendasType,
-              locacaoImoveis: objAreaVendasType,
-              total: objAreaVendasType
-          }
-
-          type linhasDreType = {
-            custoGeral: {AR: number, DR: number},
-            despesas: {AR: number, DR: number},
-          }
-
-
-          type objAntesReforma = {
-              valor: number, 
-              valorImpostos: number,
-              valorDesonerado: number,
-              porcentagemCargaTributaria: number,
-              custo: number | null, 
-          } 
-          
-          type objDepoisReforma = {
-            ano: anosType,
-            valor: number,
-            valorSemIva: number,
-            valorImpostos: number,
-            porcentagemCargaTributaria: number,
-            custo: number | null
-          }
-
-          type objItemFinal = {
-            antesReforma: objAntesReforma,
-            depoisReforma: objDepoisReforma[]
-          }    
-
-          type objDepoisReformaDreCaixa = {
-            ano: anosType,
-            valor: number
-          }
-          
-          type linhaArDrDiferencas = {
-            antesReforma: {
-              valor: number
-            },
-            depoisReforma: objDepoisReformaDreCaixa[]
-          } 
-
-          type tabelaDreType = {
-            receitaBruta: linhaArDrDiferencas,
-            deducoesTributos: linhaArDrDiferencas,
-            custoGeral: linhaArDrDiferencas,
-            lucroBruto: linhaArDrDiferencas,
-            despesas: linhaArDrDiferencas,
-            lucrosAntesIrCs: linhaArDrDiferencas,
-            irCs: linhaArDrDiferencas,
-            lucroLiquido: linhaArDrDiferencas
-          }
-
-          type tabelaCaixaType = {
-            fornecedores: linhaArDrDiferencas,
-            tributosCredito: linhaArDrDiferencas,
-            clientes: linhaArDrDiferencas,
-            tributosDebito: linhaArDrDiferencas,
-            tributosRecolhidos: linhaArDrDiferencas,
-            saldoCredor: linhaArDrDiferencas,
-            resultado: linhaArDrDiferencas,
-            irCs: linhaArDrDiferencas,
-            resultadoPosIrCs: linhaArDrDiferencas,
-            resultadoSobreClientes: linhaArDrDiferencas,
-          }
-
-          type objRegimeType = {
-              servicosPrestados: objItemFinal[],
-              servicosTomados: objItemFinal[],
-              locacaoBensMoveis: objItemFinal[],
-              produtosVendidos: objItemFinal[],
-              produtosAdquiridos: objItemFinal[],
-              locacaoBensImoveis: objItemFinal[],
-              compraVendaBensImoveis: objItemFinal[],
-              totalCompras: totalComprasType,
-              totalVendas: totalVendasType,
-              dre: tabelaDreType,
-              caixa: tabelaCaixaType
-          }
-
-          let valorInicialObjRegime: objRegimeType = {
-              servicosPrestados: [],
-              servicosTomados: [],
-              locacaoBensMoveis: [],
-              produtosVendidos: [],
-              produtosAdquiridos: [],
-              locacaoBensImoveis: [],
-              compraVendaBensImoveis: [],
-              totalCompras: {
-                  comprasProdutos: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      creditoAR: 0,
-                      custoAR: 0, 
-                      porcentagemCustoEfetivoAR: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  servicosTomados: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      creditoAR: 0,
-                      custoAR: 0, 
-                      porcentagemCustoEfetivoAR: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  locacaoMoveis: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      creditoAR: 0,
-                      custoAR: 0, 
-                      porcentagemCustoEfetivoAR: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  locacaoImoveis: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      creditoAR: 0,
-                      custoAR: 0, 
-                      porcentagemCustoEfetivoAR: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  total: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      creditoAR: 0,
-                      custoAR: 0, 
-                      porcentagemCustoEfetivoAR: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-              },
-              totalVendas: {
-                  vendasProdutos: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  servicosPrestados: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  locacaoMoveis: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  locacaoImoveis: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-                  total: {
-                    antesReforma: {
-                      valorAR: 0,
-                      impostosAR: 0,
-                      valorDesonerado: 0,
-                      porcentagemCargaTributariaAR: 0,
-                    },
-                    depoisReforma: [
-                      {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                      {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    ]
-                  },
-              },
-              dre: {
-                receitaBruta: {antesReforma: {valor: 0}, depoisReforma: []},
-                deducoesTributos: {antesReforma: {valor: 0}, depoisReforma: []},
-                custoGeral: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucroBruto: {antesReforma: {valor: 0}, depoisReforma: []},
-                despesas: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucrosAntesIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucroLiquido: {antesReforma: {valor: 0}, depoisReforma: []}
-              },
-              caixa: {
-                fornecedores: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosCredito: {antesReforma: {valor: 0}, depoisReforma: []},
-                clientes: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosDebito: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosRecolhidos: {antesReforma: {valor: 0}, depoisReforma: []},
-                saldoCredor: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultado: {antesReforma: {valor: 0}, depoisReforma: []},
-                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultadoPosIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultadoSobreClientes: {antesReforma: {valor: 0}, depoisReforma: []}
-              }
-          }    
-          
-          type respostaFinalCaluloType = {
-            tipoUsuario: "Empresa",
-            simplesNacional: objRegimeType,
-            lucroReal: objRegimeType,
-            lucroPresumido: objRegimeType,
-            meuRegime: tiposRegime,
-            cnpj: string
-          }
+          const arrAnos: anosType[] = ["A2026", "A2027", "A2028", "A2029", "A2030", "A2031", "A2032", "A2033"]
 
           type regimesChavesObjType = "simplesNacional" | "lucroReal" | "lucroPresumido"
 
-          let respostaFinalCalculo: respostaFinalCaluloType = {
+          let respostaFinalCalculo: respostaFinalCaluloEmpresaType = {
             tipoUsuario: "Empresa",
             simplesNacional: JSON.parse(JSON.stringify(valorInicialObjRegime)),
             lucroReal: JSON.parse(JSON.stringify(valorInicialObjRegime)),
@@ -1179,28 +1228,50 @@ export class calcularSimplificadoUseCase{
             cnpj
           }
 
-          type objAnoAAnoType = {
-            ano: "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033",
-            porcentagemCbs: number,
-            porcentagemIbs: number,
-            porcentagemIcmsIss: number
-          }
-
           const anoAano: objAnoAAnoType[] = [
-            {ano: "2027", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
-            {ano: "2028", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
-            {ano: "2029", porcentagemCbs: 1, porcentagemIbs: 0.1, porcentagemIcmsIss: 0.9},
-            {ano: "2030", porcentagemCbs: 1, porcentagemIbs: 0.2, porcentagemIcmsIss: 0.8},
-            {ano: "2031", porcentagemCbs: 1, porcentagemIbs: 0.3, porcentagemIcmsIss: 0.7},
-            {ano: "2032", porcentagemCbs: 1, porcentagemIbs: 0.4, porcentagemIcmsIss: 0.6},
-            {ano: "2033", porcentagemCbs: 1, porcentagemIbs: 1, porcentagemIcmsIss: 0},
+            {ano: "A2027", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "A2028", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "A2029", porcentagemCbs: 1, porcentagemIbs: 0.1, porcentagemIcmsIss: 0.9},
+            {ano: "A2030", porcentagemCbs: 1, porcentagemIbs: 0.2, porcentagemIcmsIss: 0.8},
+            {ano: "A2031", porcentagemCbs: 1, porcentagemIbs: 0.3, porcentagemIcmsIss: 0.7},
+            {ano: "A2032", porcentagemCbs: 1, porcentagemIbs: 0.4, porcentagemIcmsIss: 0.6},
+            {ano: "A2033", porcentagemCbs: 1, porcentagemIbs: 1, porcentagemIcmsIss: 0},
           ]
 
           const regimes: ("Simples Nacional" | "Lucro Real" | "Lucro Presumido")[] = ["Simples Nacional", "Lucro Real", "Lucro Presumido"]
 
           // POR REGIME COMEÇA AQUI
+          // precisa ser for...of pra usar o await dentro, o forEach n aceita
+          for(const regimeAtual of regimes){ 
 
-          regimes.forEach(regimeAtual => {   
+            // encontrar qual é o id do regime atual no banco de dados e guardar para usar mais a frente
+            let regimeCamelCase: RegimesType 
+            switch(regimeAtual){
+              case "Simples Nacional":
+                regimeCamelCase = "simplesNacional"
+                break
+
+              case "Lucro Presumido":
+                regimeCamelCase = "lucroPresumido"
+                break
+
+              case "Lucro Real":
+                regimeCamelCase = "lucroReal"
+                break
+            }
+            const objRegimeAtual = await respGeralRepo.pegarIdRegimePorNome(regimeCamelCase)
+            const regimeId = objRegimeAtual?.id
+
+            // Inicializar estruturas do banco de dados Tabelas
+            const estruturaDbAntesReformaCompras: Prisma.AntesReformaComprasUncheckedCreateInput[] = []
+            const estruturaDbAntesReformaVendas: Prisma.AntesReformaVendasUncheckedCreateInput[] = []
+            const estruturaDbAntesReformaCaixa: Prisma.AntesReformaCaixaUncheckedCreateInput[] = []
+            const estruturaDbAntesReformaDre: Prisma.AntesReformaDreUncheckedCreateInput[] = []
+            const estruturaDbDepoisReformaCompras: Prisma.DepoisReformaComprasUncheckedCreateInput[] = []
+            const estruturaDbDepoisReformaVendas: Prisma.DepoisReformaVendasUncheckedCreateInput[] = []
+            const estruturaDbDepoisReformaCaixa: Prisma.DepoisReformaCaixaUncheckedCreateInput[] = []
+            const estruturaDbDepoisReformaDre: Prisma.DepoisReformaDreUncheckedCreateInput[] = []
+
 
             let chaveRegimeObjFinal: regimesChavesObjType = "simplesNacional" 
 
@@ -1219,33 +1290,218 @@ export class calcularSimplificadoUseCase{
               }
 
               let dreCustoGeralAR = 0
-              let dreCustoGeralTransicao = [
-                {ano: "2026", custoGeralAnoVigente: 0},
-                {ano: "2027", custoGeralAnoVigente: 0},
-                {ano: "2028", custoGeralAnoVigente: 0},
-                {ano: "2029", custoGeralAnoVigente: 0},
-                {ano: "2030", custoGeralAnoVigente: 0},
-                {ano: "2031", custoGeralAnoVigente: 0},
-                {ano: "2032", custoGeralAnoVigente: 0},
-                {ano: "2033", custoGeralAnoVigente: 0},
+              let dreCustoGeralTransicao: {ano: anosType, custoGeralAnoVigente: number}[] = [
+                {ano: "A2026", custoGeralAnoVigente: 0},
+                {ano: "A2027", custoGeralAnoVigente: 0},
+                {ano: "A2028", custoGeralAnoVigente: 0},
+                {ano: "A2029", custoGeralAnoVigente: 0},
+                {ano: "A2030", custoGeralAnoVigente: 0},
+                {ano: "A2031", custoGeralAnoVigente: 0},
+                {ano: "A2032", custoGeralAnoVigente: 0},
+                {ano: "A2033", custoGeralAnoVigente: 0},
               ]
               let dreDespesasAR = 0
-              let dreDespesasTransicao = [
-                {ano: "2026", despesaAnoVigente: 0},
-                {ano: "2027", despesaAnoVigente: 0},
-                {ano: "2028", despesaAnoVigente: 0},
-                {ano: "2029", despesaAnoVigente: 0},
-                {ano: "2030", despesaAnoVigente: 0},
-                {ano: "2031", despesaAnoVigente: 0},
-                {ano: "2032", despesaAnoVigente: 0},
-                {ano: "2033", despesaAnoVigente: 0},
+              let dreDespesasTransicao: {ano: anosType, despesaAnoVigente: number}[] = [
+                {ano: "A2026", despesaAnoVigente: 0},
+                {ano: "A2027", despesaAnoVigente: 0},
+                {ano: "A2028", despesaAnoVigente: 0},
+                {ano: "A2029", despesaAnoVigente: 0},
+                {ano: "A2030", despesaAnoVigente: 0},
+                {ano: "A2031", despesaAnoVigente: 0},
+                {ano: "A2032", despesaAnoVigente: 0},
+                {ano: "A2033", despesaAnoVigente: 0},
               ]
               let valorImpostosPermanecerTotal = 0
 
 
+              async function descobrirIdCategoria(categoria: CategoriaType): Promise<Categoria | null>{
+                  const objCategoria = await respCategoriasRepo.pegarIdCategoriaPorNome(categoria)
+                  return objCategoria
+              }
+
+              const criarARCategoria = (dados: {
+                id: string
+                valor: number
+                impostos: number
+                desonerado: number
+                porcentagemCargaTributaria: number
+                calculoId: string
+                regimeId: string | undefined
+                categoriaId: string | undefined,
+                custo: number | null
+              }): Prisma.AntesReformaCategoriaUncheckedCreateInput => ({
+                id: dados.id,
+                calculo_id: dados.calculoId,
+                regime_id: dados.regimeId || "",
+                categoria_id: dados.categoriaId || "",
+                valor: new Decimal(dados.valor),
+                valor_impostos: new Decimal(dados.impostos),
+                valor_desonerado: new Decimal(dados.desonerado),
+                porcentagem_carga_tributaria: new Decimal(dados.porcentagemCargaTributaria),
+                custo: dados.custo == null ? null : new Decimal(dados.custo) 
+              })
+
+              const criarDRCategoria = (dados: {
+                antesReformaCategoriaId: string,
+                ano: AnosType,
+                valor: number,
+                valorSemIva: number,
+                impostos: number
+                porcentagemCargaTributaria: number
+                custo: number | null
+              }): Prisma.DepoisReformaCategoriaUncheckedCreateInput => ({
+                antes_reforma_categoria_id: dados.antesReformaCategoriaId,
+                ano: dados.ano,
+                valor: new Decimal(dados.valor),
+                valor_sem_iva: new Decimal(dados.valorSemIva),
+                valor_impostos: new Decimal(dados.impostos),
+                porcentagem_carga_tributaria: new Decimal(dados.porcentagemCargaTributaria),
+                custo: dados.custo == null ? null : new Decimal(dados.custo),
+              })
+
+              const criarARVendas = (dados: {
+                id: string,
+                calculoId: string,
+                regimeId: string | undefined,
+                linhaVendasId: string | undefined,
+                valor: number,
+                impostos: number,
+                desonerado: number,
+                porcentagemCargaTributaria: number 
+              }): Prisma.AntesReformaVendasUncheckedCreateInput => ({    
+                id: dados.id,               
+                calculo_id: dados.calculoId,                  
+                regime_id: dados.regimeId || "",                          
+                linha_vendas_id: dados.linhaVendasId || "",
+                valor_ar: new Decimal(dados.valor),                   
+                impostos_ar: new Decimal(dados.impostos),                    
+                valor_desonerado: new Decimal(dados.desonerado),               
+                porcentagem_carga_tributaria_ar: new Decimal(dados.porcentagemCargaTributaria),
+              })
+
+              const criarDRVendas = (dados: {
+                antesReformaId: string,
+                ano: AnosType,
+                valor: number,
+                impostos: number,
+                valorSemIva: number,
+                porcentagemCargaTributaria: number 
+              }): Prisma.DepoisReformaVendasUncheckedCreateInput => ({    
+                antes_reforma_vendas_id: dados.antesReformaId,            
+                ano: dados.ano,                                        
+                valor: new Decimal(dados.valor),                   
+                impostos: new Decimal(dados.impostos),                    
+                valor_sem_iva: new Decimal(dados.valorSemIva),               
+                porcentagem_carga_tributaria: new Decimal(dados.porcentagemCargaTributaria),
+              })              
+
+              const criarARCompras = (dados: {
+                id: string,
+                calculoId: string,
+                regimeId: string | undefined,
+                linhaComprasId: string | undefined,
+                valor: number,
+                impostos: number,
+                desonerado: number,
+                credito: number,
+                custo: number,
+                porcentagemCustoEfetivo: number,
+                porcentagemCargaTributaria: number
+              }): Prisma.AntesReformaComprasUncheckedCreateInput => ({
+                id: dados.id,
+                calculo_id: dados.calculoId,
+                regime_id: dados.regimeId || "",
+                linha_compras_id: dados.linhaComprasId || "",
+                valor_ar: new Decimal(dados.valor),
+                impostos_ar: new Decimal(dados.impostos),
+                valor_desonerado: new Decimal(dados.desonerado),
+                credito_ar: new Decimal(dados.credito),
+                custo_ar: new Decimal(dados.custo),
+                porcentagem_custo_efetivo_ar: new Decimal(dados.porcentagemCustoEfetivo),
+                porcentagem_carga_tributaria_ar: new Decimal(dados.porcentagemCargaTributaria)
+              })
+
+              const criarDRCompras = (dados: {
+                ano: AnosType,
+                antesReformaId: string,
+                valor: number,
+                impostos: number,
+                valorSemIva: number,
+                credito: number,
+                custo: number,
+                porcentagemCustoEfetivo: number,
+                porcentagemCargaTributaria: number
+              }): Prisma.DepoisReformaComprasUncheckedCreateInput => ({
+                ano: dados.ano,
+                antes_reforma_compras_id: dados.antesReformaId,
+                valor: new Decimal(dados.valor),
+                impostos: new Decimal(dados.impostos),
+                valor_sem_iva: new Decimal(dados.valorSemIva),
+                credito: new Decimal(dados.credito),
+                custo: new Decimal(dados.custo),
+                porcentagem_custo_efetivo: new Decimal(dados.porcentagemCustoEfetivo),
+                porcentagem_carga_tributaria: new Decimal(dados.porcentagemCargaTributaria),
+              })       
+              
+              const criarARCaixa = (dados: {
+                id: string,
+                calculoId: string,
+                regimeId: string | undefined,
+                linhaCaixaId: string | undefined,
+                valor: number,
+              }): Prisma.AntesReformaCaixaUncheckedCreateInput => ({
+                id: dados.id,
+                calculo_id: dados.calculoId,
+                regime_id: dados.regimeId || "",
+                linha_caixa_id: dados.linhaCaixaId || "",
+                valor: new Decimal(dados.valor)
+              })              
+
+              const criarDRCaixa = (dados: {
+                antesReformaCaixaId: string | undefined,
+                ano: AnosType,
+                valor: number,
+              }): Prisma.DepoisReformaCaixaUncheckedCreateInput => ({
+                antes_reforma_caixa_id: dados.antesReformaCaixaId || "",
+                ano: dados.ano,
+                valor: new Decimal(dados.valor)
+              })    
+      
+              const criarARDre = (dados: {
+                id: string,
+                calculoId: string,
+                regimeId: string | undefined,
+                linhaDreId: string | undefined,
+                valor: number,
+              }): Prisma.AntesReformaDreUncheckedCreateInput => ({
+                id: dados.id,
+                calculo_id: dados.calculoId,
+                regime_id: dados.regimeId || "",
+                linha_dre_id: dados.linhaDreId || "",
+                valor: new Decimal(dados.valor)
+              })              
+
+              const criarDRDre = (dados: {
+                antesReformaDreId: string | undefined,
+                ano: AnosType,
+                valor: number,
+              }): Prisma.DepoisReformaDreUncheckedCreateInput => ({
+                antes_reforma_dre_id: dados.antesReformaDreId || "",
+                ano: dados.ano,
+                valor: new Decimal(dados.valor)
+              }) 
+
 
               // Total Atividades == Total Atividades (serviços) Prestadas
               if(totalAtividades.length > 0){
+                
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("servicosPrestados")
+                const categoriaId = objCategoriaAtual?.id
 
                 // faturamentoMensal -> Faturamento mensal da empresa (que deve ser substituido por dadosEmpresaAtual.faturamento_medio_mensal)
                 // faturamentoMensalServico -> Faturamento mensal com o serviço específico que está sendo analisado no momento
@@ -1286,6 +1542,7 @@ export class calcularSimplificadoUseCase{
             
                     // Análise de cada atividade
                     totalAtividades.forEach(async (item, index) => {
+
                         console.log("ATIVIDADE " + (index + 1))
                         console.log("CNAE: " + item.cnaePrincipal)
                         console.log("Anexo: " + item.anexo)
@@ -1381,7 +1638,7 @@ export class calcularSimplificadoUseCase{
                                 const valorImpostosDesonerados = (faturamentoMensalServico - faturamentoMensalDesonerado)
                                 console.log("Valor dos impostos desonerados: " + valorImpostosDesonerados)
 
-
+                                // populando obj resposta final
                                 const objRespostaFinalAR = {
                                     valor: faturamentoMensalServico,
                                     valorImpostos: valorImpostosAtuais,
@@ -1389,8 +1646,23 @@ export class calcularSimplificadoUseCase{
                                     porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
                                     custo: null
                                   }
-
                                 respServicoPrestadoAtual.antesReforma = objRespostaFinalAR
+
+                                // criando obj atual banco de dados
+                                const antesReformaId = uuidv4()
+                                const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                                  id: antesReformaId,
+                                  calculoId: calculoId,
+                                  regimeId: regimeId,
+                                  categoriaId: categoriaId,
+                                  valor: faturamentoMensalServico,
+                                  desonerado: faturamentoMensalDesonerado,
+                                  impostos: valorImpostosAtuais,
+                                  porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                                  custo: null
+                                })
+                                estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
 
             
                                 const valorIvaBruto = faturamentoMensalDesonerado * ivaBruto
@@ -1407,7 +1679,8 @@ export class calcularSimplificadoUseCase{
 
                                   anoAano.forEach(objAno => {
 
-                                    if(objAno.ano == "2026"){
+
+                                    if(objAno.ano == "A2026"){
 
                                     }else{
                                       // CALCULAR VALOR IVA
@@ -1445,6 +1718,18 @@ export class calcularSimplificadoUseCase{
                                           custo: null
                                       }
                                       respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                                      // obj banco de dados
+                                      const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                                        antesReformaCategoriaId: antesReformaId,
+                                        ano: objAno.ano,
+                                        valor: novoValorAnoVigente,
+                                        valorSemIva: valorSemIvaAnoVigente,
+                                        impostos: valorImpostosAnoVigente,
+                                        porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                        custo: null
+                                      })
+                                      estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                                       const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                                       const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -1634,6 +1919,7 @@ export class calcularSimplificadoUseCase{
                       const faturamentoDesonerado = faturamentoMensalAtividade - valorImpostosAtuais
                       const porcentagemCargaTributariaAtual = valorImpostosAtuais / faturamentoDesonerado
 
+                      // populando obj resposta final
                       const objServPrestadoAtualAR = {
                           valor: faturamentoMensalAtividade,
                           valorImpostos: valorImpostosAtuais,
@@ -1642,7 +1928,22 @@ export class calcularSimplificadoUseCase{
                           custo: null
                         }
 
-                      respServicoPrestadoAtual.antesReforma = objServPrestadoAtualAR
+                        respServicoPrestadoAtual.antesReforma = objServPrestadoAtualAR
+
+                        // criando obj atual banco de dados
+                        const antesReformaId = uuidv4()
+                        const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                          id: antesReformaId,
+                          calculoId: calculoId,
+                          regimeId: regimeId,
+                          categoriaId: categoriaId,
+                          valor: faturamentoMensalAtividade,
+                          desonerado: faturamentoDesonerado,
+                          impostos: valorImpostosAtuais,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                          custo: null
+                        })
+                        estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
 
 
 
@@ -1650,7 +1951,7 @@ export class calcularSimplificadoUseCase{
 
                       anoAano.forEach(objAno => {
 
-                        if(objAno.ano == "2026"){
+                        if(objAno.ano == "A2026"){
 
                         }else{
                           // CALCULAR VALOR IVA
@@ -1688,6 +1989,18 @@ export class calcularSimplificadoUseCase{
                               custo: null
                           }
                           respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                          // obj banco de dados
+                          const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                            antesReformaCategoriaId: antesReformaId,
+                            ano: objAno.ano,
+                            valor: novoValorAnoVigente,
+                            valorSemIva: valorSemIvaAnoVigente,
+                            impostos: valorImpostosAnoVigente,
+                            porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                            custo: null
+                          })
+                          estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                           const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                           const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -1816,6 +2129,7 @@ export class calcularSimplificadoUseCase{
                       const faturamentoDesonerado = faturamentoMensalAtividade - valorImpostosAtuais
                       const porcentagemCargaTributariaAtual = valorImpostosAtuais / faturamentoDesonerado
 
+                      // populando obj resposta final
                       const objServPrestadoAtualAR = {
                             valor: faturamentoMensalAtividade,
                             valorImpostos: valorImpostosAtuais,
@@ -1826,12 +2140,27 @@ export class calcularSimplificadoUseCase{
 
                       respServicoPrestadoAtual.antesReforma = objServPrestadoAtualAR
 
+                        // criando obj atual banco de dados
+                        const antesReformaId = uuidv4()
+                        const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                          id: antesReformaId,
+                          calculoId: calculoId,
+                          regimeId: regimeId,
+                          categoriaId: categoriaId,
+                          valor: faturamentoMensalAtividade,
+                          desonerado: faturamentoDesonerado,
+                          impostos: valorImpostosAtuais,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAtual,
+                          custo: null
+                        })
+                        estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
 
                       // ANÁLISE DR
 
                       anoAano.forEach(objAno => {
 
-                        if(objAno.ano == "2026"){
+                        if(objAno.ano == "A2026"){
 
                         }else{
                           // CALCULAR VALOR IVA
@@ -1869,6 +2198,18 @@ export class calcularSimplificadoUseCase{
                               custo: null
                           }
                           respServicoPrestadoAtual.depoisReforma.push(objAnoVigente)
+
+                          // obj banco de dados
+                          const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                            antesReformaCategoriaId: antesReformaId,
+                            ano: objAno.ano,
+                            valor: novoValorAnoVigente,
+                            valorSemIva: valorSemIvaAnoVigente,
+                            impostos: valorImpostosAnoVigente,
+                            porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                            custo: null
+                          })
+                          estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                           const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                           const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -1952,11 +2293,67 @@ export class calcularSimplificadoUseCase{
                     })
 
                   }
+
+                  // INICIALIZANDO VARIAVEIS TABELA VENDAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaVendasId = uuidv4()
+                  const objLinhaVendasId = await respTabelasRepo.pegarIdVendaPorLinha("servicosPrestados")
+                  const linhaVendasId = objLinhaVendasId?.id
+                  // inicializar um objeto da linha tabela vendas, que tenha os valores genéricos, mas os ids já com valores finais
+                  const objServicoVendasAR = criarARVendas({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.impostosAR,
+                    id: antesReformaVendasId,
+                    linhaVendasId: linhaVendasId,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaVendas.push(objServicoVendasAR)
+
+                    // Depois Reforma
+                  const arrDRVendasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.servicosPrestados.depoisReforma
+
+                  arrDRVendasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objServicoVendasDR = criarDRVendas({
+                      antesReformaId: antesReformaVendasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaVendas.push(objServicoVendasDR)
+
+                  })
+
+                    
+
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }
+
+
               }
 
 
               // SERVIÇOS TOMADOS
               if(totalAtividadesAdquiridas.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("servicosTomados")
+                const categoriaId = objCategoriaAtual?.id
+        
                   console.log("////////////////////////")
                   console.log("Análise Serviços adquiridos")
 
@@ -2078,11 +2475,58 @@ export class calcularSimplificadoUseCase{
                         // To considerando que Serviço Tomado quando regime fornecedor é Simples Nacional tenho crédito IVA 100%
                         temCreditoIva = true
 
+
+                        // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
+                        custoAR = valorServicoAR
+                        if(regimeAtual == "Lucro Real"){
+                            if(atividade.temCreditoPisCofins){
+                              console.log("Nosso cliente é do lucro real e tem credito pis cofins")
+                              creditoAR = (custoAR * pisCo)
+                              custoAR = custoAR - creditoAR
+                            }else{
+                              console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
+                            }
+                        }
+
+                        console.log("seu custo atual com esse serviço é: " + custoAR)
+
+                        // NOVO CUSTO (CUSTO APÓS REFORMA)
+                        custoDR = valorServicoDesonerado
+                        creditoDR = valorImpostosNovos
+
+                        console.log("Seu novo custo será: " + custoDR)
+
+                        // Preenchendo obj resposta final
+                        const objServicoTomadoAtualAR = {
+                              valor: valorServicoAR,
+                              valorImpostos: valorImpostosAtuais,
+                              valorDesonerado: valorServicoDesonerado,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                              custo: custoAR
+                            }
+                        respServicoTomadoAtual.antesReforma = objServicoTomadoAtualAR
+
+                        // criando obj atual banco de dados
+                        const antesReformaId = uuidv4()
+                        const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                          id: antesReformaId,
+                          calculoId: calculoId,
+                          regimeId: regimeId,
+                          categoriaId: categoriaId,
+                          valor: valorServicoAR,
+                          desonerado: valorServicoDesonerado,
+                          impostos: valorImpostosAtuais,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                          custo: custoAR
+                        })
+                        estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
+
                         // ANÁLISE DR
 
                         anoAano.forEach(objAno => {
                             let custoAnoVigente = 0
-                            if(objAno.ano == "2026"){
+                            if(objAno.ano == "A2026"){
 
                             }else{
                               let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
@@ -2144,6 +2588,18 @@ export class calcularSimplificadoUseCase{
                                   custo: custoAnoVigente
                               }
                               respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                              // obj banco de dados
+                              const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                                antesReformaCategoriaId: antesReformaId,
+                                ano: objAno.ano,
+                                valor: novoValorAnoVigente,
+                                valorSemIva: valorSemIvaAnoVigente,
+                                impostos: valorImpostosAnoVigente,
+                                porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                custo: custoAnoVigente
+                              })
+                              estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                                 const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                                 const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -2241,27 +2697,6 @@ export class calcularSimplificadoUseCase{
                         console.log(novoValorServiço)
 
 
-                        // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
-                        custoAR = valorServicoAR
-                        if(regimeAtual == "Lucro Real"){
-                            if(atividade.temCreditoPisCofins){
-                              console.log("Nosso cliente é do lucro real e tem credito pis cofins")
-                              creditoAR = (custoAR * pisCo)
-                              custoAR = custoAR - creditoAR
-                            }else{
-                              console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
-                            }
-                        }
-
-                        console.log("seu custo atual com esse serviço é: " + custoAR)
-
-                        // NOVO CUSTO (CUSTO APÓS REFORMA)
-                        custoDR = valorServicoDesonerado
-                        creditoDR = valorImpostosNovos
-
-                        console.log("Seu novo custo será: " + custoDR)
-
-
 
                       }else{
 
@@ -2333,11 +2768,58 @@ export class calcularSimplificadoUseCase{
                             // To considerando que Serviço Tomado quando regime fornecedor é Lucro Presumido tenho crédito IVA 100%
                             temCreditoIva = true
 
+                            // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
+                            custoAR = valorServicoAR
+                            if(regimeAtual == "Lucro Real"){
+                                if(atividade.temCreditoPisCofins){
+                                  console.log("Nosso cliente é do lucro real e tem credito pis cofins")
+                                  creditoAR = (custoAR * 0.0925)
+                                  custoAR = custoAR - creditoAR
+                                }else{
+                                  console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
+                                }
+                            }
+
+                            console.log("seu custo atual com esse serviço é: " + custoAR)
+
+                            // NOVO CUSTO (CUSTO APÓS REFORMA)
+                            // SEMPRE TEM CREDITO 100% APOS REFORMA
+                            custoDR = valorServicoDesonerado
+                            creditoDR = valorImpostosNovos
+
+                            console.log("Seu novo custo será: " + custoDR)
+
+                            // preenchendo obj resposta final
+                            const objServicoTomadoAtualAR = {
+                                  valor: valorServicoAR,
+                                  valorImpostos: valorImpostosAtuais,
+                                  valorDesonerado: valorServicoDesonerado,
+                                  porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                                  custo: custoAR
+                                }
+                            respServicoTomadoAtual.antesReforma = objServicoTomadoAtualAR
+
+                            // criando obj atual banco de dados
+                            const antesReformaId = uuidv4()
+                            const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                              id: antesReformaId,
+                              calculoId: calculoId,
+                              regimeId: regimeId,
+                              categoriaId: categoriaId,
+                              valor: valorServicoAR,
+                              desonerado: valorServicoDesonerado,
+                              impostos: valorImpostosAtuais,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                              custo: custoAR
+                            })
+                            estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
+
                             // ANÁLISE DR
 
                             anoAano.forEach(objAno => {
                               let custoAnoVigente = 0
-                              if(objAno.ano == "2026"){
+                              if(objAno.ano == "A2026"){
 
                               }else{
                                 let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
@@ -2390,6 +2872,7 @@ export class calcularSimplificadoUseCase{
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
                                 custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
 
+                                // obj resposta final
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
                                     valor: novoValorAnoVigente,
@@ -2399,6 +2882,19 @@ export class calcularSimplificadoUseCase{
                                     custo: custoAnoVigente
                                 }
                                 respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                                // obj banco de dados
+                                const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                                  antesReformaCategoriaId: antesReformaId,
+                                  ano: objAno.ano,
+                                  valor: novoValorAnoVigente,
+                                  valorSemIva: valorSemIvaAnoVigente,
+                                  impostos: valorImpostosAnoVigente,
+                                  porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                  custo: custoAnoVigente
+                                })
+                                estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
+
 
                                 const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                                 const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -2457,28 +2953,6 @@ export class calcularSimplificadoUseCase{
 
                             console.log("novo valor do serviço: " + valorMensalServicoDR)
 
-
-                            // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
-                            custoAR = valorServicoAR
-                            if(regimeAtual == "Lucro Real"){
-                                if(atividade.temCreditoPisCofins){
-                                  console.log("Nosso cliente é do lucro real e tem credito pis cofins")
-                                  creditoAR = (custoAR * 0.0925)
-                                  custoAR = custoAR - creditoAR
-                                }else{
-                                  console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
-                                }
-                            }
-
-                            console.log("seu custo atual com esse serviço é: " + custoAR)
-
-                            // NOVO CUSTO (CUSTO APÓS REFORMA)
-                            // SEMPRE TEM CREDITO 100% APOS REFORMA
-                            custoDR = valorServicoDesonerado
-                            creditoDR = valorImpostosNovos
-
-                            console.log("Seu novo custo será: " + custoDR
-                            )
 
                         }else if(atividade.regimeTributario == "Lucro Real"){
                             console.log("atividade " + (index + 1) + " é do lucro real")
@@ -2549,12 +3023,59 @@ export class calcularSimplificadoUseCase{
                             // To considerando que Serviço Tomado quando regime fornecedor é Lucro Real tenho crédito IVA 100%
                             temCreditoIva = true
 
+                            // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
+                            custoAR = valorServicoAR
+                            if(regimeAtual == "Lucro Real"){
+                                if(atividade.temCreditoPisCofins){
+                                  console.log("Nosso cliente é do lucro real e tem credito pis cofins")
+                                  creditoAR = (custoAR * 0.0925)
+                                  custoAR = custoAR - creditoAR
+                                }else{
+                                  console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
+                                }
+                            }
+
+                            console.log("seu custo atual com esse serviço é: " + custoAR)
+
+                            // NOVO CUSTO (CUSTO APÓS REFORMA)
+                            // POR ESTAR COLOCANDO O CUSTO DIRETO COMO VALOR DESONERADO, VOU ASSUMIR QUE SEMPRE TEM CREDITO 100%
+                            custoDR = valorServicoDesonerado
+                            creditoDR = valorImpostosNovos
+
+                            console.log("Seu novo custo será: " + custoDR)
+
+                            // preenchendo obj resposta final
+                            const objServicoTomadoAtualAR = {
+                                  valor: valorServicoAR,
+                                  valorImpostos: valorImpostosAtuais,
+                                  valorDesonerado: valorServicoDesonerado,
+                                  porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                                  custo: custoAR
+                                }
+                            respServicoTomadoAtual.antesReforma = objServicoTomadoAtualAR
+
+                            // criando obj atual banco de dados
+                            const antesReformaId = uuidv4()
+                            const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                              id: antesReformaId,
+                              calculoId: calculoId,
+                              regimeId: regimeId,
+                              categoriaId: categoriaId,
+                              valor: valorServicoAR,
+                              desonerado: valorServicoDesonerado,
+                              impostos: valorImpostosAtuais,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                              custo: custoAR
+                            })
+                            estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
+
                             // ANÁLISE DR
 
                             anoAano.forEach(objAno => {
                               let custoAnoVigente = 0
 
-                              if(objAno.ano == '2026'){
+                              if(objAno.ano == 'A2026'){
 
                               }else{
                                 let aliquotaIbsAnoVigente = ibsBruto * objAno.porcentagemIbs
@@ -2606,6 +3127,8 @@ export class calcularSimplificadoUseCase{
                                 const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                                 const creditoAnoVigente = temCreditoIva ? valorIvaAnoVigente : 0
                                 custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+
+                                // obj resposta final
                                 const objAnoVigente: objDepoisReforma = {
                                     ano: objAno.ano,
                                     valor: novoValorAnoVigente,
@@ -2615,6 +3138,19 @@ export class calcularSimplificadoUseCase{
                                     custo: custoAnoVigente
                                 }
                                 respServicoTomadoAtual.depoisReforma.push(objAnoVigente)
+
+                                // obj banco de dados
+                                const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                                  antesReformaCategoriaId: antesReformaId,
+                                  ano: objAno.ano,
+                                  valor: novoValorAnoVigente,
+                                  valorSemIva: valorSemIvaAnoVigente,
+                                  impostos: valorImpostosAnoVigente,
+                                  porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                                  custo: custoAnoVigente
+                                })
+                                estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
+
 
                                 const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                                 const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -2667,44 +3203,12 @@ export class calcularSimplificadoUseCase{
 
                           console.log("novo valor do serviço: " + valorMensalServicoDR)
 
-
-
-                          // CUSTO ATUAL (CUSTO ANTES DA REFORMA)
-                          custoAR = valorServicoAR
-                          if(regimeAtual == "Lucro Real"){
-                              if(atividade.temCreditoPisCofins){
-                                console.log("Nosso cliente é do lucro real e tem credito pis cofins")
-                                creditoAR = (custoAR * 0.0925)
-                                custoAR = custoAR - creditoAR
-                              }else{
-                                console.log("Nosso cliente é do lucro real mas NÃO tem crédito pis cofins")
-                              }
-                          }
-
-                          console.log("seu custo atual com esse serviço é: " + custoAR)
-
-                          // NOVO CUSTO (CUSTO APÓS REFORMA)
-                          // POR ESTAR COLOCANDO O CUSTO DIRETO COMO VALOR DESONERADO, VOU ASSUMIR QUE SEMPRE TEM CREDITO 100%
-                          custoDR = valorServicoDesonerado
-                          creditoDR = valorImpostosNovos
-
-                          console.log("Seu novo custo será: " + custoDR
-                          )
-
                         }
 
 
                       }
 
-                      const objServicoTomadoAtualAR = {
-                            valor: valorServicoAR,
-                            valorImpostos: valorImpostosAtuais,
-                            valorDesonerado: valorServicoDesonerado,
-                            porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                            custo: custoAR
-                          }
 
-                      respServicoTomadoAtual.antesReforma = objServicoTomadoAtualAR
 
                       /*const respServicoTomadoAtual: objItemFinal = {
                           antesReforma: {
@@ -2761,6 +3265,55 @@ export class calcularSimplificadoUseCase{
 
                   })
 
+                  // INICIALIZANDO VARIAVEIS TABELA COMPRAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaComprasId = uuidv4()
+                  const objLinhaComprasId = await respTabelasRepo.pegarIdComprasPorLinha("servicosTomados")
+                  const linhaComprasId = objLinhaComprasId?.id
+                  // popular o obj que compras que vai para o banco de dados
+                  const objServicoComprasAR = criarARCompras({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.impostosAR,
+                    id: antesReformaComprasId,
+                    linhaComprasId: linhaComprasId,
+                    credito: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.creditoAR,
+                    custo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.custoAR,
+                    porcentagemCustoEfetivo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.porcentagemCustoEfetivoAR,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaCompras.push(objServicoComprasAR)
+
+                    // Depois Reforma
+                  const arrDRComprasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.servicosTomados.depoisReforma
+                  arrDRComprasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objServicoComprasDR = criarDRCompras({
+                      antesReformaId: antesReformaComprasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      credito: objAnoDRAtual.credito,
+                      custo: objAnoDRAtual.custo,
+                      porcentagemCustoEfetivo: objAnoDRAtual.porcentagemCustoEfetivo,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaCompras.push(objServicoComprasDR)
+
+                  })
+
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }
+
+
               }
 
 
@@ -2768,6 +3321,15 @@ export class calcularSimplificadoUseCase{
               //LOCACAO
 
               if(totalImoveisLocacao.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("locacaoBensImoveis")
+                const categoriaId = objCategoriaAtual?.id
+
                 console.log("/////////////////////////////////////////////////////////////")
                 console.log("Começo do calculo")
                 // Se meu cliente for Pessoa Fisica, conferir se ele é regime regular
@@ -2928,12 +3490,38 @@ export class calcularSimplificadoUseCase{
                     const custoAtual = valorBase - creditoAtual
                     console.log("custoAtual: " + custoAtual)
 
+                    // Obj resposta final
+                    const objImovelLocacaoAtualAR = {
+                      valor: valorBase,
+                      valorImpostos: valorImpostosAtuais,
+                      valorDesonerado: valorDesonerado,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                      custo: imovel.tipoAluguel == "Aluguel pago" ? custoAtual : null
+                    }
+                    respImovelLocacaoAtual.antesReforma = objImovelLocacaoAtualAR
+
+
+                    // criando obj atual banco de dados
+                    const antesReformaId = uuidv4()
+                    const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                      id: antesReformaId,
+                      calculoId: calculoId,
+                      regimeId: regimeId,
+                      categoriaId: categoriaId,
+                      valor: valorBase,
+                      desonerado: valorDesonerado,
+                      impostos: valorImpostosAtuais,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                      custo: imovel.tipoAluguel == "Aluguel pago" ? custoAtual : null
+                    })
+                    estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
 
                     // ONERAR NOVOS IMPOSTOS
 
 
                     anoAano.forEach(objAno => {
-                      if(objAno.ano == "2026"){
+                      if(objAno.ano == "A2026"){
 
                       }else{
                         // SIMULAÇÃO 1 (Nela usar valorBaseNovosTributosSimu1 como base, e na simu2 usar o valorDesonerado)
@@ -3019,6 +3607,7 @@ export class calcularSimplificadoUseCase{
                                 }
                             }
 
+                            // obj resposta final
                             const objAnoVigente: objDepoisReforma = {
                                 ano: objAno.ano,
                                 valor: novoValorAnoVigente,
@@ -3028,6 +3617,18 @@ export class calcularSimplificadoUseCase{
                                 custo: custoAnoVigente
                             }
                             respImovelLocacaoAtual.depoisReforma.push(objAnoVigente)
+
+                            // obj banco de dados
+                            const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                              antesReformaCategoriaId: antesReformaId,
+                              ano: objAno.ano,
+                              valor: novoValorAnoVigente,
+                              valorSemIva: valorSemIvaAnoVigente,
+                              impostos: valorImpostosAnoVigente,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                              custo: custoAnoVigente
+                            })
+                            estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                             if(imovel.tipoAluguel == "Aluguel pago"){
                                 const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -3213,16 +3814,6 @@ export class calcularSimplificadoUseCase{
                     const custoDR = temCreditoIva ? valorFinalSimu1 - valorNovosTributos : valorFinalSimu1
 
 
-                      const objImovelLocacaoAtualAR = {
-                        valor: valorBase,
-                        valorImpostos: valorImpostosAtuais,
-                        valorDesonerado: valorDesonerado,
-                        porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                        custo: imovel.tipoAluguel == "Aluguel pago" ? custoAtual : null
-                      }
-
-                      respImovelLocacaoAtual.antesReforma = objImovelLocacaoAtualAR
-
                       /*const respImovelLocacaoAtual: objItemFinal = {
                           antesReforma: {
                             valor: valorBase,
@@ -3285,12 +3876,109 @@ export class calcularSimplificadoUseCase{
                         }
 
                   })
+
+                  // INICIALIZANDO VARIAVEIS TABELA VENDAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaVendasId = uuidv4()
+                  const objLinhaVendasId = await respTabelasRepo.pegarIdVendaPorLinha("locacaoImoveis")
+                  const linhaVendasId = objLinhaVendasId?.id
+                  // inicializar um objeto da linha tabela vendas, que tenha os valores genéricos, mas os ids já com valores finais
+                  const objImovelLocacaoVendasAR = criarARVendas({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.impostosAR,
+                    id: antesReformaVendasId,
+                    linhaVendasId: linhaVendasId,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.antesReforma.porcentagemCargaTributariaAR
+                  })                  
+
+                  estruturaDbAntesReformaVendas.push(objImovelLocacaoVendasAR)
+
+                    // Depois Reforma
+                  const arrDRVendasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoImoveis.depoisReforma
+
+                  arrDRVendasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objLocacaoImoveisVendasDR = criarDRVendas({
+                      antesReformaId: antesReformaVendasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaVendas.push(objLocacaoImoveisVendasDR)
+
+                  })
+
+
+
+
+                  // INICIALIZANDO VARIAVEIS TABELA COMPRAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaComprasId = uuidv4()
+                  const objLinhaComprasId = await respTabelasRepo.pegarIdComprasPorLinha("locacaoImoveis")
+                  const linhaComprasId = objLinhaComprasId?.id
+                  // popular o obj que compras que vai para o banco de dados
+                  const objImovelLocacaoComprasAR = criarARCompras({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.impostosAR,
+                    id: antesReformaComprasId,
+                    linhaComprasId: linhaComprasId,
+                    credito: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.creditoAR,
+                    custo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.custoAR,
+                    porcentagemCustoEfetivo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.porcentagemCustoEfetivoAR,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaCompras.push(objImovelLocacaoComprasAR)          
+                  
+                    // Depois Reforma
+                  const arrDRComprasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoImoveis.depoisReforma
+                  arrDRComprasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objImovelLocacaoComprasDR = criarDRCompras({
+                      antesReformaId: antesReformaComprasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      credito: objAnoDRAtual.credito,
+                      custo: objAnoDRAtual.custo,
+                      porcentagemCustoEfetivo: objAnoDRAtual.porcentagemCustoEfetivo,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaCompras.push(objImovelLocacaoComprasDR)
+                  })
+
+
+
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }
+
               }
 
 
               // COMPRA VENDA IMOVEIS
 
               if(totalImoveisCompraVenda.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("compraVendaBensImoveis")
+                const categoriaId = objCategoriaAtual?.id
+
                 totalImoveisCompraVenda.forEach(imovel => {
 
                   let respCompraVendaAtual: objItemFinal = {
@@ -3327,7 +4015,6 @@ export class calcularSimplificadoUseCase{
                   console.log("valor desonerado: " + valorDesonerado)
                   const porcentagemCargaTributariaAR = valorImpostosAtuais / valorDesonerado
                   
-                
 
                   // base de calculo == base de calculo para aplicar alíquota do IBS e CBS
                   let baseDeCalculo = valorDesonerado - redutorDeAjuste
@@ -3406,6 +4093,15 @@ export class calcularSimplificadoUseCase{
 
 
                 })
+
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }
+
               }
 
 
@@ -3414,6 +4110,15 @@ export class calcularSimplificadoUseCase{
 
               // BENS MÓVEIS - LOCAÇÃO
               if(totalMoveisLocacao.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("locacaoBensMoveis")
+                const categoriaId = objCategoriaAtual?.id                
+
                 let pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
                 let iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
                 let icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
@@ -3688,6 +4393,31 @@ export class calcularSimplificadoUseCase{
                     const custoAR = valorBase - creditoAtual
                     console.log("custoAtual: " + custoAR)
 
+                    // obj resposta final
+                    const objMoveisLocacaoAtualAR = {
+                        valor: valorBase,
+                        valorImpostos: valorImpostosAtuais,
+                        valorDesonerado: valorDesonerado,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                        custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
+                      }
+
+                    respMoveisLocacaoAtual.antesReforma = objMoveisLocacaoAtualAR
+
+                    // criando obj atual banco de dados
+                    const antesReformaId = uuidv4()
+                    const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                      id: antesReformaId,
+                      calculoId: calculoId,
+                      regimeId: regimeId,
+                      categoriaId: categoriaId,
+                      valor: valorBase,
+                      desonerado: valorDesonerado,
+                      impostos: valorImpostosAtuais,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                      custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
+                    })
+                    estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
 
 
                     // ONERAR NOVOS IMPOSTOS
@@ -3715,6 +4445,8 @@ export class calcularSimplificadoUseCase{
                         const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                         const creditoAnoVigente = (temCreditoIva ? valorIvaAnoVigente : 0)
                         const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+
+                        // obj resposta final
                         const objAnoVigente: objDepoisReforma = {
                             ano: objAno.ano,
                             valor: novoValorAnoVigente,
@@ -3724,6 +4456,19 @@ export class calcularSimplificadoUseCase{
                             custo: movel.tipoAluguel == "Aluguel pago" ? custoAnoVigente : null
                         }
                         respMoveisLocacaoAtual.depoisReforma.push(objAnoVigente)
+
+                        // obj banco de dados
+                        const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                          antesReformaCategoriaId: antesReformaId,
+                          ano: objAno.ano,
+                          valor: novoValorAnoVigente,
+                          valorSemIva: valorSemIvaAnoVigente,
+                          impostos: valorImpostosAnoVigente,
+                          porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                          custo: movel.tipoAluguel == "Aluguel pago" ? custoAnoVigente : null
+                        })
+                        estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
+
 
                         if(movel.tipoAluguel == "Aluguel pago"){
                           const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -3789,15 +4534,7 @@ export class calcularSimplificadoUseCase{
                     const custoDR = temCreditoIva ? valorDesonerado : novoValorTotal
 
 
-                    const objMoveisLocacaoAtualAR = {
-                        valor: valorBase,
-                        valorImpostos: valorImpostosAtuais,
-                        valorDesonerado: valorDesonerado,
-                        porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                        custo: movel.tipoAluguel == "Aluguel pago" ? custoAR : null
-                      }
 
-                    respMoveisLocacaoAtual.antesReforma = objMoveisLocacaoAtualAR
 
                     /*const respMoveisLocacaoAtual: objItemFinal = {
                       antesReforma: {
@@ -3861,6 +4598,95 @@ export class calcularSimplificadoUseCase{
                     }
 
                   })
+
+                  // INICIALIZANDO VARIAVEIS TABELA VENDAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaVendasId = uuidv4()
+                  const objLinhaVendasId = await respTabelasRepo.pegarIdVendaPorLinha("locacaoMoveis")
+                  const linhaVendasId = objLinhaVendasId?.id
+                  // inicializar um objeto da linha tabela vendas, que tenha os valores genéricos, mas os ids já com valores finais
+                  const objMovelLocacaoVendasAR = criarARVendas({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.impostosAR,
+                    id: antesReformaVendasId,
+                    linhaVendasId: linhaVendasId,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaVendas.push(objMovelLocacaoVendasAR)
+
+                    // Depois Reforma
+                  const arrDRVendasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.locacaoMoveis.depoisReforma
+
+                  arrDRVendasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objLocacaoMoveisVendasDR = criarDRVendas({
+                      antesReformaId: antesReformaVendasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaVendas.push(objLocacaoMoveisVendasDR)
+
+                  })
+
+
+
+
+                  // INICIALIZANDO VARIAVEIS TABELA COMPRAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaComprasId = uuidv4()
+                  const objLinhaComprasId = await respTabelasRepo.pegarIdComprasPorLinha("locacaoMoveis")
+                  const linhaComprasId = objLinhaComprasId?.id
+                  // popular o obj que compras que vai para o banco de dados
+                  const objMovelLocacaoComprasAR = criarARCompras({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.impostosAR,
+                    id: antesReformaComprasId,
+                    linhaComprasId: linhaComprasId,
+                    credito: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.creditoAR,
+                    custo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.custoAR,
+                    porcentagemCustoEfetivo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.porcentagemCustoEfetivoAR,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaCompras.push(objMovelLocacaoComprasAR)   
+
+                    // Depois Reforma
+                  const arrDRComprasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.locacaoMoveis.depoisReforma
+                  arrDRComprasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objMovelLocacaoComprasDR = criarDRCompras({
+                      antesReformaId: antesReformaComprasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      credito: objAnoDRAtual.credito,
+                      custo: objAnoDRAtual.custo,
+                      porcentagemCustoEfetivo: objAnoDRAtual.porcentagemCustoEfetivo,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaCompras.push(objMovelLocacaoComprasDR)
+                  })
+
+
+
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }
+
+
               }
 
 
@@ -3868,7 +4694,18 @@ export class calcularSimplificadoUseCase{
               // Produtos
 
               // PRODUTOS VENDIDOS
+              console.log("Total Produtos Vendidos")
+              console.log(totalProdutosVendidos)
               if(totalProdutosVendidos.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("produtosVendidos")
+                const categoriaId = objCategoriaAtual?.id                
 
                 const ibsBruto = this.parametrosEntrada.aliquotaIbs / 100
                 const cbsBruto = this.parametrosEntrada.aliquotaCbs / 100
@@ -4168,6 +5005,32 @@ export class calcularSimplificadoUseCase{
                   console.log("Valor Desonerado: " + valorDesonerado)
 
 
+                  // obj resultado final
+                  const objProdutoVendidoAtualAR = {
+                    valor: valorBase,
+                    valorImpostos: valorImpostosAtuais,
+                    valorDesonerado: valorDesonerado,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: null
+                  }
+                  respProdutosVendidosAtual.antesReforma = objProdutoVendidoAtualAR          
+                  
+                  // criando obj atual banco de dados
+                  const antesReformaId = uuidv4()
+                  const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                    id: antesReformaId,
+                    calculoId: calculoId,
+                    regimeId: regimeId,
+                    categoriaId: categoriaId,
+                    valor: valorBase,
+                    desonerado: valorDesonerado,
+                    impostos: valorImpostosAtuais,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: null
+                  })
+                  estruturaDbAntesReformaCategoria.push(objARCategoriaItem)                  
+
+
                   // FIM DOS IMPOSTOS ATUAIS *******************************************************************************************************************************************
 
 
@@ -4211,6 +5074,8 @@ export class calcularSimplificadoUseCase{
                       const porcentagemCargaTributariaAnoVigente = valorImpostosAnoVigente / valorDesonerado
                       const novoValorAnoVigente = valorDesonerado + valorImpostosAnoVigente
                       const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
+
+                      // obj resultado final
                       const objAnoVigente: objDepoisReforma = {
                           ano: objAno.ano,
                           valor: novoValorAnoVigente,
@@ -4220,6 +5085,18 @@ export class calcularSimplificadoUseCase{
                           custo: null
                       }
                       respProdutosVendidosAtual.depoisReforma.push(objAnoVigente)
+
+                      // obj banco de dados
+                      const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                        antesReformaCategoriaId: antesReformaId,
+                        ano: objAno.ano,
+                        valor: novoValorAnoVigente,
+                        valorSemIva: valorSemIvaAnoVigente,
+                        impostos: valorImpostosAnoVigente,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                        custo: null
+                      })
+                      estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)                      
 
                       const objAnoVigenteVendas = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                       const objAnoVigenteVendasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -4259,15 +5136,6 @@ export class calcularSimplificadoUseCase{
                   const novoValorProduto = valorDesonerado + novosImpostos
                   console.log("Novo valor do produto: " + novoValorProduto)
 
-                  const objProdutoVendidoAtualAR = {
-                    valor: valorBase,
-                    valorImpostos: valorImpostosAtuais,
-                    valorDesonerado: valorDesonerado,
-                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                    custo: null
-                  }
-
-                  respProdutosVendidosAtual.antesReforma = objProdutoVendidoAtualAR
 
                   /*const respServicoPrestadoAtual: objItemFinal = {
                     antesReforma: {
@@ -4300,20 +5168,72 @@ export class calcularSimplificadoUseCase{
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR += valorImpostosAtuais
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado += valorDesonerado
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
-                  
+     
                   // preenchendo total
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR += valorBase
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR += valorImpostosAtuais
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado += valorDesonerado
                   respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR / respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado
+                })
 
+                // Atualizando os valores da estrutura linha produtos tabela vendas que será enviada pro banco de dados
+                  // Antes Reforma
+                const antesReformaVendasId = uuidv4()
+                const objLinhaVendasId = await respTabelasRepo.pegarIdVendaPorLinha("vendasProdutos")
+                const linhaVendasId = objLinhaVendasId?.id
+                // popular o obj que vai para a estrutura da tabela vendas banco de dados
+                const objProdutoVendasAR = criarARVendas({
+                  calculoId,
+                  regimeId,
+                  valor: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorAR,
+                  desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.valorDesonerado,
+                  impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.impostosAR,
+                  id: antesReformaVendasId,
+                  linhaVendasId: linhaVendasId,
+                  porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.antesReforma.porcentagemCargaTributariaAR
+                })
+                console.log("produto Vendido AR add na estrutura que vai pro banco:")
+                console.log(objProdutoVendasAR)
+
+                // adicionar o obj da linha atual atualizado acima na estrutura que será enviada para o banco
+                estruturaDbAntesReformaVendas.push(objProdutoVendasAR)
+                console.log("estrutura AR Db depos de adicionar:")
+                console.log(estruturaDbAntesReformaVendas)
+
+                  // Depois Reforma
+                const arrDRVendasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.vendasProdutos.depoisReforma
+
+                arrDRVendasCategoriaAtual.forEach((objAnoDRAtual) => {
+                  const objProdutoVendasDR = criarDRVendas({
+                    antesReformaId: antesReformaVendasId,
+                    ano: objAnoDRAtual.ano,
+                    impostos: objAnoDRAtual.impostos,
+                    valor: objAnoDRAtual.valor,
+                    valorSemIva: objAnoDRAtual.valorSemIva,
+                    porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                  })
+                  estruturaDbDepoisReformaVendas.push(objProdutoVendasDR)
                 })
 
 
+                // add respostas categorias no banco de dados
+                if(calculoId && regimeId && categoriaId){
+                  try {
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }catch(err){
+                    console.log("ERRO DO BANCO DE DAAAAADOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS:")
+                    console.log(err)
+                  }
+                }else{
+                  console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                }
+
               }
 
-              console.log("RESPOSTA FINAL PRODUTOS VENDIDOS APÓS O PRODUTOS VENDIDOS TER ACABADO DE TERMINAR")
-              console.log(respostaFinalCalculo[chaveRegimeObjFinal].produtosVendidos)
+              console.log("Estrutura banco de dados AR Vendas após produtos vendidos terminar de executar")
+              console.log(estruturaDbAntesReformaVendas)
+              
 
 
 
@@ -4321,6 +5241,15 @@ export class calcularSimplificadoUseCase{
 
               // PRODUTOS ADQUIRIDOS
               if(totalProdutosAdquiridos.length > 0){
+
+                // estruturas que serão enviadas para o banco de dados para salvar, com os dados já organizados como as tabelas esperam
+                const estruturaDbAntesReformaCategoria: Prisma.AntesReformaCategoriaUncheckedCreateInput[] = []
+                const estruturaDbDepoisReformaCategoria: Prisma.DepoisReformaCategoriaUncheckedCreateInput[] = []
+
+                // Descobrir o ID da categoria atual
+                const objCategoriaAtual = await descobrirIdCategoria("produtosAdquiridos")
+                const categoriaId = objCategoriaAtual?.id
+
                 let faturamentoTotalMensal = 0
                 totalProdutosAdquiridos.forEach(produto => {
                   faturamentoTotalMensal += produto.valorOperacao
@@ -4400,6 +5329,32 @@ export class calcularSimplificadoUseCase{
 
                   console.log("Valor Desonerado: " + valorDesonerado)
 
+                  // obj resultado final
+                  const objProdutoAdquiridoAtualAR = {
+                    valor: valorBase,
+                    valorImpostos: valorImpostosAtuais,
+                    valorDesonerado: valorDesonerado,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: custoAR
+                  }
+                  respProdutoAdquiridoAtual.antesReforma = objProdutoAdquiridoAtualAR
+
+                  // criando obj atual banco de dados
+                  const antesReformaId = uuidv4()
+                  const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                    id: antesReformaId,
+                    calculoId: calculoId,
+                    regimeId: regimeId,
+                    categoriaId: categoriaId,
+                    valor: valorBase,
+                    desonerado: valorDesonerado,
+                    impostos: valorImpostosAtuais,
+                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                    custo: custoAR
+                  })
+                  estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
+
                   // FIM DOS IMPOSTOS ATUAIS *******************************************************************************************************************************************
 
 
@@ -4448,6 +5403,8 @@ export class calcularSimplificadoUseCase{
                       const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                       const creditoAnoVigente = (produtoAdquirido.creditoIcms ? valorIcmsAnoVigente : 0)
                       let custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
+
+                      // obj resultado final
                       const objAnoVigente: objDepoisReforma = {
                           ano: objAno.ano,
                           valor: novoValorAnoVigente,
@@ -4457,6 +5414,18 @@ export class calcularSimplificadoUseCase{
                           custo: custoAnoVigente
                       }
                       respProdutoAdquiridoAtual.depoisReforma.push(objAnoVigente)
+
+                      // obj banco de dados
+                      const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                        antesReformaCategoriaId: antesReformaId,
+                        ano: objAno.ano,
+                        valor: novoValorAnoVigente,
+                        valorSemIva: valorSemIvaAnoVigente,
+                        impostos: valorImpostosAnoVigente,
+                        porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                        custo: custoAnoVigente
+                      })
+                      estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)
 
                       const objAnoVigenteCompras = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
                       const objAnoVigenteComprasTotal = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma.filter(objAnoMapeado => objAnoMapeado.ano == objAno.ano)
@@ -4530,15 +5499,6 @@ export class calcularSimplificadoUseCase{
                   const novoValorProduto = valorDesonerado + novosImpostos
                   console.log("Novo valor do produto: " + novoValorProduto)
 
-                  const objProdutoAdquiridoAtualAR = {
-                    valor: valorBase,
-                    valorImpostos: valorImpostosAtuais,
-                    valorDesonerado: valorDesonerado,
-                    porcentagemCargaTributaria: porcentagemCargaTributariaAR,
-                    custo: custoAR
-                  }
-
-                  respProdutoAdquiridoAtual.antesReforma = objProdutoAdquiridoAtualAR
 
                   /*const respServicoPrestadoAtual: objItemFinal = {
                     antesReforma: {
@@ -4591,12 +5551,60 @@ export class calcularSimplificadoUseCase{
                       dreDespesasAR += custoAR
                     }
                   }
-          
-
+        
                 })
+
+                  // INICIALIZANDO VARIAVEIS TABELA COMPRAS BANCO DE DADOS
+                    // Antes Reforma
+                  const antesReformaComprasId = uuidv4()
+                  const objLinhaComprasId = await respTabelasRepo.pegarIdComprasPorLinha("comprasProdutos")
+                  const linhaComprasId = objLinhaComprasId?.id
+                  // popular o obj que compras que vai para o banco de dados
+                  const objprodutoComprasAR = criarARCompras({
+                    calculoId,
+                    regimeId,
+                    valor: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorAR,
+                    desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.valorDesonerado,
+                    impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.impostosAR,
+                    id: antesReformaComprasId,
+                    linhaComprasId: linhaComprasId,
+                    credito: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.creditoAR,
+                    custo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.custoAR,
+                    porcentagemCustoEfetivo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.porcentagemCustoEfetivoAR,
+                    porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.antesReforma.porcentagemCargaTributariaAR
+                  })
+
+                  estruturaDbAntesReformaCompras.push(objprodutoComprasAR)   
+
+                    // Depois Reforma
+                  const arrDRComprasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.comprasProdutos.depoisReforma
+                  arrDRComprasCategoriaAtual.forEach((objAnoDRAtual) => {
+                    const objProdutoComprasDR = criarDRCompras({
+                      antesReformaId: antesReformaComprasId,
+                      ano: objAnoDRAtual.ano,
+                      impostos: objAnoDRAtual.impostos,
+                      valor: objAnoDRAtual.valor,
+                      valorSemIva: objAnoDRAtual.valorSemIva,
+                      credito: objAnoDRAtual.credito,
+                      custo: objAnoDRAtual.custo,
+                      porcentagemCustoEfetivo: objAnoDRAtual.porcentagemCustoEfetivo,
+                      porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                    })
+                    estruturaDbDepoisReformaCompras.push(objProdutoComprasDR)
+                  })
+        
+                  // add respostas no banco de dados
+                  if(calculoId && regimeId && categoriaId){
+                    const addARBanco = await respCategoriasRepo.criarARCategoria(estruturaDbAntesReformaCategoria)
+                    const addDRBanco = await respCategoriasRepo.criarDRCategoria(estruturaDbDepoisReformaCategoria)
+                  }else{
+                    console.log("Não foi possivel salvar no banco de dados por problemas com os ID's")
+                  }        
+        
               }
 
-
+              console.log("Estrutura banco de dados AR Vendas após produtos COMPRASS terminar de executar")
+              console.log(estruturaDbAntesReformaVendas)
 
               // No final de tudo realizo a soma de colunas para fazer a tabela da DRE
               
@@ -4909,9 +5917,177 @@ export class calcularSimplificadoUseCase{
                 tabelaCaixa.resultadoPosIrCs.depoisReforma.push(objLinhaResultadoPosIrCs)
 
               })
-              
 
-          })
+              // Antes de passar para o próximo regime, preciso salvar as tabelas do regime atual no banco de dados
+
+              // TABELA VENDAS
+                // Antes Reforma
+              // Antes de salvar preciso popular a linha "total" que vai para o banco de dados
+              const antesReformaVendasId = uuidv4()
+              const objLinhaVendasId = await respTabelasRepo.pegarIdVendaPorLinha("total")
+              const linhaVendasId = objLinhaVendasId?.id
+              // popular o obj que vai para a estrutura da tabela vendas banco de dados
+              const objTotalVendasAR = criarARVendas({
+                calculoId,
+                regimeId,
+                valor: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorAR,
+                desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.valorDesonerado,
+                impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.impostosAR,
+                id: antesReformaVendasId,
+                linhaVendasId: linhaVendasId,
+                porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.antesReforma.porcentagemCargaTributariaAR
+              })
+              // adicionar o obj da linha total atualizado acima na estrutura que será enviada para o banco
+              estruturaDbAntesReformaVendas.push(objTotalVendasAR)    
+              // Salvando de fato no banco
+              await respTabelasRepo.salvarTabelaVendasAR(estruturaDbAntesReformaVendas)
+
+                // Depois Reforma
+              const arrDRVendasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalVendas.total.depoisReforma
+              arrDRVendasCategoriaAtual.forEach((objAnoDRAtual) => {
+                const objTotalVendasDR = criarDRVendas({
+                  // pegando o antesReformaVendasId do total antes reforma calculado logo acima
+                  antesReformaId: antesReformaVendasId,
+                  ano: objAnoDRAtual.ano,
+                  impostos: objAnoDRAtual.impostos,
+                  valor: objAnoDRAtual.valor,
+                  valorSemIva: objAnoDRAtual.valorSemIva,
+                  porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                })
+                estruturaDbDepoisReformaVendas.push(objTotalVendasDR)
+              })
+              // Salvando de fato no banco
+              await respTabelasRepo.salvarTabelaVendasDR(estruturaDbDepoisReformaVendas)
+
+
+              // TABELA COMPRAS
+                // Antes Reforma
+              // Antes de salvar preciso popular a linha "total" que vai para o banco de dados
+              const antesReformaComprasId = uuidv4()
+              const objLinhaComprasId = await respTabelasRepo.pegarIdComprasPorLinha("total")
+              const linhaComprasId = objLinhaComprasId?.id
+              // popular o obj que compras que vai para o banco de dados
+              const objTotalComprasAR = criarARCompras({
+                calculoId,
+                regimeId,
+                valor: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorAR,
+                desonerado: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.valorDesonerado,
+                impostos: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.impostosAR,
+                id: antesReformaComprasId,
+                linhaComprasId: linhaComprasId,
+                credito: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.creditoAR,
+                custo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.custoAR,
+                porcentagemCustoEfetivo: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCustoEfetivoAR,
+                porcentagemCargaTributaria: respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.antesReforma.porcentagemCargaTributariaAR
+              })
+              // adicionar o obj da linha total atualizado acima na estrutura que será enviada para o banco
+              estruturaDbAntesReformaCompras.push(objTotalComprasAR)    
+              // Salvando de fato no banco
+              await respTabelasRepo.salvarTabelaComprasAR(estruturaDbAntesReformaCompras)
+
+                // Depois Reforma
+              const arrDRComprasCategoriaAtual = respostaFinalCalculo[chaveRegimeObjFinal].totalCompras.total.depoisReforma
+              arrDRComprasCategoriaAtual.forEach((objAnoDRAtual) => {
+                const objTotalComprasDR = criarDRCompras({
+                  antesReformaId: antesReformaComprasId,
+                  ano: objAnoDRAtual.ano,
+                  impostos: objAnoDRAtual.impostos,
+                  valor: objAnoDRAtual.valor,
+                  valorSemIva: objAnoDRAtual.valorSemIva,
+                  credito: objAnoDRAtual.credito,
+                  custo: objAnoDRAtual.custo,
+                  porcentagemCustoEfetivo: objAnoDRAtual.porcentagemCustoEfetivo,
+                  porcentagemCargaTributaria: objAnoDRAtual.porcentagemCargaTributaria
+                })
+                estruturaDbDepoisReformaCompras.push(objTotalComprasDR)
+              })
+              // Salvando de fato no banco
+              await respTabelasRepo.salvarTabelaComprasDR(estruturaDbDepoisReformaCompras)
+
+
+              // Colocando TABELA CAIXA no banco de dados
+              const objCaixa = respostaFinalCalculo[chaveRegimeObjFinal].caixa
+              for(const [linhaCaixaAtual, valorLinha] of Object.entries(objCaixa)){
+                  // Antes Reforma
+                // Como eu tenho certeza que as propriedades do obj da tabela caixa são exatamente iguais os possiveis valores da coluna linha_caixa, eu forço isso no TypeScript com o "as LinhasCaixaType"
+                const objIdLinhaCaixaAtual = await respTabelasRepo.pegarIdCaixaPorLinha(linhaCaixaAtual as LinhasCaixaType) 
+                const idLinhaCaixaAtual = objIdLinhaCaixaAtual?.id
+                const antesReformaCaixaId = uuidv4()
+                // popular o obj que vai para a estrutura que vai pro banco de dados
+                const objCaixaLinhaAtualAR = criarARCaixa({
+                  calculoId,
+                  regimeId,
+                  id: antesReformaCaixaId,
+                  linhaCaixaId: idLinhaCaixaAtual,
+                  valor: valorLinha.antesReforma.valor
+                })
+                estruturaDbAntesReformaCaixa.push(objCaixaLinhaAtualAR)
+
+                  // Depois Reforma
+                // Como aqui estamos iterando em cada linha da tabela caixa, cada linha tem um depoisReforma, que é um array de objetos DR, vamos chegar nesse valor, para iterar em cima dele para adicionarmos cada um desses objetos na tabela DepoisReformaCaixax
+                const arrDRCaixaLinhaAtual = valorLinha.depoisReforma
+                arrDRCaixaLinhaAtual.forEach((objAnoDRAtual) => {
+                  // Aqui já temos cada obj DR, pra cada um queremos fazer um objeto com a função criarDRCaixa que já está pronto pra ser enviado ao banco
+                  const objCaixaLinhaAtualDR = criarDRCaixa({
+                    antesReformaCaixaId,
+                    ano: objAnoDRAtual.ano,
+                    valor: objAnoDRAtual.valor
+                  })
+                  estruturaDbDepoisReformaCaixa.push(objCaixaLinhaAtualDR)
+                })
+              }
+
+              // Salvando de fato no banco
+              try{
+                await respTabelasRepo.salvarTabelaCaixaAR(estruturaDbAntesReformaCaixa)
+                await respTabelasRepo.salvarTabelaCaixaDR(estruturaDbDepoisReformaCaixa)
+              }catch(err){
+                console.log("ERRO NO SALVAMENTO DA TABELA CAIXA")
+                console.log(err)
+              }
+
+
+              // Colocando TABELA DRE no banco de dados
+              const objDre = respostaFinalCalculo[chaveRegimeObjFinal].dre
+              for(const [linhaDreAtual, valorLinha] of Object.entries(objDre)){
+                  // Antes Reforma
+                // Como eu tenho certeza que as propriedades do obj da tabela caixa são exatamente iguais os possiveis valores da coluna linha_caixa, eu forço isso no TypeScript com o "as LinhasCaixaType"
+                const objIdLinhaDreAtual = await respTabelasRepo.pegarIdDrePorLinha(linhaDreAtual as LinhasDreType)
+                const idLinhaDreAtual = objIdLinhaDreAtual?.id
+                const antesReformaDreId = uuidv4()
+                // popular o obj que vai pra estrutura que vai pro banco de dados
+                const objDreLinhaAtualAR = criarARDre({
+                  calculoId,
+                  regimeId,
+                  id: antesReformaDreId,
+                  linhaDreId: idLinhaDreAtual,
+                  valor: valorLinha.antesReforma.valor
+                })
+                estruturaDbAntesReformaDre.push(objDreLinhaAtualAR)
+
+                  // Depois Reforma
+                const arrDRDreLinhaAtual = valorLinha.depoisReforma
+                arrDRDreLinhaAtual.forEach((objAnoDRAtual) => {
+                  const objDreLinhaAtualDR = criarDRDre({
+                    antesReformaDreId,
+                    ano: objAnoDRAtual.ano,
+                    valor: objAnoDRAtual.valor
+                  })
+                  estruturaDbDepoisReformaDre.push(objDreLinhaAtualDR)
+
+                })
+              }
+              // Salvando de fato no banco
+              try{
+                await respTabelasRepo.salvarTabelaDreAR(estruturaDbAntesReformaDre)
+                await respTabelasRepo.salvarTabelaDreDR(estruturaDbDepoisReformaDre)
+              }catch(err){
+                console.log("Erro no salvamento da TABELA DRE")
+                console.log(err)
+              }
+
+
+          }
 
           
 

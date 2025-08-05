@@ -1,12 +1,21 @@
-import { ImoveisLocacaoObj, MoveisLocacaoObj, parametrosEntrada } from "./calcularSimplificadoUseCase";
+import { anosType, ImoveisLocacaoObj, MoveisLocacaoObj, objAnoAAnoType, objDepoisReforma, objItemFinal, objRegimeType, parametrosEntrada, valorInicialObjRegime } from "./calcularSimplificadoUseCase";
 
 
 type tiposRegime = "Simples Nacional" | "Lucro Real" | "Lucro Presumido" | "Pessoa Fisica" | ""
 
 
+// Tipos da resposta final
+
+export type respostaFinalCaluloPessoaFisicaType = {
+    tipoUsuario: "Pessoa Física"
+    respostaFinal: objRegimeType
+    cpf: string
+}
+
+
 export class CalcularPessoaFisicaUseCase{
 
-    constructor(private cpf: string, private totalImoveisLocacao: ImoveisLocacaoObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private parametrosEntrada: parametrosEntrada){}
+    constructor(private cpf: string, private totalImoveisLocacao: ImoveisLocacaoObj[], private totalMoveisLocacao: MoveisLocacaoObj[], private parametrosEntrada: parametrosEntrada, nomeCalculo: string){}
 
 
 
@@ -20,422 +29,47 @@ export class CalcularPessoaFisicaUseCase{
         const cbsBruto = parametrosEntrada.aliquotaCbs / 100
         const ivaBruto = parametrosEntrada.aliquotaIva / 100        
 
-        type anosType = "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033"
-
-        const arrAnos: anosType[] = ["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]
-
-        type objAreaComprasTransicaoType = {
-            ano: anosType
-            valor: number,
-            valorSemIva: number,
-            impostos: number,
-            credito: number,
-            custo: number,
-            porcentagemCustoEfetivo: number,
-            porcentagemCargaTributaria: number
-        }
-
-        type objAreaComprasType = {
-            antesReforma: {
-                valorAR: number,
-                impostosAR: number,
-                valorDesonerado: number,
-                creditoAR: number, 
-                custoAR: number,
-                porcentagemCustoEfetivoAR: number,
-                porcentagemCargaTributariaAR: number
-            },
-            depoisReforma: objAreaComprasTransicaoType[]
-        }
-
-        type objAreaVendasTransicaoType = {
-            ano: anosType
-            valor: number,
-            valorSemIva: number,
-            impostos: number,
-            porcentagemCargaTributaria: number
-        }
-
-        type objAreaVendasType = {
-            antesReforma: {
-                valorAR: number,
-                impostosAR: number,
-                valorDesonerado: number,
-                porcentagemCargaTributariaAR: number
-            },
-            depoisReforma: objAreaVendasTransicaoType[]
-        }        
-
-        type totalComprasType = {
-            comprasProdutos: objAreaComprasType,
-            servicosTomados: objAreaComprasType,
-            locacaoMoveis: objAreaComprasType,
-            locacaoImoveis: objAreaComprasType,
-            total: objAreaComprasType
-        }
-
-        type totalVendasType = {
-            vendasProdutos: objAreaVendasType,
-            servicosPrestados: objAreaVendasType,
-            locacaoMoveis: objAreaVendasType,
-            locacaoImoveis: objAreaVendasType,
-            total: objAreaVendasType
-        }
-
-        type objAntesReforma = {
-            valor: number, 
-            valorImpostos: number,
-            valorDesonerado: number,
-            porcentagemCargaTributaria: number,
-            custo: number | null, 
-        } 
-        
-        type objDepoisReforma = {
-            ano: anosType,
-            valor: number,
-            valorSemIva: number,
-            valorImpostos: number,
-            porcentagemCargaTributaria: number,
-            custo: number | null
-        }
-
-        type objItemFinal = {
-            antesReforma: objAntesReforma,
-            depoisReforma: objDepoisReforma[]
-        }    
-
-        type objDepoisReformaDreCaixa = {
-            ano: anosType,
-            valor: number
-        }
-        
-        type linhaArDrDiferencas = {
-            antesReforma: {
-                valor: number
-            },
-            depoisReforma: objDepoisReformaDreCaixa[]
-        } 
-
-        type tabelaDreType = {
-            receitaBruta: linhaArDrDiferencas,
-            deducoesTributos: linhaArDrDiferencas,
-            custoGeral: linhaArDrDiferencas,
-            lucroBruto: linhaArDrDiferencas,
-            despesas: linhaArDrDiferencas,
-            lucrosAntesIrCs: linhaArDrDiferencas,
-            irCs: linhaArDrDiferencas,
-            lucroLiquido: linhaArDrDiferencas
-        }
-
-        type tabelaCaixaType = {
-            fornecedores: linhaArDrDiferencas,
-            tributosCredito: linhaArDrDiferencas,
-            clientes: linhaArDrDiferencas,
-            tributosDebito: linhaArDrDiferencas,
-            tributosRecolhidos: linhaArDrDiferencas,
-            saldoCredor: linhaArDrDiferencas,
-            resultado: linhaArDrDiferencas,
-            irCs: linhaArDrDiferencas,
-            resultadoPosIrCs: linhaArDrDiferencas,
-            resultadoSobreClientes: linhaArDrDiferencas,
-        }
-
-        type objRegimeType = {
-            servicosPrestados: objItemFinal[],
-            servicosTomados: objItemFinal[],
-            locacaoBensMoveis: objItemFinal[],
-            produtosVendidos: objItemFinal[],
-            produtosAdquiridos: objItemFinal[],
-            locacaoBensImoveis: objItemFinal[],
-            compraVendaBensImoveis: objItemFinal[],
-            totalCompras: totalComprasType,
-            totalVendas: totalVendasType,
-            dre: tabelaDreType,
-            caixa: tabelaCaixaType
-        }
-
-        let valorInicialObjRegime: objRegimeType = {
-            servicosPrestados: [],
-            servicosTomados: [],
-            locacaoBensMoveis: [],
-            produtosVendidos: [],
-            produtosAdquiridos: [],
-            locacaoBensImoveis: [],
-            compraVendaBensImoveis: [],
-            totalCompras: {
-                comprasProdutos: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                servicosTomados: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                locacaoMoveis: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                locacaoImoveis: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                total: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    creditoAR: 0,
-                    custoAR: 0, 
-                    porcentagemCustoEfetivoAR: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, credito: 0, custo: 0, porcentagemCustoEfetivo: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-            },
-            totalVendas: {
-                vendasProdutos: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                servicosPrestados: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                locacaoMoveis: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                locacaoImoveis: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-                total: {
-                antesReforma: {
-                    valorAR: 0,
-                    impostosAR: 0,
-                    valorDesonerado: 0,
-                    porcentagemCargaTributariaAR: 0,
-                },
-                depoisReforma: [
-                    {ano: "2026", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2027", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2028", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2029", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2030", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2031", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2032", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                    {ano: "2033", valor: 0, valorSemIva: 0, impostos: 0, porcentagemCargaTributaria: 0},
-                ]
-                },
-            },
-            dre: {
-                receitaBruta: {antesReforma: {valor: 0}, depoisReforma: []},
-                deducoesTributos: {antesReforma: {valor: 0}, depoisReforma: []},
-                custoGeral: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucroBruto: {antesReforma: {valor: 0}, depoisReforma: []},
-                despesas: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucrosAntesIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                lucroLiquido: {antesReforma: {valor: 0}, depoisReforma: []}
-            },
-            caixa: {
-                fornecedores: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosCredito: {antesReforma: {valor: 0}, depoisReforma: []},
-                clientes: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosDebito: {antesReforma: {valor: 0}, depoisReforma: []},
-                tributosRecolhidos: {antesReforma: {valor: 0}, depoisReforma: []},
-                saldoCredor: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultado: {antesReforma: {valor: 0}, depoisReforma: []},
-                irCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultadoPosIrCs: {antesReforma: {valor: 0}, depoisReforma: []},
-                resultadoSobreClientes: {antesReforma: {valor: 0}, depoisReforma: []}
-            }
-        }    
 
 
-        type objAnoAAnoType = {
-            ano: "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033",
-            porcentagemCbs: number,
-            porcentagemIbs: number,
-            porcentagemIcmsIss: number
-        }
+        const arrAnos: anosType[] = ["A2026", "A2027", "A2028", "A2029", "A2030", "A2031", "A2032", "A2033"]  
 
         const anoAano: objAnoAAnoType[] = [
-            {ano: "2027", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
-            {ano: "2028", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
-            {ano: "2029", porcentagemCbs: 1, porcentagemIbs: 0.1, porcentagemIcmsIss: 0.9},
-            {ano: "2030", porcentagemCbs: 1, porcentagemIbs: 0.2, porcentagemIcmsIss: 0.8},
-            {ano: "2031", porcentagemCbs: 1, porcentagemIbs: 0.3, porcentagemIcmsIss: 0.7},
-            {ano: "2032", porcentagemCbs: 1, porcentagemIbs: 0.4, porcentagemIcmsIss: 0.6},
-            {ano: "2033", porcentagemCbs: 1, porcentagemIbs: 1, porcentagemIcmsIss: 0},
+            {ano: "A2027", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "A2028", porcentagemCbs: 0.9892, porcentagemIbs: 0.001, porcentagemIcmsIss: 1},
+            {ano: "A2029", porcentagemCbs: 1, porcentagemIbs: 0.1, porcentagemIcmsIss: 0.9},
+            {ano: "A2030", porcentagemCbs: 1, porcentagemIbs: 0.2, porcentagemIcmsIss: 0.8},
+            {ano: "A2031", porcentagemCbs: 1, porcentagemIbs: 0.3, porcentagemIcmsIss: 0.7},
+            {ano: "A2032", porcentagemCbs: 1, porcentagemIbs: 0.4, porcentagemIcmsIss: 0.6},
+            {ano: "A2033", porcentagemCbs: 1, porcentagemIbs: 1, porcentagemIcmsIss: 0},
         ]        
 
-        type respostaFinalCaluloType = {
-            tipoUsuario: "Pessoa Física"
-            respostaFinal: objRegimeType
-            cpf: string
-        }
-
         let dreCustoGeralAR = 0
-        let dreCustoGeralTransicao = [
-            {ano: "2026", custoGeralAnoVigente: 0},
-            {ano: "2027", custoGeralAnoVigente: 0},
-            {ano: "2028", custoGeralAnoVigente: 0},
-            {ano: "2029", custoGeralAnoVigente: 0},
-            {ano: "2030", custoGeralAnoVigente: 0},
-            {ano: "2031", custoGeralAnoVigente: 0},
-            {ano: "2032", custoGeralAnoVigente: 0},
-            {ano: "2033", custoGeralAnoVigente: 0},
+        let dreCustoGeralTransicao: {ano: anosType, custoGeralAnoVigente: number}[] = [
+            {ano: "A2026", custoGeralAnoVigente: 0},
+            {ano: "A2027", custoGeralAnoVigente: 0},
+            {ano: "A2028", custoGeralAnoVigente: 0},
+            {ano: "A2029", custoGeralAnoVigente: 0},
+            {ano: "A2030", custoGeralAnoVigente: 0},
+            {ano: "A2031", custoGeralAnoVigente: 0},
+            {ano: "A2032", custoGeralAnoVigente: 0},
+            {ano: "A2033", custoGeralAnoVigente: 0},
         ]
         let dreDespesasAR = 0
-        let dreDespesasTransicao = [
-            {ano: "2026", despesaAnoVigente: 0},
-            {ano: "2027", despesaAnoVigente: 0},
-            {ano: "2028", despesaAnoVigente: 0},
-            {ano: "2029", despesaAnoVigente: 0},
-            {ano: "2030", despesaAnoVigente: 0},
-            {ano: "2031", despesaAnoVigente: 0},
-            {ano: "2032", despesaAnoVigente: 0},
-            {ano: "2033", despesaAnoVigente: 0},
+        let dreDespesasTransicao: {ano: anosType, despesaAnoVigente: number}[] = [
+            {ano: "A2026", despesaAnoVigente: 0},
+            {ano: "A2027", despesaAnoVigente: 0},
+            {ano: "A2028", despesaAnoVigente: 0},
+            {ano: "A2029", despesaAnoVigente: 0},
+            {ano: "A2030", despesaAnoVigente: 0},
+            {ano: "A2031", despesaAnoVigente: 0},
+            {ano: "A2032", despesaAnoVigente: 0},
+            {ano: "A2033", despesaAnoVigente: 0},
         ]
         let valorImpostosPermanecerTotal = 0
 
         type regimesChavesObjType = "simplesNacional" | "lucroReal" | "lucroPresumido"
 
-        let respostaFinalCalculo: respostaFinalCaluloType = {
+        let respostaFinalCalculo: respostaFinalCaluloPessoaFisicaType = {
             tipoUsuario: "Pessoa Física",
             respostaFinal: JSON.parse(JSON.stringify(valorInicialObjRegime)),
             cpf
@@ -522,13 +156,8 @@ export class CalcularPessoaFisicaUseCase{
                       aliquotaDesonerar = pisCo + iss + icms + ipi
                       valorImpostosAtuais = valorBase * aliquotaDesonerar
 
-                        // CRÉDITO: como eu sou o locatário:
-                        if(regimeAtual == 'Lucro Real' && movel.creditaPisCofins && (movel.regimeOutro == "Lucro Presumido" || movel.regimeOutro == "Lucro Real" || movel.regimeOutro == "Simples Nacional")){
-                            console.log("tem crédito atual de: ")
-                            creditoAtual = valorBase * 0.0925
-                            console.log(creditoAtual)
-                            console.log("aliquota usada para calcular o credito: " + 0.0925)
-                        } 
+                        // CRÉDITOAR: para PF é sempre ZERO, então não precisa fazer nada pq ele é inicializado como ZERO
+
 
 
 
@@ -544,14 +173,15 @@ export class CalcularPessoaFisicaUseCase{
                         // Minha empresa é o locador
                         // Conferir se eu sou PF ou PJ, como ainda não coloquei a opção de eu ser PF, vai como se todos fossem PJ inicialmente
 
-                        // CRÉDITO: como o outro é o locatário:
-                        if(movel.regimeOutro == 'Lucro Real' && movel.creditaPisCofins && (regimeAtual == "Lucro Presumido" || regimeAtual == "Lucro Real" || regimeAtual == "Simples Nacional")){
-                            console.log("tem crédito atual de: ")
-                            creditoAtual = valorBase * 0.0925
-                            console.log(creditoAtual)
-                            console.log("aliquota usada para calcular o credito: " + 0.0925)
-                        } 
+                        // CRÉDITO: para PF é sempre ZERO, então não precisa fazer nada pq ele é inicializado como ZERO
 
+                        //ANTES DA REFORMA PF não são cobrados impostos 
+                        icms = 0
+                        iss = 0
+                        pisCo = 0
+                        ipi = 0
+                        aliquotaDesonerar = pisCo + iss + icms + ipi
+                        valorImpostosAtuais = valorBase * aliquotaDesonerar
 
 
                         // *************************************************************
@@ -605,7 +235,7 @@ export class CalcularPessoaFisicaUseCase{
                         const valorSemIvaAnoVigente = novoValorAnoVigente - valorIvaAnoVigente
                         const creditoAnoVigente = (temCreditoIva ? valorIvaAnoVigente : 0)
                         const custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
-                        const objAnoVigente: objDepoisReforma = {
+                        const objAnoVigente: objDepoisReforma  = {
                             ano: objAno.ano,
                             valor: novoValorAnoVigente,
                             valorSemIva: valorSemIvaAnoVigente,
@@ -788,13 +418,15 @@ export class CalcularPessoaFisicaUseCase{
 
 
                   totalImoveisLocacao.forEach((imovel, index) => {
-                    let pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
-                    let iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
-                    let icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
-                    let ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0
+
+                    // IMPOSTOS AR PF ZERO CASO SEJA RECEBIDO, CASO SEJA PAGO, É DEFINIDO MAIS A FRENTE
+                    let pisCo = 0
+                    let iss = 0
+                    let icms = 0
+                    let ipi = 0
 
 
-
+                    // Inicializando obj resposta final item atual
                     let respImovelLocacaoAtual: objItemFinal = {
                       antesReforma: {
                         valor: 0,
@@ -833,6 +465,7 @@ export class CalcularPessoaFisicaUseCase{
                     let creditoDR = 0
                     let temCreditoIva = false
 
+                    // Dentro do ifElse Aluguel pagou ou recebido definimos: as alíquotas uma a uma, alíquota a desonerar, e se tem crédito antes e depois da reforma
                     if(imovel.tipoAluguel == 'Aluguel pago'){
                         // O outro que é o locador (Simples Nacional não pode ser locador)
                         if(imovel.tipoOutraParte == 'Pessoa jurídica'){
@@ -849,17 +482,19 @@ export class CalcularPessoaFisicaUseCase{
                           }
                           aliquotaDesonerar = pisCo + iss + icms + ipi
                           console.log("aliquota a desonerar: " + aliquotaDesonerar)
+                        }else{
+                          // Caso a outra parte seja PF manterá a aliquota a desonerar como zero, logo, não haverá desoneração
+                          pisCo = 0
+                          iss = 0
+                          icms = 0
+                          ipi = 0
+                          aliquotaDesonerar = pisCo + iss + icms + ipi
                         }
-                        // Caso a outra parte seja PF manterá a aliquota a desonerar como zero, logo, não haverá desoneração
 
-                        //CRÉDITO: como eu sou o locatário:
-                        //Aqui o valor base já tem que estar com redução??
-                        if(regimeAtual == 'Lucro Real' && imovel.residencial == false && (imovel.regimeOutro == 'Lucro Presumido' || imovel.regimeOutro == 'Lucro Real')){
-                            console.log("tem crédito atual de: ")
-                            creditoAtual = valorBase * pisCo
-                            console.log(creditoAtual)
-                            console.log("aliquota usada para calcular o credito: " + pisCo)
-                        }
+
+                        //CRÉDITO: ANTES REFORMA PF NÃO TEM CRÉDITO
+                        creditoAtual = 0
+
 
                         // Nós não sabemos se o simples (mesmo sendo nosso cliente) vai ser regime regular ou não, logo vamos colocar que tem crédito por padrao, mas na hora de apresentar os resultados, precisamos falar que ele terá crédito se ele optar, caso não será um custo
                         if(pfRegimeRegular){
@@ -868,29 +503,16 @@ export class CalcularPessoaFisicaUseCase{
 
 
                     }else if(imovel.tipoAluguel == 'Aluguel recebido'){
-                        //Minha empresa é o locador
-                        // Conferir se eu sou PF ou PJ, como ainda não coloquei a opção de eu ser PF, vai como se todos fossem PJ inicialmente
-                        if(regimeAtual == 'Lucro Presumido'){
-                            pisCo = this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.pisCo / 100 : 0
-                            iss = this.parametrosEntrada.tabelaLucroPresumido.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.iss / 100 : 0
-                            icms = this.parametrosEntrada.tabelaLucroPresumido.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.icms / 100 : 0
-                            ipi = this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroPresumido.locacao.ipi / 100 : 0                    
-                        }else if(regimeAtual == 'Lucro Real'){
-                            pisCo = this.parametrosEntrada.tabelaLucroReal.locacao.pisCo !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.pisCo / 100 : 0
-                            iss = this.parametrosEntrada.tabelaLucroReal.locacao.iss !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.iss / 100 : 0
-                            icms = this.parametrosEntrada.tabelaLucroReal.locacao.icms !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.icms / 100 : 0
-                            ipi = this.parametrosEntrada.tabelaLucroReal.locacao.ipi !== null ? this.parametrosEntrada.tabelaLucroReal.locacao.ipi / 100 : 0
-                        }
+                        //ANTES DA REFORMA PF não são cobrados impostos 
+                        icms = 0
+                        iss = 0
+                        pisCo = 0
+                        ipi = 0
                         aliquotaDesonerar = pisCo + iss + icms + ipi
+                        
+                        // CRÉDITO ATUAL: ANTES DA REFORMA PF NÃO TEM CRÉDITO
+                        creditoAtual = 0
 
-                        // CRÉDITO ATUAL (antes da reforma): como o outro é o locatário:
-                        if(imovel.regimeOutro == 'Lucro Real' && imovel.residencial == false && (regimeAtual == "Lucro Presumido" || regimeAtual == "Lucro Real")){
-                            console.log("tem crédito atual de: ")
-                            creditoAtual = valorBase * pisCo
-                            console.log(creditoAtual)
-                            console.log("aliquota usada para calcular o credito: " + pisCo)
-                        } 
-                      
                         //CRÉDITO NOVO (sempre olhamos para o locatário) - falta adicionar ou pf-regime regular
                         // Nós não sabemos se o simples (mesmo sendo nosso cliente) vai ser regime regular ou não, logo vamos colocar que tem crédito por padrao, mas na hora de apresentar os resultados, precisamos falar que ele terá crédito se ele optar, caso não será um custo
                         if(imovel.regimeOutro == 'Lucro Presumido' || imovel.regimeOutro == 'Lucro Real' || imovel.regimeOutro == "Simples Nacional"){
@@ -898,10 +520,9 @@ export class CalcularPessoaFisicaUseCase{
                         }
                     }
 
-
-                    // valor impostos ANTES da reforma
-                    // Aqui o valor base já tem que estar com a redução??
+                    // usando a aliquotaDesonerar definida acima pra achar o valorImpostosAtuais
                     valorImpostosAtuais = valorBase * aliquotaDesonerar
+
                     console.log("valor dos impostos atuais (a desonerar): " + valorImpostosAtuais)
                     let valorDesonerado = valorBase - valorImpostosAtuais
                     console.log("valor desonerado: " + valorDesonerado)
@@ -919,7 +540,7 @@ export class CalcularPessoaFisicaUseCase{
 
 
                     anoAano.forEach(objAno => {
-                      if(objAno.ano == "2026"){
+                      if(objAno.ano == "A2026"){
 
                       }else{
                         // SIMULAÇÃO 1 (Nela usar valorBaseNovosTributosSimu1 como base, e na simu2 usar o valorDesonerado)
@@ -998,7 +619,7 @@ export class CalcularPessoaFisicaUseCase{
 
                             // Calcular custo
                             // Só tem que conferir creditoIVA se for condominio embutido e quem paga não é simples nacional (esse é o único caso que eu tenho certeza se tem ou não crédito através da variavel temCreditoIva)
-                            if(imovel.condominioEmbutido && !((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional") || (imovel.tipoAluguel == "Aluguel pago" && regimeAtual == "Simples Nacional"))){
+                            if(imovel.condominioEmbutido && !((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional"))){
                                 if(temCreditoIva){
                                   creditoAnoVigente = valorIvaAnoVigente
                                   custoAnoVigente = novoValorAnoVigente - creditoAnoVigente
@@ -1127,7 +748,7 @@ export class CalcularPessoaFisicaUseCase{
                               // Não destacado
 
                               // Se quem tá pagando aluguel é do SIMPLES NACIONAL
-                              if((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional") || (imovel.tipoAluguel == "Aluguel pago" && regimeAtual == "Simples Nacional")){
+                              if((imovel.tipoAluguel == 'Aluguel recebido' && imovel.regimeOutro == "Simples Nacional")){
 
                                 // Como é simples nacional, eu não tenho certeza se tem crédito ou não então tenho que apresentar os dois casos
                                   // SIMULAÇÃO 1

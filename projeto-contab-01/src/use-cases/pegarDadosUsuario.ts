@@ -2,7 +2,7 @@ import { compare } from "bcryptjs";
 import { UsersRepository } from "../repositories/users-repository";
 import { CredencialInvalidaErro } from "./errors/credencial-invalida-erro";
 import { User } from "@prisma/client";
-import { recursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
+import { RecursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
 
 interface AutenticacaoUsuarioRequest {
     userId: string,
@@ -26,7 +26,7 @@ export class pegarDadosUsuarioUseCase{
         const user = await this.usersRepository.findById(userId)
 
         if(!user){
-            throw new recursoNaoEncontradoErro()
+            throw new RecursoNaoEncontradoErro()
         }
 
         return {

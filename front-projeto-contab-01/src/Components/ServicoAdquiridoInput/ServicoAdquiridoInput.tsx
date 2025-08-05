@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useContext, useEffect, useRef } from "react"
+import { Dispatch, SetStateAction, useState, useContext, useEffect, useRef, ChangeEvent } from "react"
 import { objAtividadesAdquitidasType } from "../SegundoPasso/SegundoPasso"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro"
@@ -9,6 +9,7 @@ import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import { metodosType } from "../SegundoPasso/SegundoPasso"
 import { Xis } from "../Xis/Xis"
 import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 
 type Props = {
@@ -28,7 +29,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
     const [metodoAdd, setMetodoAdd] = useState<metodosType>()
     const [operacaoAdd, setOperacaoAdd] = useState<string>("")
     const [cnpjAdquiridoAdd, setCnpjAdquiridoAdd] = useState<string>()
-    const [cnpjFaturamentoAdd, setCnpjFaturamentoAdd] = useState<number>()
+    const [cnpjFaturamentoAdd, setCnpjFaturamentoAdd] = useState<string>("")
     const [metodoAberto, setMetodoAberto] = useState<boolean>(false)
     const [operacaoAberto, setOperacaoAberto] = useState<boolean>(false)
     const [modalServicosTomadosAberto, setModalServicosTomadosAberto] = useState<boolean>(false)
@@ -106,7 +107,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
         setMetodoAdd(undefined)
         setOperacaoAdd("")
         setCnpjAdquiridoAdd(undefined)
-        setCnpjFaturamentoAdd(undefined)
+        setCnpjFaturamentoAdd("")
         setMetodoAberto(false)
         setOperacaoAberto(false)
         setTotalServicosTomadosModal([])
@@ -125,6 +126,23 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
             setTotalAtividadesAdquiridas(objTotalServAdqClone)
         }else{
             console.log("ID compoe custo não encontrado")
+        }
+    }
+
+    function mudarCnpjAdquirido(e: ChangeEvent<HTMLInputElement>){
+        const valorInput = e.target.value
+
+        if(valorInput === ""){
+            setCnpjAdquiridoAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            return 
+        }
+
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
+
+        if(regexStrNum.test(valorInput)){
+            setCnpjAdquiridoAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
+            return 
         }
     }
 
@@ -189,12 +207,11 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                     operacao = operacaoAdd
                     regimeTributario = "Simples Nacional"
                     cnpjPorOperacao = ""
-
                 }
             
                 const novoObj: objAtividadesAdquitidasType = {
                     cpfOuCnpj: cnpjAdquiridoAdd ? cnpjAdquiridoAdd : "",
-                    faturamento: cnpjFaturamentoAdd,
+                    faturamento: Number(cnpjFaturamentoAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                     id: idAtual,
                     regimeTributario,
                     cnaePrincipal: cnaePrincipalStr,
@@ -213,7 +230,7 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                 setMetodoAdd(undefined)
                 setOperacaoAdd("")
                 setCnpjAdquiridoAdd(undefined)
-                setCnpjFaturamentoAdd(undefined)
+                setCnpjFaturamentoAdd("")
                 setMetodoAberto(false)
                 setOperacaoAberto(false)
 
@@ -436,13 +453,13 @@ export function ServicoAdquiridoInput({setTotalAtividadesAdquiridas, totalAtivid
                                     metodoAdd == "Por CNPJ" &&
                                     <div className="flex flex-col gap-1">
                                         <label className="text-gray-400" htmlFor="cnpjAdquirido">Cnpj:</label>
-                                        <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-2" type="number" id="cnpjAdquirido" onChange={(e) => setCnpjAdquiridoAdd(e.target.value)}/>
+                                        <input value={cnpjAdquiridoAdd} className="outline-none rounded-md border-2 border-solid border-gray-300 p-2" type="text" id="cnpjAdquirido" onChange={mudarCnpjAdquirido}/>
                                     </div>
                                 }
 
                                 <div className="flex flex-col gap-1">
                                     <label className="text-gray-400" htmlFor="cnpjFaturamento">Valor Total:</label>
-                                    <input value={cnpjFaturamentoAdd} className="outline-none p-2 rounded-md border-2 border-solid border-gray-300" type="number" id="cnpjFaturamento" onChange={(e) => setCnpjFaturamentoAdd(Number(e.target.value))}/>
+                                    <InputFinanceiro stateValor={cnpjFaturamentoAdd} onValueChange={(values) => setCnpjFaturamentoAdd(values.formattedValue)} />
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <label className="text-gray-400 opacity-0" htmlFor="cnpjFaturamento">Valor Total:</label>

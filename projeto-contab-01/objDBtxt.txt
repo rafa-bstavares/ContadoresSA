@@ -1,0 +1,27 @@
+                    // criando obj atual banco de dados
+                    const antesReformaId = uuidv4()
+                    const objARCategoriaItem: Prisma.AntesReformaCategoriaUncheckedCreateInput = criarARCategoria({
+                      id: antesReformaId,
+                      calculoId: calculoId,
+                      regimeId: regimeId,
+                      categoriaId: categoriaId,
+                      valor: valorBase,
+                      desonerado: valorDesonerado,
+                      impostos: valorImpostosAtuais,
+                      porcentagemCargaTributaria: porcentagemCargaTributariaAR,
+                      custo: imovel.tipoAluguel == "Aluguel pago" ? custoAtual : null
+                    })
+                    estruturaDbAntesReformaCategoria.push(objARCategoriaItem)
+
+
+                            // obj banco de dados
+                            const objDRCategoriasItemAnoVigente = criarDRCategoria({
+                              antesReformaCategoriaId: antesReformaId,
+                              ano: "A" + objAno.ano as AnosType,
+                              valor: novoValorAnoVigente,
+                              valorSemIva: valorSemIvaAnoVigente,
+                              impostos: valorImpostosAnoVigente,
+                              porcentagemCargaTributaria: porcentagemCargaTributariaAnoVigente,
+                              custo: custoAnoVigente
+                            })
+                            estruturaDbDepoisReformaCategoria.push(objDRCategoriasItemAnoVigente)

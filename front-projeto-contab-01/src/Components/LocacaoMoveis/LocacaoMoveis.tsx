@@ -11,6 +11,7 @@ import { ContextoMoveis, MoveisLocacaoObj } from "../../Contextos/ContextoMoveis
 import { Xis } from "../Xis/Xis"
 import { ToggleButtonMapeado } from "../ToggleButtonMapeado/ToggleButtonMapeado"
 import { ToggleButton } from "../ToggleButton/ToggleButton"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 type Props = {
     modoBranco: boolean
@@ -155,13 +156,13 @@ export default function LocacaoMoveis({modoBranco}: Props){
 
             const novoArr = [...totalMoveisModal]
             const novoObjAtual: MoveisLocacaoObj = {
-                valorLocacao: Number(valorLocacaoAdd),
+                valorLocacao: Number(valorLocacaoAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 tipoAluguel: tipoAluguelAdd,
                 tipoOutraParte: tipoOutroAdd,
                 prazoDeterminado: prazoDeterminadoAdd,
                 comOperador: comOperadorAdd,
                 creditaPisCofins: creditaPisCofinsAdd,
-                valorMaoObra: temMaoDeObra ? Number(valorLocacaoAdd) : 0 ,
+                valorMaoObra: temMaoDeObra ? Number(valorLocacaoAdd.slice(3).replace(/\./g, "").replace(",", ".")) : 0 ,
                 compoeCusto: false,
                 regimeOutro: tipoOutroAdd == "Pessoa física" ? "Pessoa Fisica" : regimeOutroAdd ? regimeOutroAdd : "Simples Nacional",
                 id: idAtual 
@@ -754,13 +755,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                     <div>Valor Locação</div>
                                     <div className="text-gray-400 text-sm">(Se a locação incluir mão de obra, considere o valor total com a mão de obra já incorporada ao valor da locação.)</div>
                                 </label>
-                                <input
-                                    className="outline-none rounded-md border-2 border-solid border-gray-300 p-1"
-                                    type="number"
-                                    id="valorAluguel"
-                                    value={valorLocacaoAdd}
-                                    onChange={mudarValorLocacaoAdd}
-                                />
+                                <InputFinanceiro stateValor={valorLocacaoAdd} onValueChange={(values) => setValorLocacaoAdd(values.formattedValue)} />
                             </div>
                         
                             {
@@ -772,12 +767,7 @@ export default function LocacaoMoveis({modoBranco}: Props){
                                 > 
                                     Valor Mão de Obra
                                 </label>
-                                <input
-                                    className="outline-none rounded-md border-2 border-solid border-gray-300 p-1"
-                                    type="number"
-                                    id="valorAluguel"
-                                    onChange={mudarValorMaoObraAdd}
-                                />
+                                <InputFinanceiro stateValor={valorMaoObraAdd} onValueChange={(values) => setValorMaoObraAdd(values.formattedValue)} />
                             </div>
                             }
 

@@ -16,6 +16,8 @@ import { editarEmpresaController } from "./controllers/editarEmpresaController";
 import { beneficiosController } from "./controllers/beneficiosController";
 import { xmlProdutosVendidosController } from "./controllers/xmlProdutosVendidosController";
 import { xmlProdutosAdquiridosController } from "./controllers/xmlProdutosAdquiridosController";
+import { pegarResultadoController } from "./controllers/pegarResultadoController";
+import { pegarResultadosSalvosController } from "./controllers/pegarResultadosSalvosController";
 
 
 export async function appRoutes(app: FastifyInstance){
@@ -43,6 +45,10 @@ export async function appRoutes(app: FastifyInstance){
 
     app.post("/xmlProdutosVendidos", xmlProdutosVendidosController)
     app.post("/xmlProdutosAdquiridos", xmlProdutosAdquiridosController)
+
+    app.post("/pegarResultado", {onRequest: [verifyJWT]}, pegarResultadoController)
+
+    app.get("/pegarResultadosSalvos", {onRequest: [verifyJWT]}, pegarResultadosSalvosController)
 
     app.get("/lerXlsx", (request: FastifyRequest, reply: FastifyReply) => {
 

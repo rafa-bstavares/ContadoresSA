@@ -4,7 +4,7 @@ import ServicoInput from '../ServicoPrestadoInput/ServicoPrestadoInput'
 import Locacao from "../Locacao/Locacao"
 import CompraEVendaImoveis from "../CompraEVendaImoveis/CompraEVendaImoveis"
 import Servicos from '../Servicos/Servicos'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, ChangeEvent } from 'react'
 import { BotaoGeral } from '../BotaoGeral/BotaoGeral'
 import { baseUrl } from '../../App'
 import { ContextoParametrosOpcionais, objAreas } from '../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais'
@@ -145,6 +145,7 @@ export function SegundoPasso({modoBranco}: Props){
     const [totalAtividadesAdquiridas, setTotalAtividadesAdquiridas] = useState<objAtividadesAdquitidasType[]>([])
     const [modalPerguntaBeneficiosAberto, setModalPerguntaBeneficiosAberto] = useState<boolean>(false)
     const [modalBeneficiosAberto, setModalBeneficiosAberto] = useState<boolean>(false)
+    const [nomeCalculo, setNomeCalculo] = useState<string>("")
     const [objIsChecked, setObjIsChecked] = useState<objIsCheckedType>({
         isCheckedImoveis: false,
         isCheckedServicos: false,
@@ -310,10 +311,8 @@ export function SegundoPasso({modoBranco}: Props){
             if(objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa"){
                 if(objMinhaEmpresaOuPessoaAtual.cnpj && objMinhaEmpresaOuPessoaAtual.folha ){ // && (arrInfosEmpresa.length > 0)       
                     
-                    fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
-                        method: "POST",
-                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
-                        body: JSON.stringify({
+                    const bodyCalcular = {
+                            nomeCalculo,
                             tipoUsuario: "Empresa",
                             cnpj: objMinhaEmpresaOuPessoaAtual.cnpj,
                             folha: objMinhaEmpresaOuPessoaAtual.folha.toString(),
@@ -326,7 +325,15 @@ export function SegundoPasso({modoBranco}: Props){
                             totalMoveisLocacao,
                             totalProdutosVendidos,
                             totalProdutosAdquiridos
-                        })
+                        }
+
+                        console.log("BODY CALCULAR")
+                        console.log(bodyCalcular)
+
+                    fetch(baseUrl + "/calcularDiagnosticoSimplificado", {
+                        method: "POST",
+                        headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
+                        body: JSON.stringify(bodyCalcular)
                     }).then(res => res.json()).then((data: respostaApiType) => {
                         console.log("retorno do calcular simplificado")
                         console.log(data)
@@ -347,6 +354,7 @@ export function SegundoPasso({modoBranco}: Props){
                         method: "POST",
                         headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : "", "Content-Type": "application/json"},
                         body: JSON.stringify({
+                            nomeCalculo,
                             tipoUsuario: "Pessoa Física",
                             cpf: objMinhaEmpresaOuPessoaAtual.cpf,
                             parametrosEntrada,
@@ -381,6 +389,10 @@ export function SegundoPasso({modoBranco}: Props){
     function abrirModalBeneficios(){
         setModalBeneficiosAberto(true)
         setModalPerguntaBeneficiosAberto(false)
+    }
+
+    function mudarNomeCalculo(e: ChangeEvent<HTMLInputElement>){
+        setNomeCalculo(e.target.value)
     }
 
 
@@ -421,6 +433,9 @@ export function SegundoPasso({modoBranco}: Props){
 
     return (
         <div className='w-full'>
+            <div>
+                <input type="text" className="outline-none p-2 border-b-2 border-solid border-white/20 text-2xl" placeholder="Nomeie o calculo" value={nomeCalculo} onChange={mudarNomeCalculo} />
+            </div>
             <div className='flex gap-14 my-12 flex-wrap'>
                 <ProdutosBotao objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} />
                 <Servicos objIsChecked={objIsChecked} setObjIsChecked={setObjIsChecked} totalAtividadesAdquiridas={totalAtividadesAdquiridas} setTotalAtividadesAdquiridas={setTotalAtividadesAdquiridas} setTotalAtividadesPrestadas={setTotalAtividadesPrestadas} totalAtividadesPrestadas={totalAtividadesPrestadas} arrInfosEmpresa={arrInfosEmpresa} setArrInfosEmpresa={setArrInfosEmpresa} cnaes={objMinhaEmpresaOuPessoaAtual.tipoUsuario == "Empresa" ? objMinhaEmpresaOuPessoaAtual.cnaes : arrVazio}/>

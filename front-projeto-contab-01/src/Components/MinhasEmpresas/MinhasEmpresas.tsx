@@ -30,7 +30,7 @@ export function MinhasEmpresas(){
         
         async function buscarDadosMinhasEmpresas(){
             try{
-                const resp = await fetch(baseUrl + "/minhasEmpresas")
+                const resp = await fetch(baseUrl + "/minhasEmpresas", {headers: {"authorization": localStorage.getItem("authToken")? `Bearer ${localStorage.getItem("authToken")}` : ""}})
                 const data = await resp.json()
 
                 console.log("resposta minhas empresas meus dados")

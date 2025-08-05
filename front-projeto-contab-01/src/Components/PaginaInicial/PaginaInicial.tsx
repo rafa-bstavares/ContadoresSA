@@ -50,6 +50,7 @@ export function PaginaInicial(){
 
     return (
         <div className="transition-bg relative flex flex-col items-start  w-full min-h-[100vh] justify-center bg-premiumBg text-white">
+            {/*
             <div className={`absolute h-screen top-0 left-0 right-0 overflow-hidden opacity-60 -index-1`}
                     style={
                             {
@@ -80,7 +81,7 @@ export function PaginaInicial(){
                         ></div>
                         
             </div>
-
+            */}
             <Menu/>
 
             <div className='flex w-full text-white'>
@@ -92,7 +93,7 @@ export function PaginaInicial(){
                 </div>
                 <div className='flex-1 min-h-[100vh] rounded-tl-2xl overflow-hidden'>
                 
-                    <div className="relative min-h-[100vh] w-full flex flex-col items-center justify-between font-fontePrincipal">
+                    <div className="relative min-h-[100vh] w-full flex flex-col items-center justify-between font-fontePrincipal [background-color:hsla(0,0%,7%,1)] [background-image:radial-gradient(at_48%_44%,hsla(24,0%,18%,1)_0px,transparent_50%),radial-gradient(at_79%_0%,hsla(189,0%,7%,1)_0px,transparent_50%),radial-gradient(at_0%_50%,hsla(350,0%,7%,1)_0px,transparent_50%),radial-gradient(at_86%_45%,hsla(340,0%,18%,1)_0px,transparent_50%),radial-gradient(at_0%_100%,hsla(16,0%,7%,1)_0px,transparent_50%),radial-gradient(at_80%_100%,hsla(240,0%,7%,1)_0px,transparent_50%),radial-gradient(at_0%_0%,hsla(343,0%,7%,1)_0px,transparent_50%)]">
                         {/*<div className="flex justify-center items-center text-8xl h-[100vh] w-2/3 text-center">
                             Tudo sobre a reforma tributária em um só lugar
                         </div>*/}

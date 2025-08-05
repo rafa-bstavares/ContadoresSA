@@ -1,7 +1,7 @@
-import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useState } from "react"
 import xis from "../../assets/images/xisContab.svg"
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral"
-import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoObj, ProdutoVendidoManualObj, ProdutoVendidoXmlObj } from "../../Contextos/ContextoProduto/ContextoProduto"
+import { ContextoProduto, tipoOperacaoVendidoArr, TipoOperacaoVendidoType, ProdutoVendidoManualObj, ProdutoVendidoXmlObj } from "../../Contextos/ContextoProduto/ContextoProduto"
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
 import uploadImg from "../../assets/images/uploadImg.svg"
 import lixeira from "../../assets/images/lixeira.svg"
@@ -11,6 +11,7 @@ import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral"
 import { ContextoParametrosOpcionais } from "../../Contextos/ContextoParametrosOpcionais/ContextoParametrosOpcionais"
 import { Xis } from "../Xis/Xis"
 import { baseUrl } from "../../App"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 
 
@@ -338,7 +339,7 @@ export function ProdutosVendidosInput(){
                 ipi: ipi ? Number(ipi.replace(",", ".")) : 0,
                 ncm: ncmGenerico ? "" : ncmAdd,
                 pisCofins: pisCofins ? Number(pisCofins.replace(",", ".")) : 0,
-                valorOperacao: Number(valorOperacaoAdd),
+                valorOperacao: Number(valorOperacaoAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 beneficio: 0,
                 manterBeneficio: true,
                 descricaoAnexo: "",
@@ -389,15 +390,14 @@ export function ProdutosVendidosInput(){
 
     function mudarNcmAdd(e: ChangeEvent<HTMLInputElement>){
         const valorInput = e.target.value
-        console.log("VALOR NA MUDANÇA DO NCM")
-        console.log(valorInput)
 
         if(valorInput === ""){
             setNcmAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
             return 
         }
 
-        const regexStrNum = /^\d*(?:[.,]\d*)?$/
+        // PARA QUE ESSE REGEX REALMENTE BLOQUEIE TUDO QUE NÃO É NUMERO O TYPE DO INPUT TEM QUE SER TEXT, SE FOR TYPE NUMBER VAI CONTINUAR VINDO VIRGULA, PONTO, ETC
+        const regexStrNum = /^\d*$/
 
         if(regexStrNum.test(valorInput)){
             setNcmAdd(valorInput.replace(",", "*").replace(".", ",").replace("*", "."))
@@ -518,6 +518,11 @@ export function ProdutosVendidosInput(){
 
     }, [tipoOperacaoAdd])
 
+    useEffect(() => {
+        console.log("mudou o valor Operação add ")
+        console.log(valorOperacaoAdd)
+    }, [valorOperacaoAdd])
+
 
     return (
         <div className="flex flex-col gap-2">
@@ -611,7 +616,7 @@ export function ProdutosVendidosInput(){
                                             </label>
                                             <input
                                                 className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                                type="number"
+                                                type="text"
                                                 id="ncm"
                                                 value={ncmAdd}
                                                 onChange={mudarNcmAdd}
@@ -664,13 +669,7 @@ export function ProdutosVendidosInput(){
                                     > 
                                         <div>Valor Operação</div>
                                     </label>
-                                    <input
-                                        className="outline-none rounded-md border-2 border-solid border-gray-300 p-2"
-                                        type="number"
-                                        id="valorAluguel"
-                                        value={valorOperacaoAdd}
-                                        onChange={mudarValorOperacaoAdd}
-                                    />
+                                    <InputFinanceiro stateValor={valorOperacaoAdd} onValueChange={(values) => setValorOperacaoAdd(values.formattedValue)} />
                                 </div>
 
                                 {

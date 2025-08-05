@@ -19,6 +19,7 @@ import { MoveisProvider } from './Contextos/ContextoMoveis/ContextoMoveis.tsx'
 import { ProdutoProvider } from './Contextos/ContextoProduto/ContextoProduto.tsx'
 import { ResultadoSimulador } from './Components/ResultadoSimulador/ResultadoSimulador.tsx'
 import { ResultadoSimuladorProvider } from './Contextos/ContextoResultadoSimulador/ContextoResultadoSimulador.tsx'
+import ResultadosSalvos from './Components/ResultadosSalvos/ResultadosSalvos.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -40,6 +41,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route path='/Perfil/DadosPessoais' element={<DadosPessoais/>}></Route>
               <Route path='/Perfil/MinhasEmpresas' element={<MinhasEmpresas/>}></Route>
               <Route path='/Perfil/Resultado' element={<ResultadoSimulador/>} ></Route>
+              <Route path='/Perfil/ResultadosSalvos' element={<ResultadosSalvos/>} ></Route>
             </Route>
             <Route path='/' element={<PaginaInicial/>}></Route>
           </Route>

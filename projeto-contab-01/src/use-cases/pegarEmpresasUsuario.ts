@@ -1,5 +1,5 @@
 import { Empresa, User } from "@prisma/client";
-import { recursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
+import { RecursoNaoEncontradoErro } from "./errors/recurso-nao-encontrado-erro";
 import { EmpresasRepository } from "../repositories/empresas-repository";
 import { CnaesRepository } from "../repositories/cnaes-repository";
 
@@ -23,7 +23,7 @@ export class pegarEmpresasUsuarioUseCase{
 
 async execute({ userId }: AutenticacaoUsuarioRequest): Promise<AutenticacaoUsuarioResponse> {
   const empresas = await this.empresasRepository.buscarTodasEmpresasUsuario(userId);
-  if (!empresas) throw new recursoNaoEncontradoErro();
+  if (!empresas) throw new RecursoNaoEncontradoErro();
 
   const arrFinal: EmpresaComCnaes[] = await Promise.all(
     empresas.map(async (item) => {

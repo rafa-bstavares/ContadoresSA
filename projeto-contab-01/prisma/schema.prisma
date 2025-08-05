@@ -13,6 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AnosType {
+  A2026
+  A2027
+  A2028
+  A2029
+  A2030
+  A2031
+  A2032
+  A2033
+}
+
 enum RegimeTributario {
   SIMPLES_NACIONAL @map("Simples Nacional")
   LUCRO_REAL       @map("Lucro Real")
@@ -29,13 +40,14 @@ model User {
   data_cadastro DateTime  @default(now())
   Company       Empresa[]
   cpf           String?   @unique
+  Calculo       Calculo[]
 
   @@map("users")
 }
 
 model Empresa {
-  id                            String           @id @default(uuid())
-  usuario                       User             @relation(fields: [usuario_id], references: [id])
+  id                            String              @id @default(uuid())
+  usuario                       User                @relation(fields: [usuario_id], references: [id])
   usuario_id                    String
   cnpj                          String
   folha                         String
@@ -49,6 +61,7 @@ model Empresa {
   regularidade                  Boolean?
   regime_tributario             RegimeTributario
   Cnae                          Cnae[]
+  CalculoPorEmpresa             CalculoPorEmpresa[]
 
   @@map("empresas")
 }
@@ -61,4 +74,313 @@ model Cnae {
   empresa_id String
 
   @@map("cnaes")
+}
+
+// TABELAS PARA COMPOR O RESULTADO DO CALCULO
+
+// infelizmente o prisma não permite fazer enums com valores com espaço, logo, para enviar a resposta final teremos que fazer algo como: tipoUsuarioDb == "Empresa" ? "Empresa" : "Pessoa Física"
+enum TipoUsuarioType {
+  Empresa
+  Pessoa_Física
+}
+
+model Calculo {
+  id                    String                  @id @default(uuid())
+  usuario               User                    @relation(fields: [usuario_id], references: [id])
+  usuario_id            String
+  nome_calculo          String
+  tipo_usuario          TipoUsuarioType
+  CalculoPorEmpresa     CalculoPorEmpresa[]
+  CalculoPorCpf         CalculoPorCpf[]
+  AntesReformaCategoria AntesReformaCategoria[]
+  AntesReformaCaixa     AntesReformaCaixa[]
+  AntesReformaDre       AntesReformaDre[]
+  AntesReformaCompras   AntesReformaCompras[]
+  AntesReformaVendas    AntesReformaVendas[]
+
+  @@map("calculos")
+}
+
+model CalculoPorEmpresa {
+  id         String  @id @default(uuid())
+  calculo    Calculo @relation(fields: [calculo_id], references: [id])
+  calculo_id String
+  empresa    Empresa @relation(fields: [empresa_id], references: [id])
+  empresa_id String
+
+  @@map("calculos_por_empresa")
+}
+
+model CalculoPorCpf {
+  id         String  @id @default(uuid())
+  calculo    Calculo @relation(fields: [calculo_id], references: [id])
+  calculo_id String
+  cpf        String
+
+  @@map("calculos_por_cpf")
+}
+
+// Detalhe: aqui tem que ser em camelCase porque eu vou usar os valores provenientes dessa coluna para acessar a propriedade dos regimes no objeto resposta final e no objeto resposta final elas estãop em camelCase, logo, para bater precisam estar iguais
+enum RegimesType {
+  simplesNacional
+  lucroPresumido
+  lucroReal
+}
+
+model Regime {
+  id                    String                  @id @default(uuid())
+  regime                RegimesType             @unique
+  AntesReformaCategoria AntesReformaCategoria[]
+  AntesReformaCaixa     AntesReformaCaixa[]
+  AntesReformaDre       AntesReformaDre[]
+  AntesReformaCompras   AntesReformaCompras[]
+  AntesReformaVendas    AntesReformaVendas[]
+
+  @@map("regimes")
+}
+
+// CATEGORIAS
+// Aqui precisa ser camelCase pelo mesmo motivo do RegimesType, pra já usar esse valor pra acessar as propriedades do objeto respostas final
+enum CategoriaType {
+  servicosPrestados
+  servicosTomados
+  locacaoBensMoveis
+  produtosVendidos
+  produtosAdquiridos
+  locacaoBensImoveis
+  compraVendaBensImoveis
+}
+
+model Categoria {
+  id                    String                  @id @default(uuid())
+  categoria             CategoriaType           @unique
+  AntesReformaCategoria AntesReformaCategoria[]
+
+  @@map("categorias")
+}
+
+model AntesReformaCategoria {
+  id                           String                   @id
+  regime                       Regime                   @relation(fields: [regime_id], references: [id])
+  regime_id                    String
+  categoria                    Categoria                @relation(fields: [categoria_id], references: [id])
+  categoria_id                 String
+  calculo                      Calculo                  @relation(fields: [calculo_id], references: [id])
+  calculo_id                   String
+  valor                        Decimal                  @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_impostos               Decimal                  @db.Decimal(18, 2)
+  valor_desonerado             Decimal                  @db.Decimal(18, 2)
+  porcentagem_carga_tributaria Decimal                  @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  custo                        Decimal?                 @db.Decimal(18, 2)
+  DepoisReformaCategoria       DepoisReformaCategoria[]
+
+  @@map("antes_reforma_categorias")
+}
+
+model DepoisReformaCategoria {
+  id                           String                @id @default(uuid())
+  antesReformaCategoria        AntesReformaCategoria @relation(fields: [antes_reforma_categoria_id], references: [id])
+  antes_reforma_categoria_id   String
+  ano                          AnosType // No prisma não podemos fazer um enum começar com numero, mesmo q ele seja uma string. Logo, precisamos salvar ao inves de 2026 no ano salvar A2026, logo, quando for salvar tem que colocar esse "A" e quando for consumir, tem que retirar, pois o front espera reveber esses anos sem o "A"
+  valor                        Decimal               @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_sem_iva                Decimal               @db.Decimal(18, 2)
+  valor_impostos               Decimal               @db.Decimal(18, 2)
+  porcentagem_carga_tributaria Decimal               @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  custo                        Decimal?              @db.Decimal(18, 2)
+
+  @@map("depois_reforma_categorias")
+}
+
+// TABELA CAIXA
+// Aqui precisa ser camelCase pelo mesmo motivo do RegimesType, pra já usar esse valor pra acessar as propriedades do objeto respostas final
+enum LinhasCaixaType {
+  fornecedores
+  tributosCredito
+  clientes
+  tributosDebito
+  tributosRecolhidos
+  saldoCredor
+  resultado
+  irCs
+  resultadoPosIrCs
+  resultadoSobreClientes
+}
+
+model CaixaLinha {
+  id                String              @id @default(uuid())
+  linha_caixa       LinhasCaixaType     @unique
+  AntesReformaCaixa AntesReformaCaixa[]
+
+  @@map("caixa_linhas")
+}
+
+model AntesReformaCaixa {
+  id                 String               @id
+  calculo            Calculo              @relation(fields: [calculo_id], references: [id])
+  calculo_id         String
+  regime             Regime               @relation(fields: [regime_id], references: [id])
+  regime_id          String
+  caixaLinha         CaixaLinha           @relation(fields: [linha_caixa_id], references: [id])
+  linha_caixa_id     String
+  valor              Decimal              @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  DepoisReformaCaixa DepoisReformaCaixa[]
+
+  @@map("antes_reforma_caixa")
+}
+
+model DepoisReformaCaixa {
+  id                     String            @id @default(uuid())
+  antesReformaCaixa      AntesReformaCaixa @relation(fields: [antes_reforma_caixa_id], references: [id])
+  antes_reforma_caixa_id String
+  ano                    AnosType
+  valor                  Decimal           @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+
+  @@map("depois_reforma_caixa")
+}
+
+// TABELA DRE
+// Aqui precisa ser camelCase pelo mesmo motivo do RegimesType, pra já usar esse valor pra acessar as propriedades do objeto respostas final
+enum LinhasDreType {
+  receitaBruta
+  deducoesTributos
+  custoGeral
+  lucroBruto
+  despesas
+  lucrosAntesIrCs
+  irCs
+  lucroLiquido
+}
+
+model DreLinha {
+  id              String            @id @default(uuid())
+  linha_dre       LinhasDreType     @unique
+  AntesReformaDre AntesReformaDre[]
+
+  @@map("dre_linhas")
+}
+
+model AntesReformaDre {
+  id               String             @id
+  calculo          Calculo            @relation(fields: [calculo_id], references: [id])
+  calculo_id       String
+  regime           Regime             @relation(fields: [regime_id], references: [id])
+  regime_id        String
+  dreLinha         DreLinha           @relation(fields: [linha_dre_id], references: [id])
+  linha_dre_id     String
+  valor            Decimal            @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  DepoisReformaDre DepoisReformaDre[]
+
+  @@map("antes_reforma_dre")
+}
+
+model DepoisReformaDre {
+  id                   String          @id @default(uuid())
+  antesReformaDre      AntesReformaDre @relation(fields: [antes_reforma_dre_id], references: [id])
+  antes_reforma_dre_id String
+  ano                  AnosType
+  valor                Decimal         @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+
+  @@map("depois_reforma_dre")
+}
+
+// TABELA TOTAL COMPAS
+// Aqui precisa ser camelCase pelo mesmo motivo do RegimesType, pra já usar esse valor pra acessar as propriedades do objeto respostas final
+enum LinhasTotalCompras {
+  comprasProdutos
+  servicosTomados
+  locacaoMoveis
+  locacaoImoveis
+  total
+}
+
+model ComprasLinha {
+  id                  String                @id @default(uuid())
+  linha_compras       LinhasTotalCompras    @unique
+  AntesReformaCompras AntesReformaCompras[]
+
+  @@map("compras_linhas")
+}
+
+model AntesReformaCompras {
+  id                              String                 @id
+  calculo                         Calculo                @relation(fields: [calculo_id], references: [id])
+  calculo_id                      String
+  regime                          Regime                 @relation(fields: [regime_id], references: [id])
+  regime_id                       String
+  comprasLinha                    ComprasLinha           @relation(fields: [linha_compras_id], references: [id])
+  linha_compras_id                String
+  valor_ar                        Decimal                @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  impostos_ar                     Decimal                @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_desonerado                Decimal                @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  credito_ar                      Decimal                @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  custo_ar                        Decimal                @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  porcentagem_custo_efetivo_ar    Decimal                @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  porcentagem_carga_tributaria_ar Decimal                @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  DepoisReformaCompras            DepoisReformaCompras[]
+
+  @@map("antes_reforma_compras")
+}
+
+model DepoisReformaCompras {
+  id                           String              @id @default(uuid())
+  antesReformaCompras          AntesReformaCompras @relation(fields: [antes_reforma_compras_id], references: [id])
+  antes_reforma_compras_id     String
+  ano                          AnosType
+  valor                        Decimal             @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_sem_iva                Decimal             @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  impostos                     Decimal             @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  credito                      Decimal             @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  custo                        Decimal             @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  porcentagem_custo_efetivo    Decimal             @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  porcentagem_carga_tributaria Decimal             @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+
+  @@map("depois_reforma_compras")
+}
+
+// TABELA TOTAL VENDAS
+// Aqui precisa ser camelCase pelo mesmo motivo do RegimesType, pra já usar esse valor pra acessar as propriedades do objeto respostas final
+enum LinhasTotalVendas {
+  vendasProdutos
+  servicosPrestados
+  locacaoMoveis
+  locacaoImoveis
+  total
+}
+
+model VendasLinha {
+  id                 String               @id @default(uuid())
+  linha_vendas       LinhasTotalVendas    @unique
+  AntesReformaVendas AntesReformaVendas[]
+
+  @@map("vendas_linhas")
+}
+
+model AntesReformaVendas {
+  id                              String                @id
+  calculo                         Calculo               @relation(fields: [calculo_id], references: [id])
+  calculo_id                      String
+  regime                          Regime                @relation(fields: [regime_id], references: [id])
+  regime_id                       String
+  vendasLinha                     VendasLinha           @relation(fields: [linha_vendas_id], references: [id])
+  linha_vendas_id                 String
+  valor_ar                        Decimal               @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  impostos_ar                     Decimal               @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_desonerado                Decimal               @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  porcentagem_carga_tributaria_ar Decimal               @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+  DepoisReformaVendas             DepoisReformaVendas[]
+
+  @@map("antes_reforma_vendas")
+}
+
+model DepoisReformaVendas {
+  id                           String             @id @default(uuid())
+  antesReformaVendas           AntesReformaVendas @relation(fields: [antes_reforma_vendas_id], references: [id])
+  antes_reforma_vendas_id      String
+  ano                          AnosType
+  valor                        Decimal            @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  valor_sem_iva                Decimal            @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  impostos                     Decimal            @db.Decimal(18, 2) // aceita até 999 trilhões com 2 casas 
+  porcentagem_carga_tributaria Decimal            @db.Decimal(5, 4) // aceita de 0.0000 até 9.9999, como vamos salvar apenas porcentagens de 0 até 100%, ou seja, de 0.0000 até 1.0000, atende
+
+  @@map("depois_reforma_vendas")
 }

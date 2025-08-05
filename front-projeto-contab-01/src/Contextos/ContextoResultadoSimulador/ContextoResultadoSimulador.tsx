@@ -63,8 +63,8 @@ export type linhasDreType = {
   despesas: {AR: number, DR: number},
 }
 
-export type anosType = "2026" | "2027" | "2028" | "2029" | "2030" | "2031" | "2032" | "2033"
-export const arrAnos: anosType[] = ["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]
+export type anosType = "A2026" | "A2027" | "A2028" | "A2029" | "A2030" | "A2031" | "A2032" | "A2033"
+export const arrAnos: anosType[] = ["A2026", "A2027", "A2028", "A2029", "A2030", "A2031", "A2032", "A2033"]
 
 
 type objDepoisReformaDreCaixa = {

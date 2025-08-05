@@ -4,6 +4,9 @@ import {nullable, z} from "zod"
 import { RegimeTributario } from "@prisma/client";
 import { PrismaEmpresaRepository } from "../../repositories/prisma/prisma-empresas-repository";
 import { CalcularPessoaFisicaUseCase } from "../../use-cases/calcularPessoaFisicaUseCase";
+import { PrismaRespostaGeralRepository } from "../../repositories/prisma/prisma-resposta-geral-repository";
+import { PrismaRespostaCategoriasRepository } from "../../repositories/prisma/prisma-resposta-categorias-repository";
+import { PrismaRespostaTabelasRepository } from "../../repositories/prisma/prisma-resposta-tabelas-repository";
 
 
 
@@ -180,6 +183,7 @@ export const objParametrosEntradaBodyType = z.object({
 
 
 export const empresaBody = z.object({
+    nomeCalculo: z.string(),
     tipoUsuario: z.literal("Empresa"),
     cnpj: z.string(),
     folha: z.string(),
@@ -202,6 +206,7 @@ export const empresaBody = z.object({
 })
 
 export const pessoaBody = z.object({
+    nomeCalculo: z.string(),
     tipoUsuario: z.literal("Pessoa Física"),
     cpf: z.string(),
     parametrosEntrada: z.object({
@@ -235,13 +240,15 @@ export async function calcularSimplificadoController(request: FastifyRequest, re
     try{
 
         const empresaRepo = new PrismaEmpresaRepository
+        const respGeralRepo = new PrismaRespostaGeralRepository
+        const respCategoriasRepo = new PrismaRespostaCategoriasRepository
+        const respTabelasRepo = new PrismaRespostaTabelasRepository
         let calcularSimplificado
 
         if(body.tipoUsuario == "Empresa"){
-            calcularSimplificado = new calcularSimplificadoUseCase(empresaRepo, body.cnpj, body.totalAtividadesPrestadas, body.parametrosEntrada, body.totalAtividadesAdquiridas, body.totalImoveisLocacao, body.totalImoveisCompraVenda, body.totalMoveisLocacao, body.totalProdutosVendidos, body.totalProdutosAdquiridos, body.meuRegime)
+            calcularSimplificado = new calcularSimplificadoUseCase(request.user.sub, respTabelasRepo, respGeralRepo, respCategoriasRepo, empresaRepo, body.cnpj, body.totalAtividadesPrestadas, body.parametrosEntrada, body.totalAtividadesAdquiridas, body.totalImoveisLocacao, body.totalImoveisCompraVenda, body.totalMoveisLocacao, body.totalProdutosVendidos, body.totalProdutosAdquiridos, body.meuRegime, body.nomeCalculo)
         }else{
-            calcularSimplificado = new CalcularPessoaFisicaUseCase(body.cpf, body.totalImoveisLocacao, body.totalMoveisLocacao, body.parametrosEntrada)
-            
+            calcularSimplificado = new CalcularPessoaFisicaUseCase(body.cpf, body.totalImoveisLocacao, body.totalMoveisLocacao, body.parametrosEntrada, body.nomeCalculo)
         }
 
 

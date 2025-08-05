@@ -8,6 +8,7 @@ import lixeira from "../../assets/images/lixeira.svg"
 import { DatePicker } from "../DatePicker/DatePicker"
 import BrDatePicker from "../BrDatePicker/BrDatePicker"
 import { Xis } from "../Xis/Xis"
+import { InputFinanceiro } from "../InputFinanceiro/InputFinanceiro"
 
 
 
@@ -255,8 +256,8 @@ export default function CompraEVendaImoveis(){
             const novoArr = [...totalImoveisCompraModal]
             const novoObjAtual: ImoveisCompraVendaObj = {
                 residencial: residencialAdd,
-                valorVendaImovel: Number(valorVendaImovelAdd),
-                valorAquisicao: Number(valorAquisicaoAdd),
+                valorVendaImovel: Number(valorVendaImovelAdd.slice(3).replace(/\./g, "").replace(",", ".")),
+                valorAquisicao: Number(valorAquisicaoAdd.slice(3).replace(/\./g, "").replace(",", ".")),
                 diaAquisicao: diaAquisicaoAdd,
                 mesAquisicao: mesAquisicaoAdd,
                 anoAquisicao: anoAquisicaoAdd,
@@ -484,12 +485,12 @@ export default function CompraEVendaImoveis(){
                                             {/* Cada novo input entra aqui */}
                                             <div className="flex flex-col ">
                                                 <label className="text-gray-400" htmlFor="valorImovel">Valor Venda:</label>
-                                                <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="valorImovel" onChange={(e) => mudarValorVendaImovelAdd(e)}/>
+                                                <InputFinanceiro stateValor={valorVendaImovelAdd} onValueChange={(values) => setValorVendaImovelAdd(values.formattedValue)} />
                                             </div>
 
                                             <div className="flex flex-col ">
                                                 <label className="text-gray-400" htmlFor="valorAquisicao">Valor Aquisição:</label>
-                                                <input className="outline-none rounded-md border-2 border-solid border-gray-300 p-1" type="number" id="valorAquisicao" onChange={(e) => mudarValorAquisicaoAdd(e)}/>
+                                                <InputFinanceiro stateValor={valorAquisicaoAdd} onValueChange={(values) => setValorAquisicaoAdd(values.formattedValue)} />
                                             </div>
 
                                             <DatePicker label="Data de Venda" id="Data de Venda" value={dataVendaAdd} onChange={(novaData) => setDataVendaAdd(novaData)}/>

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Empresa, Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { EmpresasRepository } from "../empresas-repository";
 
@@ -27,6 +27,17 @@ export class PrismaEmpresaRepository implements EmpresasRepository {
 
         return empresa
     }
+
+    async buscarEmpresaPorEmpresaId(empresaId: string): Promise<Empresa | null> {
+        const empresa = await prisma.empresa.findUnique({
+            where:{
+                id: empresaId
+            }
+        })
+        return empresa
+    }
+
+
 
     // Verifica se aquela empresa está cadastrada no nome do usuário que está mandando a requisição através do seu id
     async buscarEmpresaPorUsuarioId(usuario_id: string, cnpj: string){

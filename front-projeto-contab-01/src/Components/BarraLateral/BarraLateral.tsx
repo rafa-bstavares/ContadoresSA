@@ -1,5 +1,6 @@
 import { useContext, useState } from "react"
 import iconeSimulador from "../../assets/images/iconeSimulador.svg"
+import iconeResultados from "../../assets/images/iconeResultados.svg"
 import iconeSeta from "../../assets/images/setaBranca.svg"
 import { Link } from "react-router-dom"
 import { ContextoConfiguracoes } from "../../Contextos/ContextoConfiguracoes/ContextoConfiguracoes"
@@ -29,10 +30,13 @@ export function BarraLateral({modoBranco}: Props){
         setConfigAberta(!configAberta)
     }
 
+    function trocarDropMeusDados(){
+        setDropMeusDados(!dropMeusDados)
+    }
+
     function cliqueMeusDados(){
         setBarraAberta(true)
-        setDropMeusDados(!dropMeusDados)
-
+        trocarDropMeusDados()
     }
 
     function abreFechaBarraLateral(){
@@ -63,6 +67,7 @@ export function BarraLateral({modoBranco}: Props){
 
     function fecharBarraLateral(){
         setBarraAberta(false)
+        setDropMeusDados(false)
     }
 
 
@@ -71,7 +76,7 @@ export function BarraLateral({modoBranco}: Props){
 
         
         <div className={`flex fixed h-screen z-40 pt-20 ${modoBranco ? "bg-white" : "bg-premiumBg"}`}>
-            <div className={`flex flex-col gap-6 p-4 overflow-hidden rounded-[30px]`}>
+            <div className={`flex flex-col gap-6 p-4 overflow-hidden rounded-[30px]` }>
                 <div>
                     <img onClick={abreFechaBarraLateral} className={` cursor-pointer h-7 object-cover mb-4 ${barraAberta ? "rotate-180" : "rotate-0"} transition duration-700 ease-in-out`} src={iconeSeta} alt="seta abre fecha menu lateral" />
                 </div>
@@ -80,7 +85,7 @@ export function BarraLateral({modoBranco}: Props){
                     <div className="cursor-pointer flex" onClick={fecharBarraLateral}>
 
                         <div className="w-[28px]">
-                            <img className="w-full object-cover" src={iconeSimulador} alt="icone Simulador" />
+                            <img className="w-full object-cover" src={iconeSimulador} alt="Icone simulador" />
                         </div>
                         <div className={`${barraAberta? "w-[10vw] pl-2" : "w-0 pl-0"} overflow-hidden transition-[width,padding-left] duration-700 ease-in-out`}>
                             Simulador
@@ -88,8 +93,20 @@ export function BarraLateral({modoBranco}: Props){
                     </div>
                 </Link>
 
+                <Link to="/Perfil/ResultadosSalvos">
+                    <div className="cursor-pointer flex" onClick={fecharBarraLateral}>
+
+                        <div className="w-[28px]">
+                            <img className="w-full object-cover" src={iconeResultados} alt="Icone resultados" />
+                        </div>
+                        <div className={`${barraAberta? "w-[10vw] pl-2" : "w-0 pl-0"} overflow-hidden transition-[width,padding-left] duration-700 ease-in-out`}>
+                            Resultados
+                        </div>
+                    </div>
+                </Link>
+
                 
-                <div className="cursor-pointer flex-col" >
+                <div className="cursor-pointer flex-col">
                     <div className="flex" onClick={cliqueMeusDados}>
                         <div className="w-[28px]">
                             <img className="w-full object-cover" src={dadosImg} alt="configurações" />

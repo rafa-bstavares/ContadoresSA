@@ -6,6 +6,8 @@ export interface EmpresasRepository {
 
     buscarEmpresa(cnpj: string): Promise<Empresa | null>
 
+    buscarEmpresaPorEmpresaId(empresaId: string): Promise<Empresa | null>
+
     buscarEmpresaPorUsuarioId(usuario_id: string, cnpj: string): Promise<Empresa | null>
 
     buscarTodasEmpresasUsuario(usuario_id: string): Promise<Empresa[] | null>
