@@ -53,9 +53,7 @@ export default function ModalLogin(){
                 px-20 py-10
                 w-[30vw]
                 rounded-2xl
-                border border-[#ffffff22]
-                ring-1 ring-[#FFDD00]/30
-                shadow-[0_0_40px_#FFDD0055]
+                border-solid border-2 border-[#FFDD00]/30
                 bg-[radial-gradient(ellipse_90%_55%_at_50%_-15%,_#695c0095,_rgb(18,18,18)_80%)]
                 backdrop-blur-2xl
                 text-white

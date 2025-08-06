@@ -1,7 +1,9 @@
 import { Multipart, MultipartFile} from "@fastify/multipart";
 import { XMLParser } from "fast-xml-parser";
 import { custoDespesaType, MetodoAdquiridoType, ProdutoAdquiridoXmlObj, ProdutoVendidoXmlObj } from "./calcularSimplificadoUseCase";
-import * as XLSX from 'xlsx';
+
+import ExcelJS from "exceljs"
+import { worksheetToJson } from "./beneficiosUseCase";
 
 type ProdutoFinal = Omit<ProdutoAdquiridoXmlObj, "id">
 
@@ -106,7 +108,7 @@ export class XmlProdutosAdquiridosUseCase{
                 const prod = item.prod
                 const cfop = (prod?.CFOP || 0)
                 if(cfop){
-
+                    /*
                     // Encontrar linha CFOP
                     const filePath = "src/xlsx/BD CFOP.xlsx";
 
@@ -119,8 +121,18 @@ export class XmlProdutosAdquiridosUseCase{
                     // Converter os dados da planilha para um array de objetos
                     // Se sua planilha possuir cabeçalhos, você pode omitir o header: 1
                     const data = XLSX.utils.sheet_to_json<linhaTabelaCFOP>(worksheet)
+                    */
+                    const filePath = "src/xlsx/BD CFOP.xlsx";
+                    const workbook = new ExcelJS.Workbook();
+                    await workbook.xlsx.readFile(filePath);
+                    const worksheetCfop = workbook.getWorksheet("CFOP Infos");
+                    let linhaCFOPAtual
+                    if(worksheetCfop){
+                        const data = worksheetToJson<linhaTabelaCFOP>(worksheetCfop)
+                        linhaCFOPAtual = data.find(linhaCFOP => linhaCFOP["CFOP"] == cfop)
+                    }
 
-                    const linhaCFOPAtual = data.find(linhaCFOP => linhaCFOP["CFOP"] == cfop)
+
 
                     if(linhaCFOPAtual){
                         // Só é pra calcular pros casos de coluna reforma tributaria no CFOP ser "Sim" e caso o tipo operação seja industrial ou comercial

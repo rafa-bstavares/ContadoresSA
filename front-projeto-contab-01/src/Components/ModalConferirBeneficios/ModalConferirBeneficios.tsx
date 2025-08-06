@@ -1,11 +1,12 @@
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { BotaoGeral } from "../BotaoGeral/BotaoGeral";
 import { objAtividadeFinal, objAtividadesAdquitidasType } from "../SegundoPasso/SegundoPasso";
-import * as XLSX from 'xlsx';
 import xis from "../../assets/images/xisContab.svg"
 import { ItemBeneficioCnae } from "../ItemBeneficioCnae/ItemBeneficioCnae";
 import { ContextoProduto } from "../../Contextos/ContextoProduto/ContextoProduto";
 import { ItemBeneficioNcm } from "../ItemBeneficioNcm/ItemBeneficioNcm";
+import ExcelJS from "exceljs"
+import { linhaTabelaCnae, worksheetToJson } from "../Servicos/Servicos";
 
 type ObjInfosType = {
     cnae: string,
@@ -146,6 +147,7 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
 
             const novoArrBeneficiosCnae: beneficiosPorCnaeType[] = []
     
+            /*
             // Supondo que o arquivo esteja em "public/data/arquivo.xlsx"
             const response = await fetch('src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx');
             const arrayBuffer = await response.arrayBuffer();
@@ -158,15 +160,34 @@ export function ModalConferirBeneficios({setTotalAtividadesAdquiridas,setTotalAt
 
             // Converte a planilha para um array de arrays (você pode ajustar conforme necessário)
             const jsonData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            */
+
+            const response = await fetch("src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx");
+            const buffer = await response.arrayBuffer();
+            const workbook = new ExcelJS.Workbook();
+            console.log("passou do workbook")
+            await workbook.xlsx.load(buffer);
+            console.log("passou do readFile")
+            const worksheetCnae = workbook.getWorksheet("CNAE SIMPLES NACIONAL");
+            console.log("passou do getWorksheet")
+            let data: linhaTabelaCnae[] = []
+            if(worksheetCnae){
+                data = worksheetToJson<linhaTabelaCnae>(worksheetCnae)
+            }
+
+
+            console.log("consolando totala saetjiasjnfioasndfioadnsifoansiodfnasdiof")
+            console.log(totalAtividadesAdquiridas)
 
             totalAtividadesAdquiridas.forEach(atividadeAdquirida => {
                 // Encontrar descrições de CNAES  
                 let descricaoAtividade: string = ""
-                const cnaesIguais = jsonData.filter(elem => elem[0] == atividadeAdquirida.cnaePrincipal)
+                const cnaesIguais = data.filter(elem => elem["CNAE"].text.toString() == atividadeAdquirida.cnaePrincipal)
                 // como ainda n to colocando a folha de pagamento (talvez por isso seja interessante fazer essa calculo no back) vou sempre pegar o primeiro
                 if(cnaesIguais.length > 0){
-                    // cnaesIguais[0][1] representa a coluna de descrição do cnae encontrado no xlsx
-                    descricaoAtividade = cnaesIguais[0][1] ? cnaesIguais[0][1] : ""
+                    descricaoAtividade = cnaesIguais[0]["Descrição"].text.richText[0].text
+                    console.log("cnaesIguais")
+                    console.log(cnaesIguais)
                 }
             
                 

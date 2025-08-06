@@ -1,11 +1,11 @@
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
-import * as XLSX from 'xlsx';
 import { objAtividadeFinal } from "../SegundoPasso/SegundoPasso";
 import { objAtividadesAdquitidasType } from "../SegundoPasso/SegundoPasso";
 import { ContextoGeral } from "../../Contextos/ContextoGeral/ContextoGeral";
 import iconeServicos from "../../assets/images/servicosBotaoBgBranco100.svg"
 import SetaNao from "../../Components/SetaNao/SetaNao"
 import { objIsCheckedType } from "../SegundoPasso/SegundoPasso";
+import ExcelJS from "exceljs"
 
 type objCnaesDesc = {
   cnae: string,
@@ -31,6 +31,44 @@ type ObjInfosType = {
     aliquota: string | number,
 }
 
+export type linhaTabelaCnae = {
+    "CNAE": {text: number, hyperlink: string},
+    "Descrição": {text: {richText: {font: any, text: string}[]} , hyperlink: string},
+    "Anexo": string,
+    "Fator R": string,
+    "Alíquota": number,
+    "Contabilizei": string
+}
+
+export function worksheetToJson<T>(worksheet: ExcelJS.Worksheet): T[] {
+    const data: T[] = [];
+    const headers: string[] = [];
+    
+    // Pega headers da primeira linha
+    const firstRow = worksheet.getRow(1);
+    firstRow.eachCell((cell, colNumber) => {
+        headers[colNumber - 1] = cell.text;
+    });
+    
+    // Processa as outras linhas
+    for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
+        const row = worksheet.getRow(rowNumber);
+        const rowData: any = {};
+        
+        row.eachCell((cell, colNumber) => {
+            const header = headers[colNumber - 1];
+            if (header) {
+                rowData[header] = cell.value;
+            }
+        });
+        
+        if (Object.keys(rowData).length > 0) {
+            data.push(rowData as T);
+        }
+    }
+    
+    return data;
+}
 
 export default function Servicos({cnaes, arrInfosEmpresa, setArrInfosEmpresa, totalAtividadesPrestadas, setTotalAtividadesPrestadas, setTotalAtividadesAdquiridas, totalAtividadesAdquiridas, objIsChecked, setObjIsChecked}: Props){
 
@@ -42,6 +80,8 @@ export default function Servicos({cnaes, arrInfosEmpresa, setArrInfosEmpresa, to
     async function buscarAtividadesPorCnae(){
         console.log("BUSCAR ATIVIDADES POR CNAE ACIONADA DE NOVO")
         try {
+            
+            /*
             // Supondo que o arquivo esteja em "public/data/arquivo.xlsx"
             const response = await fetch('src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx');
             const arrayBuffer = await response.arrayBuffer();
@@ -54,19 +94,45 @@ export default function Servicos({cnaes, arrInfosEmpresa, setArrInfosEmpresa, to
     
             // Converte a planilha para um array de arrays (você pode ajustar conforme necessário)
             const jsonData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            const novoArrInfos = [...arrInfosEmpresa]
+            */
             
-            cnaes.forEach(item => {
-                const cnaesIguais = jsonData.filter(elem => elem[0] == item)
-                // como ainda n to colocando a folha de pagamento (talvez por isso seja interessante fazer essa calculo no back) vou sempre pegar o primeiro
-                if(cnaesIguais.length > 0){
-                  const arrCnaeCorreto = cnaesIguais[0]
-                  const objAtual: ObjInfosType = {cnae: item, descricao: arrCnaeCorreto[1], anexo: arrCnaeCorreto[2], aliquota: arrCnaeCorreto[4]}
-                  novoArrInfos.push(objAtual)
-                }
-            })
+            const response = await fetch("src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx");
+            const buffer = await response.arrayBuffer();
+            const workbook = new ExcelJS.Workbook();
+            console.log("passou do workbook")
+            await workbook.xlsx.load(buffer);
+            console.log("passou do readFile")
+            const worksheetCnae = workbook.getWorksheet("CNAE SIMPLES NACIONAL");
+            console.log("passou do getWorksheet")
+            let data: linhaTabelaCnae[] = []
+            if(worksheetCnae){
+                data = worksheetToJson<linhaTabelaCnae>(worksheetCnae)
+            }
 
-            setArrInfosEmpresa(novoArrInfos)
+            console.log("DATA CNAES SERVICOS")
+            console.log(data)
+
+
+            if(data.length > 0){
+                const novoArrInfos = [...arrInfosEmpresa]
+                
+                console.log("VALOR CNAES PARA ITERAR ")
+                console.log(cnaes)
+
+                cnaes.forEach(item => {
+                    const cnaesIguais = data.filter(elem => elem["CNAE"].text.toString() == item)
+                    console.log("Linha cnae")
+                    console.log(cnaesIguais)
+                    // como ainda n to colocando a folha de pagamento (talvez por isso seja interessante fazer essa calculo no back) vou sempre pegar o primeiro
+                    if(cnaesIguais.length > 0){
+                        const arrCnaeCorreto = cnaesIguais[0]
+                        const objAtual: ObjInfosType = {cnae: item, descricao: arrCnaeCorreto["Descrição"].text.richText[0].text, anexo: arrCnaeCorreto["Anexo"], aliquota: arrCnaeCorreto["Alíquota"]}
+                        novoArrInfos.push(objAtual)
+                    }
+                })
+
+                setArrInfosEmpresa(novoArrInfos)
+            }
 
           } catch (error) {
             console.error('Erro ao carregar o arquivo Excel:', error);

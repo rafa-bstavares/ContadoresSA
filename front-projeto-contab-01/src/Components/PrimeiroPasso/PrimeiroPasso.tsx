@@ -5,7 +5,6 @@ import { ContextoGeral, tipoObjEmpresa, tipoObjPessoaFisica } from "../../Contex
 import { ContextoErro } from "../../Contextos/ContextoErro/ContextoErro";
 import { ContextoUsuario } from "../../Contextos/ContextoUsuario/ContextoUsuario";
 import setaSeletor from "../../assets/images/setaSeletor2.svg"
-import * as XLSX from 'xlsx';
 import { InputReais } from "../InputReais/InputReais";
 
 
@@ -753,39 +752,7 @@ export function PrimeiroPasso({modoBranco}: Props){
     }
 
     
-    async function buscarAtividadesPorCnae(cnaes: string[]){
-        try {
-            // Supondo que o arquivo esteja em "public/data/arquivo.xlsx"
-            const response = await fetch('src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx');
-            const arrayBuffer = await response.arrayBuffer();
-    
-            // Lê o workbook a partir do arrayBuffer
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    
-            // Se
-            const worksheet = workbook.Sheets["CNAE SIMPLES NACIONAL"];
-    
-            // Converte a planilha para um array de arrays (você pode ajustar conforme necessário)
-            const jsonData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            let arrFinalCnaes: cnaeDescricao[] = []
-            
-            cnaes.forEach(item => {
-                const cnaesIguais = jsonData.filter(elem => elem[0] == item)
-                // como ainda n to colocando a folha de pagamento (talvez por isso seja interessante fazer essa calculo no back) vou sempre pegar o primeiro
-                if(cnaesIguais.length > 0){
-                    const arrCnaeCorreto = cnaesIguais[0]
-                    const objAtual: cnaeDescricao = {cnae: arrCnaeCorreto[0], descricao: arrCnaeCorreto[1]}
-                    arrFinalCnaes.push(objAtual)
-                }
-            })
 
-            return arrFinalCnaes
-
-        } catch (error) {
-            setTemErro(true)
-            setTextoErro("Erro ao verificar excel CNAES")
-        }
-    }
 
     async function avancarEmpresaCadastrada(){
         const dadosEmpresaAtual = minhasEmpresas.filter(item => item.cnpj == cnpjMinhaEmpresaSeletor)

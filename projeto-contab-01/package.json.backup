@@ -30,7 +30,7 @@
     "dotenv": "16.4.7",
     "exceljs": "4.4.0",
     "fast-xml-parser": "5.2.5",
-    "fastify": "5.4.0",
+    "fastify": "5.2.1",
     "googleapis": "146.0.0",
     "react-router-dom": "7.5.3",
     "uuid": "11.1.0",

@@ -80,9 +80,8 @@ export function Configuracoes(){
     return (
         <div className="fixed top-0 left-0 h-screen w-screen bg-black/90 flex justify-center items-center [font-family:'Manrope',sans-serif]">
             <div className=" flex flex-col w-1/2 h-[90vh]  rounded-2xl
-                border border-[#ffffff22]
+                border-solid border-2 border-[#FFDD00]/30
                 ring-1 ring-[#FFDD00]/30
-                shadow-[0_0_40px_#FFDD0055]
                 bg-[radial-gradient(ellipse_90%_55%_at_50%_-15%,_#695c0095,_rgb(18,18,18)_80%)]
                 backdrop-blur-2xl relative p-4">
                 <div className="flex justify-end h-6 ">

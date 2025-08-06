@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { createUserController } from "./controllers/createUserController";
 import { xmlExampleFunction } from "../xmlExampleFunction";
 import { descricaoPorNcm } from "../descricaoPorNcm";
-import XLSX from "xlsx";
+
 import { FastifyRequest, FastifyReply } from "fastify";
 import { buscarEmpresaController } from "./controllers/buscarEmpresaController";
 import { criarEmpresaController } from "./controllers/criarEmpresaController";
@@ -50,18 +50,5 @@ export async function appRoutes(app: FastifyInstance){
 
     app.get("/pegarResultadosSalvos", {onRequest: [verifyJWT]}, pegarResultadosSalvosController)
 
-    app.get("/lerXlsx", (request: FastifyRequest, reply: FastifyReply) => {
-
- 
-
-        const tabelas = XLSX.readFile("src/xlsx/IMPACTOS RT PILOTO FELIPE.xlsx")
-        const anexoPorCnae = tabelas.Sheets["CNAE SIMPLES NACIONAL"]  
-        const anexoPorCnaeFinal = XLSX.utils.sheet_to_json(anexoPorCnae)
-
-
-        console.log(anexoPorCnaeFinal)
-
-        return reply.status(200).send()
-    })
 
 }
