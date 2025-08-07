@@ -14,7 +14,9 @@ import { cn } from './utils/cn';
 import { ContextoLogin } from './Contextos/ContextoLogin/ContextoLogin';
 
 
-export const baseUrl = "http://localhost:3333"
+export const baseUrl = import.meta.env.VITE_API_URL
+console.log("baseUrl")
+console.log(baseUrl)
 
 
 function App() {

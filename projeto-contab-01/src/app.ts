@@ -12,7 +12,7 @@ import fastifyMultipart from "@fastify/multipart"
 export const app = fastify()
 
 app.register(cors, {
-    origin: ['http://localhost:5173'], // ajuste conforme a URL do seu front-end
+    origin: ['http://localhost:5173', 'http://localhost'], // ajuste conforme a URL do seu front-end
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // cabeçalhos permitidos
   });

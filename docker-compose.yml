@@ -1,0 +1,74 @@
+services:
+
+# Banco de dados postgres
+  database:
+    image: bitnami/postgresql:latest
+    env_file: 
+      - ./projeto-contab-01/.env
+    container_name: myapp-database-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    networks:
+      - myapp-network
+
+# Backend Node.js/TypeScript
+  backend:
+    env_file:
+      - projeto-contab-01/.env
+    build:
+      context: ./projeto-contab-01
+      dockerfile: Dockerfile
+      target: builder  # Usa apenas o stage de build para dev
+    container_name: myapp-backend-dev
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+      - "9229:9229"  # Porta para debug do Node.js
+    volumes:
+      # Monta o código para hot reload
+      - ./projeto-contab-01:/app
+      # Previne sobrescrever node_modules do container
+      - /app/node_modules
+      # Persiste o cache do TypeScript
+      - typescript_cache:/app/.tscache
+    command: npm run start:dev
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - myapp-network
+
+  frontend:
+    build:
+      context: ./front-projeto-contab-01
+      dockerfile: Dockerfile
+      target: builder
+      # Remove args - não precisa em dev!
+    container_name: myapp-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    # Remove env_file - Vite usa o .env local!
+    volumes:
+      # ✅ Caminho correto!
+      - ./front-projeto-contab-01:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - backend
+    networks:
+      - myapp-network
+
+volumes:
+  postgres_data:
+    name: myapp_postgres_data_dev
+  typescript_cache:
+    name: myapp_typescript_cache
+
+networks:
+  myapp-network:
+    name: myapp_network_dev
+    driver: bridge
